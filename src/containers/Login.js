@@ -100,7 +100,7 @@ export default class Login extends Component {
         return (
             <>
                 {authState === "loading" && (<p className="aside ~info my-4">Loading...</p>)}
-                {authState === "signIn" && (
+                {(authState === "signIn" || authState === "loading") && (
                     <>
                         <button className="button !normal ~neutral my-4" onClick={() => {
                             Auth.federatedSignIn({ provider: 'Google' });

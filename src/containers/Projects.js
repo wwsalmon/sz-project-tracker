@@ -1,3 +1,69 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { API, graphqlOperation, Auth } from 'aws-amplify';
+
+export default function Projects() {
+    const history = useHistory();
+    const [isLoading, setIsLoading] = useState(true);
+    const [projects, setProjects] = useState([]);
+
+    const query = `
+    query {
+        listProjects{
+        items{
+            id
+            name      
+        }
+        }
+    }
+    `
+
+    useEffect(() => {
+        function loadProjects() {
+            return API.graphql(graphqlOperation(query));
+        }
+
+        async function onLoad() {
+            try{
+                console.log("checking authentication");
+                await Auth.currentAuthenticatedUser();
+                console.log("authenticated");
+            }
+            catch (e){
+                console.log(e);
+                history.push("/");
+            }
+            const projects = await loadProjects();
+            setProjects(projects);
+            setIsLoading(false);
+        }
+
+        onLoad();
+    }, []);
+
+    return (
+        <div>
+            {isLoading && (
+                <p className="aside">Loading...</p>
+            )}
+            {!isLoading && (
+                <>
+                    <button className="button !normal ~neutral my-4">New Project</button>
+                    <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3">
+                        {projects.data.listProjects.items.map((project) => (
+                            <div key={project.id} className="card border">
+                                <Link to={`/projects/${project.id}`}><p>{project.name}</p></Link>
+                                <button className="button">Delete</button>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
+    )
+}
+
+
 // render() {
 //     const { authState } = this.state;
 //     return (

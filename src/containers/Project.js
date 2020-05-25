@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { API, graphqlOperation} from "aws-amplify";
+import { useParams, useHistory } from "react-router-dom";
+import { API, graphqlOperation, Auth } from "aws-amplify";
 
 export default function Notes() {
     const { id } = useParams();
-    // const history = useHistory();
+    const history = useHistory();
     const [projName, setProjName] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -22,10 +22,22 @@ export default function Notes() {
             return API.graphql(graphqlOperation(query));
         }
 
-        async function onLoad(){
+        async function onLoad() {
+            try {
+                console.log("checking authentication");
+                await Auth.currentAuthenticatedUser();
+                console.log("authenticated");
+            }
+            catch (e) {
+                console.log(e);
+                history.push("/");
+            }
+
             try{
+                console.log("looking for project");
                 const project = await loadProject();
-                setProjName(project.name);
+                console.log("found project", project);
+                setProjName(project.data.getProject.name);
                 setIsLoading(false);
             }
             catch (e){
@@ -41,7 +53,7 @@ export default function Notes() {
             {isLoading && (
                 <p className="aside">Loading...</p>
             )}
-            {projName && (
+            {!isLoading && (
                 <h1 className="heading">{projName}</h1>
             )}
         </div>
