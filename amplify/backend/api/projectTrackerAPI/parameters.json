@@ -1,0 +1,11 @@
+{
+    "AppSyncApiName": "projectTrackerAPI",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": "false",
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authprojecttracker46100bbc",
+            "Outputs.UserPoolId"
+        ]
+    }
+}
