@@ -1,27 +1,30 @@
 import React, { Component } from 'react';
 import { Auth } from 'aws-amplify';
+import { Link } from 'react-router-dom';
 
 export default class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isLoading: true,
             authState: "loading",
-            username: "sztest",
+            username: "wwsalmon",
             password: "Passw0rd!",
             code: ""
         };
         this.handleFieldUsername = this.handleFieldUsername.bind(this);
         this.handleFieldPassword = this.handleFieldPassword.bind(this);
         this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
+        this.handleFieldCode = this.handleFieldCode.bind(this);
+        this.handleConfirmSubmit = this.handleConfirmSubmit.bind(this);
     }
 
     componentDidMount() {
         Auth.currentAuthenticatedUser().then(() => {
-            this.setState({ authState: "signedIn" });
-            this.loadProjects();
+            this.setState({ isLoading: false, authState: "signedIn" });
         }).catch(e => {
             console.log(e);
-            this.setState({ authState: "signIn" })
+            this.setState({ isLoading: false, authState: "signIn" })
         })
     }
 
@@ -33,21 +36,47 @@ export default class Login extends Component {
         this.setState({ password: e.target.value });
     }
 
+    handleFieldCode(e) {
+        this.setState({ code: e.target.value });
+    }
+
     async handleLoginSubmit(e) {
         e.preventDefault();
         this.signIn();
     }
 
+    async handleConfirmSubmit(e) {
+        e.preventDefault();
+        this.confirmSignUp();
+    }
+
+    async confirmSignUp() {
+        const { username, code } = this.state;
+        this.setState({ isLoading: true });
+        try {
+            await Auth.confirmSignUp(username, code);
+            this.setState({ isLoading: false, authState: "signedIn" });
+        } catch (error) {
+            this.setState({ isLoading: false });
+            console.log('error confirming sign up', error);
+        }
+    }
+
     async signIn() {
-        this.setState({ authState: "loading" });
+        this.setState({ isLoading: true });
         const { username, password } = this.state;
         try {
             await Auth.signIn(username, password).then(() => {
-                this.setState({ authState: "signedIn" });
+                this.setState({ isLoading: false, authState: "signedIn" });
             });
         } catch (error) {
-            console.log('error signing in', error);
-            this.setState({ authState: "signIn" });
+            if (error.code === "UserNotConfirmedException"){
+                this.setState({isLoading: false, authState: "confirm"});
+            }
+            else {
+                console.log('error signing in', error);
+                this.setState({ isLoading: false, authState: "signIn" });
+            }
         }
     }
 
@@ -61,50 +90,17 @@ export default class Login extends Component {
         }
     }
 
-    async resendConfirmationCode() {
-        const { username } = this.state;
-        try {
-            await Auth.resendSignUp(username);
-            console.log('code resent succesfully');
-        } catch (err) {
-            console.log('error resending code: ', err);
-        }
-    }
-
-    async signUp() {
-        const { username, password, email } = this.state;
-        try {
-            const user = await Auth.signUp({
-                username, password,
-                attributes: {
-                    email,
-                }
-            });
-            console.log({ user })
-        } catch (error) {
-            console.log('error signing up: ', error);
-        }
-    }
-
-    async confirmSignUp() {
-        const { username, code } = this.state;
-        try {
-            await Auth.confirmSignUp(username, code);
-        } catch (error) {
-            console.log('error confirming sign up', error);
-        }
-    }
-
     render() {
-        const { authState } = this.state;
+        const { authState, isLoading } = this.state;
         return (
             <>
-                {authState === "loading" && (<p className="aside ~info my-4">Loading...</p>)}
-                {(authState === "signIn" || authState === "loading") && (
+                {isLoading && (<p className="aside ~info my-4">Loading...</p>)}
+                {authState === "signIn" && (
                     <>
                         <button className="button !normal ~neutral my-4" onClick={() => {
                             Auth.federatedSignIn({ provider: 'Google' });
                         }}>Sign in with Google</button>
+                        <Link to="/signup"><button className="button !high ~neutral my-4">Sign up</button></Link>
                         <h3>Or, login with username</h3>
                         <form onSubmit={this.handleLoginSubmit}>
                             <p className="label">Username:</p>
@@ -118,7 +114,18 @@ export default class Login extends Component {
                 {authState === "signedIn" && (
                     <>
                         <p className="aside ~info my-4">Logged in!</p>
-                        <button className="button !normal ~neutral my-4" onClick={() => this.signOut()}>Log out</button>
+                        <button className="button !normal ~neutral my-4" onClick={this.signOut}>Log out</button>
+                        <Link to="/projects"><button className="button !high ~neutral my-4">Go to projects</button></Link>
+                    </>
+                )}
+                {authState === "confirm" && (
+                    <>
+                        <h3>Confirm your account</h3>
+                        <form onSubmit={this.handleConfirmSubmit}>
+                            <p className="label">Enter the code sent to your email.</p>
+                            <input type="text" className="field ~neutral !normal w-auto my-1" value={this.state.code} onChange={this.handleFieldCode}></input>
+                            <input type="submit" className="button field w-auto block my-4"></input>
+                        </form>
                     </>
                 )}
             </>

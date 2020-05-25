@@ -17,27 +17,36 @@ export default function Projects() {
         }
     }
     `
+    function loadProjects() {
+        return API.graphql(graphqlOperation(query));
+    }
+
+    async function signOut() {
+        try {
+            await Auth.signOut();
+            history.push("/login")
+        }
+        catch (error) {
+            console.log('error signing out: ', error);
+        }
+    }
+
+    async function onLoad() {
+        try {
+            console.log("checking authentication");
+            await Auth.currentAuthenticatedUser();
+            console.log("authenticated");
+        }
+        catch (e) {
+            console.log(e);
+            history.push("/login");
+        }
+        const projects = await loadProjects();
+        setProjects(projects);
+        setIsLoading(false);
+    }
 
     useEffect(() => {
-        function loadProjects() {
-            return API.graphql(graphqlOperation(query));
-        }
-
-        async function onLoad() {
-            try{
-                console.log("checking authentication");
-                await Auth.currentAuthenticatedUser();
-                console.log("authenticated");
-            }
-            catch (e){
-                console.log(e);
-                history.push("/");
-            }
-            const projects = await loadProjects();
-            setProjects(projects);
-            setIsLoading(false);
-        }
-
         onLoad();
     }, []);
 
@@ -49,6 +58,7 @@ export default function Projects() {
             {!isLoading && (
                 <>
                     <button className="button !normal ~neutral my-4">New Project</button>
+                    <button className="button !normal ~neutral my-4" onClick={() => signOut()}>Log out</button>
                     <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3">
                         {projects.data.listProjects.items.map((project) => (
                             <div key={project.id} className="card border">
