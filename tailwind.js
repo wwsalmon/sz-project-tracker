@@ -1,5 +1,7 @@
 module.exports = {
-  purge: [],
+  purge: [
+    "./src/App.js"
+  ],
   target: 'relaxed',
   prefix: '',
   important: false,
