@@ -17,6 +17,7 @@ export default class Login extends Component {
         this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
         this.handleFieldCode = this.handleFieldCode.bind(this);
         this.handleConfirmSubmit = this.handleConfirmSubmit.bind(this);
+        this.signOut = this.signOut.bind(this);
     }
 
     componentDidMount() {

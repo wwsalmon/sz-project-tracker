@@ -1,7 +1,7 @@
 type Project @model @auth(rules: [{allow: owner}]) {
   id: ID!
   name: String!
-  events: [Event]
+  events: [Event]!
 }
 
 type Event @model @auth(rules: [{allow: owner}]) {
