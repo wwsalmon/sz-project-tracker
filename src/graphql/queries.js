@@ -7,15 +7,17 @@ export const getProject = /* GraphQL */ `
       id
       name
       events {
-        eventID
+        id
         projectID
         time
         note
         createdAt
         updatedAt
+        owner
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -30,15 +32,17 @@ export const listProjects = /* GraphQL */ `
         id
         name
         events {
-          eventID
+          id
           projectID
           time
           note
           createdAt
           updatedAt
+          owner
         }
         createdAt
         updatedAt
+        owner
       }
       nextToken
     }
@@ -47,12 +51,13 @@ export const listProjects = /* GraphQL */ `
 export const getEvent = /* GraphQL */ `
   query GetEvent($id: ID!) {
     getEvent(id: $id) {
-      eventID
+      id
       projectID
       time
       note
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -64,12 +69,13 @@ export const listEvents = /* GraphQL */ `
   ) {
     listEvents(filter: $filter, limit: $limit, nextToken: $nextToken) {
       items {
-        eventID
+        id
         projectID
         time
         note
         createdAt
         updatedAt
+        owner
       }
       nextToken
     }

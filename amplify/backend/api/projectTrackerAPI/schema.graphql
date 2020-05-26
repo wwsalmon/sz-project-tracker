@@ -5,28 +5,8 @@ type Project @model @auth(rules: [{allow: owner}]) {
 }
 
 type Event @model @auth(rules: [{allow: owner}]) {
-  eventID: String!
+  id: ID!
   projectID: String!
-  time: String!
+  time: AWSDate!
   note: String!
 }
-
-# type Task 
-#   @model 
-#   @auth(rules: [
-#       {allow: groups, groups: ["Managers"], queries: null, mutations: [create, update, delete]},
-#       {allow: groups, groups: ["Employees"], queries: [get, list], mutations: null}
-#     ])
-# {
-#   id: ID!
-#   title: String!
-#   description: String
-#   status: String
-# }
-# type PrivateNote
-#   @model
-#   @auth(rules: [{allow: owner}])
-# {
-#   id: ID!
-#   content: String!
-# }

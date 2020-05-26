@@ -10,15 +10,17 @@ export const createProject = /* GraphQL */ `
       id
       name
       events {
-        eventID
+        id
         projectID
         time
         note
         createdAt
         updatedAt
+        owner
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -31,15 +33,17 @@ export const updateProject = /* GraphQL */ `
       id
       name
       events {
-        eventID
+        id
         projectID
         time
         note
         createdAt
         updatedAt
+        owner
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -52,15 +56,17 @@ export const deleteProject = /* GraphQL */ `
       id
       name
       events {
-        eventID
+        id
         projectID
         time
         note
         createdAt
         updatedAt
+        owner
       }
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -70,12 +76,13 @@ export const createEvent = /* GraphQL */ `
     $condition: ModelEventConditionInput
   ) {
     createEvent(input: $input, condition: $condition) {
-      eventID
+      id
       projectID
       time
       note
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -85,12 +92,13 @@ export const updateEvent = /* GraphQL */ `
     $condition: ModelEventConditionInput
   ) {
     updateEvent(input: $input, condition: $condition) {
-      eventID
+      id
       projectID
       time
       note
       createdAt
       updatedAt
+      owner
     }
   }
 `;
@@ -100,12 +108,13 @@ export const deleteEvent = /* GraphQL */ `
     $condition: ModelEventConditionInput
   ) {
     deleteEvent(input: $input, condition: $condition) {
-      eventID
+      id
       projectID
       time
       note
       createdAt
       updatedAt
+      owner
     }
   }
 `;

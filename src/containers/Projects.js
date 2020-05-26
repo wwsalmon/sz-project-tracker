@@ -68,7 +68,7 @@ export default function Projects() {
         }
         catch (error) {
             setIsLoading(false);
-            console.log(e);
+            console.log(error);
         }
     }
 
