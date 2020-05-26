@@ -1,7 +1,6 @@
 import React, { Component } from "react";
-import {withRouter} from 'react-router-dom';
 import { Auth } from 'aws-amplify';
-import { Link } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 class SignUp extends Component {
     constructor(props) {
@@ -19,6 +18,7 @@ class SignUp extends Component {
         this.handleFieldPassword = this.handleFieldPassword.bind(this);
         this.handleFieldCode = this.handleFieldPassword.bind(this);
         this.handleSignUpSubmit = this.handleSignUpSubmit.bind(this);
+        this.handleConfirmSubmit = this.handleConfirmSubmit.bind(this);
         this.history = this.props.history;
     }
 
@@ -81,15 +81,7 @@ class SignUp extends Component {
             this.setState({ isLoading: false, authState: "confirm" })
         } catch (error) {
             if (error.code === "UsernameExistsException"){
-                try {
-                    await Auth.verifyCurrentUserAttribute('email');
-                    console.log("...success?");
-                } catch(error){
-                    console.log(error);
-                    if (error.code === "UserNotConfirmedException") {
-                        this.setState({ isLoading: false, authState: "confirm" })
-                    }
-                }
+                this.history.push("/login")
             } else {
                 this.setState({ isLoading: false });
                 console.log('error signing up: ', error);

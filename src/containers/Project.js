@@ -7,6 +7,7 @@ export default function Notes() {
     const history = useHistory();
     const [projName, setProjName] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isInit, setIsInit] = useState(false);
 
     const query = `
         query {
@@ -39,6 +40,7 @@ export default function Notes() {
                 console.log("found project", project);
                 setProjName(project.data.getProject.name);
                 setIsLoading(false);
+                setIsInit(true);
             }
             catch (e){
                 console.log(e);
@@ -50,10 +52,10 @@ export default function Notes() {
 
     return (
         <div>
-            {isLoading && (
-                <p className="aside">Loading...</p>
-            )}
-            {!isLoading && (
+            {/* {isLoading && (
+                <p className="aside ~info">Loading...</p>
+            )} */}
+            {isInit && (
                 <h1 className="heading">{projName}</h1>
             )}
         </div>

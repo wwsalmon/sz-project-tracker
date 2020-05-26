@@ -4,7 +4,7 @@ import { Route, Switch } from "react-router-dom";
 import Home from "./containers/Home";
 import Login from "./containers/Login";
 import SignUp from "./containers/SignUp";
-// import NewProject from "./containers/NewProject";
+import NewProject from "./containers/NewProject";
 import Project from "./containers/Project";
 import Projects from "./containers/Projects";
 
@@ -22,12 +22,10 @@ export default function Routes() {
             </Route>
             <Route exact path="/projects">
                 <Projects />
-            </Route>
-            {/*
+            </Route>           
             <Route exact path="/projects/new">
                 <NewProject />
             </Route>
-            */}
             <Route exact path="/projects/:id">
                 <Project />
             </Route>

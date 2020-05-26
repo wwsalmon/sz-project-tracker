@@ -5,9 +5,10 @@ import { API, graphqlOperation, Auth } from 'aws-amplify';
 export default function Projects() {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(true);
+    const [isInit, setIsInit] = useState(false);
     const [projects, setProjects] = useState([]);
 
-    const query = `
+    const listQuery = `
     query {
         listProjects{
         items{
@@ -18,7 +19,7 @@ export default function Projects() {
     }
     `
     function loadProjects() {
-        return API.graphql(graphqlOperation(query));
+        return API.graphql(graphqlOperation(listQuery));
     }
 
     async function signOut() {
@@ -44,6 +45,31 @@ export default function Projects() {
         const projects = await loadProjects();
         setProjects(projects);
         setIsLoading(false);
+        setIsInit(true);
+    }
+
+    async function deleteProject(e, projectID) {
+        e.preventDefault();
+        setIsLoading(true);
+        const deleteQuery = `
+            mutation {
+                deleteProject(input: {
+                    id: "${projectID}"
+                }){
+                    name id
+                }
+            }
+        `
+        try {
+            await API.graphql(graphqlOperation(deleteQuery));
+            const projects = await loadProjects();
+            setIsLoading(false);
+            setProjects(projects);
+        }
+        catch (error) {
+            setIsLoading(false);
+            console.log(e);
+        }
     }
 
     useEffect(() => {
@@ -52,18 +78,18 @@ export default function Projects() {
 
     return (
         <div>
-            {isLoading && (
-                <p className="aside">Loading...</p>
-            )}
-            {!isLoading && (
+            {/* {isLoading && (
+                <p className="aside ~info">Loading...</p>
+            )} */}
+            {isInit && (
                 <>
-                    <button className="button !normal ~neutral my-4">New Project</button>
+                    <Link to="/projects/new"><button className="button !normal ~neutral my-4">New Project</button></Link>
                     <button className="button !normal ~neutral my-4" onClick={() => signOut()}>Log out</button>
                     <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3">
                         {projects.data.listProjects.items.map((project) => (
                             <div key={project.id} className="card border">
                                 <Link to={`/projects/${project.id}`}><p>{project.name}</p></Link>
-                                <button className="button">Delete</button>
+                                <button className="button" onClick={(e) => deleteProject(e, project.id)}>Delete</button>
                             </div>
                         ))}
                     </div>
