@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { API, graphqlOperation, Auth } from "aws-amplify";
+import TextareaAutoresize from 'react-textarea-autosize';
 import Moment from 'react-moment';
 
 export default function Notes() {
     const { id } = useParams();
     const history = useHistory();
     const [projName, setProjName] = useState(null);
-    const [newNote, setNewNote] = useState("");
+    const [newNote, setNewNote] = useState("Write a new update here...");
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
@@ -119,15 +120,17 @@ mutation {
                     <hr className="sep"></hr>
                     <form onSubmit={handleCreateEvent}>
                         <p className="label">Event Note:</p>
-                        <textarea rows="8" className="textarea field ~neutral !normal my-1" value={newNote} onChange={(e) => setNewNote(e.target.value)}></textarea>
+                        <TextareaAutoresize style={{outline: "none", resize: "none"}} className="my-1 w-full" value={newNote} onChange={(e) => setNewNote(e.target.value)}></TextareaAutoresize>
                         <input type="submit" value="Create Event" className="button field w-auto block my-4"></input>
                     </form>
                     <hr className="sep"></hr>
                     {events.map(event => (
-                        <div key={event.id} className="card border">
-                            <p><Moment format="dddd, MMMM D, h:mm a">{event.time}</Moment></p>
-                            <p>{event.note}</p>
-                            <button className="button" onClick={(e) => handleDeleteEvent(e, event.id)}>Delete</button>
+                        <div key={event.id} className="flex py-4 hover:bg-gray-100 rounded">
+                                <p className="w-64"><Moment format="dddd, MMMM D, h:mm a">{event.time}</Moment></p>
+                                <div>
+                                    <p>{event.note}</p>
+                                    <button className="button" onClick={(e) => handleDeleteEvent(e, event.id)}>Delete</button>                                    
+                                </div>
                         </div>
                     ))}
                 </>
