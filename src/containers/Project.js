@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, Link } from "react-router-dom";
 import { API, graphqlOperation, Auth } from "aws-amplify";
-import Moment from 'react-moment';
+import { toDate, format } from 'date-fns';
 
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
@@ -19,6 +19,7 @@ export default function Notes() {
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
+    let currDate = "initial"; // for loop later on
 
     function loadProject() {
         const query = `
@@ -65,8 +66,7 @@ query {
             const events = await loadEvents();
             const sortedEvents = events.data.listEvents.items.sort((a,b)=>{
                 return new Date(b.time) - new Date(a.time);
-            }
-            )
+            });
             setEvents(sortedEvents);
             setIsLoading(false);
             setIsInit(true);
@@ -135,10 +135,11 @@ mutation {
             )} */}
             {isInit && (
                 <>
+                    <Link to="/projects"><button className="button ~neutral !normal my-4">Back to all projects</button></Link>
                     <h1 className="heading">{projName}</h1>
                     <hr className="sep"></hr>
                     <form onSubmit={handleCreateEvent}>
-                        <p className="label">Event Note:</p>
+                        <p className="label my-4">Create New Update</p>
                         <SimpleMDE
                             value={newNote}
                             onChange={setNewNote}
@@ -146,16 +147,27 @@ mutation {
                                 spellChecker: false
                             }}
                         />
-                        <input type="submit" value="Create Event" className="button field w-auto block my-4"></input>
+                        <input type="submit" value="Create Update" className="button field w-auto block my-4"></input>
                     </form>
                     <hr className="sep"></hr>
-                    {events.map(event => (
-                        <div key={event.id} className="md:flex py-4 hover:bg-gray-100 rounded">
-                                <p className="w-64 supra flex-none"><Moment format="dddd, MMMM D, h:mm a">{event.time}</Moment></p>
+                    {events.map((event, i, arr) => (
+                        <div key={event.id}>
+                            { 
+                                (i == 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") != format(new Date(event.time), "yyyy-MM-dd")) && (
+                                    <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
+                                )
+                            }
+                            <hr></hr>
+                            <div className="md:flex py-8 hover:bg-gray-100 rounded">
+                                <p className="w-32 supra flex-none">{
+                                format(new Date(event.time), "h:mm a")
+                                }</p>
                                 <div className="content">
                                     {Parser(markdownConverter.makeHtml(event.note))}
-                                    <button className="button" onClick={(e) => handleDeleteEvent(e, event.id)}>Delete</button>                                    
+                                    <button className="button" onClick={(e) => handleDeleteEvent(e, event.id)}>Delete</button>
                                 </div>
+                            </div>
+
                         </div>
                     ))}
                 </>
