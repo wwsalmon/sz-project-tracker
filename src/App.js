@@ -3,7 +3,7 @@ import Routes from "./Routes";
 
 export default function App() {
   return(
-    <div className="max-w-6xl mx-auto px-2">
+    <div className="max-w-6xl mx-auto px-4">
       <Routes />
     </div>
   )

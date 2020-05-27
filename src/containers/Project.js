@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { API, graphqlOperation, Auth } from "aws-amplify";
-import TextareaAutoresize from 'react-textarea-autosize';
 import Moment from 'react-moment';
+
+import * as Showdown from "showdown";
+import Parser from 'html-react-parser';
+
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
+import "./Project.css";
 
 export default function Notes() {
     const { id } = useParams();
     const history = useHistory();
     const [projName, setProjName] = useState(null);
     const [newNote, setNewNote] = useState("Write a new update here...");
+    const [mdeTab, setMdeTab] = useState("write");
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
@@ -56,7 +63,11 @@ query {
             const project = await loadProject();
             setProjName(project.data.getProject.name);
             const events = await loadEvents();
-            setEvents(events.data.listEvents.items);
+            const sortedEvents = events.data.listEvents.items.sort((a,b)=>{
+                return new Date(b.time) - new Date(a.time);
+            }
+            )
+            setEvents(sortedEvents);
             setIsLoading(false);
             setIsInit(true);
         }
@@ -67,10 +78,11 @@ query {
 
     async function handleCreateEvent(e){
         e.preventDefault();
+        console.log(newNote);
         let currentDate = new Date();
         const newNoteQuery = `
 mutation {
-  createEvent(input: {projectID: "${id}", time: "${currentDate.toISOString()}", note: "${newNote}"}) {
+  createEvent(input: {projectID: "${id}", time: "${currentDate.toISOString()}", note: """${newNote}"""}) {
     id
     note
     time
@@ -109,6 +121,13 @@ mutation {
         onLoad();
     }, [id]);
 
+    const markdownConverter = new Showdown.Converter({
+        tables: true,
+        simplifiedAutoLink: true,
+        strikethrough: true,
+        tasklists: true
+    });
+
     return (
         <div>
             {/* {isLoading && (
@@ -120,15 +139,21 @@ mutation {
                     <hr className="sep"></hr>
                     <form onSubmit={handleCreateEvent}>
                         <p className="label">Event Note:</p>
-                        <TextareaAutoresize style={{outline: "none", resize: "none"}} className="my-1 w-full" value={newNote} onChange={(e) => setNewNote(e.target.value)}></TextareaAutoresize>
+                        <SimpleMDE
+                            value={newNote}
+                            onChange={setNewNote}
+                            options={{
+                                spellChecker: false
+                            }}
+                        />
                         <input type="submit" value="Create Event" className="button field w-auto block my-4"></input>
                     </form>
                     <hr className="sep"></hr>
                     {events.map(event => (
-                        <div key={event.id} className="flex py-4 hover:bg-gray-100 rounded">
-                                <p className="w-64"><Moment format="dddd, MMMM D, h:mm a">{event.time}</Moment></p>
-                                <div>
-                                    <p>{event.note}</p>
+                        <div key={event.id} className="md:flex py-4 hover:bg-gray-100 rounded">
+                                <p className="w-64 supra flex-none"><Moment format="dddd, MMMM D, h:mm a">{event.time}</Moment></p>
+                                <div className="content">
+                                    {Parser(markdownConverter.makeHtml(event.note))}
                                     <button className="button" onClick={(e) => handleDeleteEvent(e, event.id)}>Delete</button>                                    
                                 </div>
                         </div>
