@@ -14,8 +14,8 @@ export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
     const [newFiles, setNewFiles] = useState([]);
 
-    const [showNote, setShowNote] = useState(true);
-    const [showUpload, setShowUpload] = useState(true);
+    const [showNote, setShowNote] = useState(false);
+    const [showUpload, setShowUpload] = useState(false);
     const [showAudio, setShowAudio] = useState(false);
     const [showVideo, setShowVideo] = useState(false);
 
@@ -127,8 +127,8 @@ mutation {
             </div>
             <hr></hr>
             <div className="flex">
-                <button onClick={handleCreateEvent} disabled={!canSubmit} className="button field w-auto block my-4">Create Update</button>
-                <button onClick={handleCreateEvent} disabled={!canSubmit} className=" mx-4 button ~info !low w-auto block my-4">Create Update & Post to Twitter</button>
+                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="button field w-auto block my-4">Create Update</button>
+                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className=" mx-4 button ~info !low w-auto block my-4">Create Update & Post to Twitter</button>
             </div>
         </div>
     )

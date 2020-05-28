@@ -22,16 +22,6 @@ export default function Projects() {
         return API.graphql(graphqlOperation(listQuery));
     }
 
-    async function signOut() {
-        try {
-            await Auth.signOut();
-            history.push("/login")
-        }
-        catch (error) {
-            console.log('error signing out: ', error);
-        }
-    }
-
     async function onLoad() {
         try {
             console.log("checking authentication");
@@ -84,7 +74,6 @@ export default function Projects() {
             {isInit && (
                 <>
                     <Link to="/projects/new"><button className="button !normal ~neutral my-4">New Project</button></Link>
-                    <button className="button !normal ~neutral my-4" onClick={() => signOut()}>Log out</button>
                     <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3">
                         {projects.data.listProjects.items.map((project) => (
                             <div key={project.id} className="card border">

@@ -92,11 +92,11 @@ export default function Project() {
                     <hr className="sep"></hr>
 
                     {showHidden ? (
-                        <button class="button ml-auto block ~neutral my-4" onClick={() => setShowHidden(false)}>Hide x updates marked "hidden"</button>
+                        <button className="button ml-auto block ~neutral my-4" onClick={() => setShowHidden(false)}>Hide x updates marked "hidden"</button>
                     ) : (
                         <div className="aside align-center ~info flex">
                             <span className="leading-8">x updates hidden.</span>
-                            <button class="button ml-auto bg-transparent" onClick={() => setShowHidden(true)}>Show</button>
+                            <button className="button ml-auto bg-transparent" onClick={() => setShowHidden(true)}>Show</button>
                         </div>
                     )}
 

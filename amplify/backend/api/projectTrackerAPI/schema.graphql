@@ -9,6 +9,7 @@ type Event @model @auth(rules: [{allow: owner}]) {
   project: Project! @connection(name: "ProjectEvents")
   time: AWSDateTime!
   note: String
+  hidden: boolean!
   filenames: [String!]
   audio: String
   video: String
