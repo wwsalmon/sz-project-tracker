@@ -15,8 +15,8 @@ export default function Project() {
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
-    const [showHidden, setShowHidden] = useState(true);
-    const [numHidden, setNumHidden] = useState(0);
+    const [showPrivate, setShowPrivate] = useState(true);
+    const [numPrivate, setNumPrivate] = useState(0);
     let projectData;
 
     function loadProject() {
@@ -57,7 +57,7 @@ export default function Project() {
             const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
                 return new Date(b.time) - new Date(a.time);
             });
-            setNumHidden(sortedEvents.filter(event => event.hidden).length);
+            setNumPrivate(sortedEvents.filter(event => event.hidden).length);
             setEvents(sortedEvents);
             setIsLoading(false);
             setIsInit(true);
@@ -72,7 +72,7 @@ export default function Project() {
     }
 
     function changeHiddenLocal(eventID, hide) {
-        setNumHidden(hide ? numHidden + 1 : numHidden - 1);
+        setNumPrivate(hide ? numPrivate + 1 : numPrivate - 1);
     }
 
     // breaks a lot of things, just gonna not use it for now
@@ -99,16 +99,16 @@ export default function Project() {
                     <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}></ProjectNewEvent>
                     <hr className="sep"></hr>
 
-                    {showHidden ? (
-                        <button className="button ml-auto block ~neutral my-4" disabled={numHidden === 0} onClick={() => setShowHidden(false)}>Hide {numHidden} {numHidden === 1 ? "update" : "updates"} marked "hidden"</button>
+                    {showPrivate ? (
+                        <button className="button ml-auto block ~neutral my-4" disabled={numPrivate === 0} onClick={() => setShowPrivate(false)}>Show only public updates</button>
                     ) : (
-                        <div className="aside align-center ~info flex">
-                            <span className="leading-8">{numHidden} {numHidden === 1 ? "update" : "updates"} hidden.</span>
-                            <button className="button ml-auto bg-transparent" onClick={() => setShowHidden(true)}>Show</button>
+                        <div className="aside align-center ~info md:flex">
+                            <span className="leading-8">Showing only public updates</span>
+                                <button className="button ml-auto bg-transparent pl-0 underline" onClick={() => setShowPrivate(true)}>Show {numPrivate} private {numPrivate === 1 ? "update" : "updates"}</button>
                         </div>
                     )}
 
-                    <div className={showHidden ? "" : "projectsHideHidden"}>
+                    <div className={showPrivate ? "" : "projectsHidePrivate"}>
                     {events.map((event, i, arr) => 
                         (
                                 <div key={event.id}>

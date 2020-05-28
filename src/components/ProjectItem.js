@@ -11,12 +11,12 @@ import EventImage from "../components/EventImage";
 import { SRLWrapper } from "simple-react-lightbox";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisV, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faLock } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProjectItem(props) {
     const event = props.event;
     const [showOptions, setShowOptions] = useState(false);
-    const [isHidden, setIsHidden] = useState(event.hidden);
+    const [isPrivate, setIsPrivate] = useState(event.hidden);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
 
@@ -47,11 +47,11 @@ export default function ProjectItem(props) {
 
     async function handleToggleHidden(e){
         e.preventDefault();
-        changeHiddenLocal(event.id, !isHidden);
-        setIsHidden(!isHidden);
+        changeHiddenLocal(event.id, !isPrivate);
+        setIsPrivate(!isPrivate);
         const query = `
         mutation{
-            updateEvent(input: {id: "${event.id}", hidden: ${!isHidden}}){ id }
+            updateEvent(input: {id: "${event.id}", hidden: ${!isPrivate}}){ id }
         }
         `
         API.graphql(graphqlOperation(query)).then(res => console.log(res)).catch(e => console.log(e));
@@ -65,14 +65,14 @@ export default function ProjectItem(props) {
     });
 
     return (
-        <div className={isHidden ? "projectItemHidden" : ""}>
+        <div className={isPrivate ? "projectItemPrivate" : ""}>
             <hr></hr>
             <div className="md:flex py-8 hover:bg-gray-100 rounded relative">
                 <div className="w-32 flex-none flex md:block mb-4 md:mb-0">
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {isHidden && (<FontAwesomeIcon className="opacity-25 ml-2 md:ml-0 md:my-4" icon={faEyeSlash}></FontAwesomeIcon>)}
+                    {isPrivate && (<FontAwesomeIcon className="opacity-25 ml-2 md:ml-0 md:my-4" icon={faLock}></FontAwesomeIcon>)}
                 </div>
                 <div className="content mr-6 md:mr-0">
                     {Parser(markdownConverter.makeHtml(event.note))}
@@ -90,7 +90,7 @@ export default function ProjectItem(props) {
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left">Edit</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleHidden}>
-                            {isHidden ? "Show" : "Hide"}
+                            {isPrivate ? "Make public" : "Make private"}
                         </button>
                     </div>
                 )}
