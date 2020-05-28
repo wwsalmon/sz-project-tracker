@@ -65,16 +65,16 @@ export default function ProjectItem(props) {
     });
 
     return (
-        <div className={isHidden && "projectItemHidden"}>
+        <div className={isHidden ? "projectItemHidden" : ""}>
             <hr></hr>
             <div className="md:flex py-8 hover:bg-gray-100 rounded relative">
-                <div className="w-32 flex-none">
+                <div className="w-32 flex-none flex md:block mb-4 md:mb-0">
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {isHidden && (<FontAwesomeIcon className=" opacity-25 my-4" icon={faEyeSlash}></FontAwesomeIcon>)}
+                    {isHidden && (<FontAwesomeIcon className="opacity-25 ml-2 md:ml-0 md:my-4" icon={faEyeSlash}></FontAwesomeIcon>)}
                 </div>
-                <div className="content">
+                <div className="content mr-6 md:mr-0">
                     {Parser(markdownConverter.makeHtml(event.note))}
                     <SRLWrapper>
                         <div className="flex items-center">
@@ -84,7 +84,7 @@ export default function ProjectItem(props) {
                         </div>
                     </SRLWrapper>
                 </div>
-                <button className="ml-auto button self-start" onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
+                <button className="ml-auto button self-start absolute right-0 top-8 md:static" onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
                 {showOptions && (
                     <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border z-10">
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>

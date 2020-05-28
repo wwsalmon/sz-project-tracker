@@ -108,7 +108,7 @@ export default function Project() {
                         </div>
                     )}
 
-                    <div className={!showHidden && "projectsHideHidden"}>
+                    <div className={showHidden ? "" : "projectsHideHidden"}>
                     {events.map((event, i, arr) => 
                         (
                                 <div key={event.id}>

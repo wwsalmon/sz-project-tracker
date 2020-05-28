@@ -130,18 +130,21 @@ mutation {
                 onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
             ></FilePond.FilePond>
             )}
-            
-            <div className="flex my-4">
-                <button className={`button mr-2 ~neutral ${showNote ? "!low" : "!normal"}`} onClick={() => setShowNote(!showNote)}>{!showNote ? "Add Note" : "Remove Note"}</button>
-                <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
-                <button className={`button mx-2 ~neutral ${showAudio ? "!low" : "!normal"}`} onClick={() => setShowAudio(!showAudio)}>{!showAudio ? "Record Audio" : "Remove Audio"}</button>
-                <button className={`button mx-2 ~neutral ${showVideo ? "!low" : "!normal"}`} onClick={() => setShowVideo(!showVideo)}>{!showVideo ? "Record Video" : "Remove Video"}</button>
+            <div className="overflow-auto">
+                <div className="flex my-4">
+                    <button className={`button mr-2 ~neutral ${showNote ? "!low" : "!normal"}`} onClick={() => setShowNote(!showNote)}>{!showNote ? "Add Note" : "Remove Note"}</button>
+                    <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
+                    <button className={`button mx-2 ~neutral ${showAudio ? "!low" : "!normal"}`} onClick={() => setShowAudio(!showAudio)}>{!showAudio ? "Record Audio" : "Remove Audio"}</button>
+                    <button className={`button mx-2 ~neutral ${showVideo ? "!low" : "!normal"}`} onClick={() => setShowVideo(!showVideo)}>{!showVideo ? "Record Video" : "Remove Video"}</button>
+                </div>
             </div>
             <hr></hr>
-            <div className="flex">
-                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="button field w-auto block my-4 mr-2">Create Update</button>
-                {(canSubmit && (showNote || showUpload || showAudio || showVideo)) && (<button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">Cancel</button>)}
-                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="mx-4 button ~info !low w-auto block my-2">Create Update & Post to Twitter</button>
+            <div className="overflow-auto">
+                <div className="flex">
+                    <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="button field w-auto block my-4 mr-2">Create Update</button>
+                    {(canSubmit && (showNote || showUpload || showAudio || showVideo)) && (<button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">Cancel</button>)}
+                    <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="mx-4 button ~info !low w-auto block my-2">Create Update & Post to Twitter</button>
+                </div>
             </div>
         </div>
     )
