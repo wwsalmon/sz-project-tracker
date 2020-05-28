@@ -55,6 +55,14 @@ mutation {
         }
     }
 
+    async function handleCancelEvent(e) {
+        e.preventDefault();
+        setShowNote(false);
+        setShowUpload(false);
+        setShowAudio(false);
+        setShowVideo(false);
+    }
+
     function handleFilePondInit() {
         console.log("filepond init", pond);
     }
@@ -127,8 +135,9 @@ mutation {
             </div>
             <hr></hr>
             <div className="flex">
-                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="button field w-auto block my-4">Create Update</button>
-                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className=" mx-4 button ~info !low w-auto block my-4">Create Update & Post to Twitter</button>
+                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="button field w-auto block my-4 mr-2">Create Update</button>
+                {(canSubmit && (showNote || showUpload || showAudio || showVideo)) && (<button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">Cancel</button>)}
+                <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="mx-4 button ~info !low w-auto block my-2">Create Update & Post to Twitter</button>
             </div>
         </div>
     )

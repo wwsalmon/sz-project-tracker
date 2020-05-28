@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory, Link } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { API, graphqlOperation, Auth } from "aws-amplify";
 import { format } from 'date-fns';
 
@@ -85,7 +85,6 @@ export default function Project() {
             )} */}
             {isInit && (
                 <>
-                    <Link to="/projects"><button className="button ~neutral !normal my-4">Back to all projects</button></Link>
                     <h1 className="heading">{projName}</h1>
                     <hr className="sep"></hr>
                     <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}></ProjectNewEvent>

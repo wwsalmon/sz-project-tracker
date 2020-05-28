@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, {useState} from "react";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
 
@@ -10,7 +10,11 @@ import EventImage from "../components/EventImage";
 
 import { SRLWrapper } from "simple-react-lightbox";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+
 export default function ProjectItem(props) {
+    const [showOptions, setShowOptions] = useState(false);
     const removeLocal = props.removeLocal;
 
     async function handleDeleteEvent(e, eventID, filenames) {
@@ -48,7 +52,7 @@ export default function ProjectItem(props) {
     const event = props.event;
 
     return (
-        <div className="md:flex py-8 hover:bg-gray-100 rounded">
+        <div className="md:flex py-8 hover:bg-gray-100 rounded relative">
             <p className="w-32 supra flex-none">{
                 format(new Date(event.time), "h:mm a")
             }</p>
@@ -61,12 +65,15 @@ export default function ProjectItem(props) {
                         ))}
                     </div>
                 </SRLWrapper>
-                <div className="flex">
-                    <button className="button mr-2" onClick={(e) => handleDeleteEvent(e, event.id, event.filenames)}>Delete</button>
-                    <button className="button mx-2">Edit</button>
-                    <button className="button mx-2">Hide</button>
-                </div>
             </div>
+            <button className="ml-auto button self-start" onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
+            {showOptions && (
+                <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border">
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={(e) => handleDeleteEvent(e, event.id, event.filenames)}>Delete</button>
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left">Edit</button>
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left">Hide</button>
+                </div>
+            )}
         </div>
     )
 }

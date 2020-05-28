@@ -74,7 +74,8 @@ export default function Projects() {
             {isInit && (
                 <>
                     <Link to="/projects/new"><button className="button !normal ~neutral my-4">New Project</button></Link>
-                    <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3">
+                    <p className="label my-4">Active Projects</p>
+                    <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3 my-4">
                         {projects.data.listProjects.items.map((project) => (
                             <div key={project.id} className="card border">
                                 <Link to={`/projects/${project.id}`}><p>{project.name}</p></Link>
@@ -82,6 +83,8 @@ export default function Projects() {
                             </div>
                         ))}
                     </div>
+                    <hr className="my-16"></hr>
+                    <p className="label my-4">Archived</p>
                 </>
             )}
         </div>
