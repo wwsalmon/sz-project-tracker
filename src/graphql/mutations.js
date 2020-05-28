@@ -10,13 +10,16 @@ export const createProject = /* GraphQL */ `
       id
       name
       events {
-        id
-        projectID
-        time
-        note
-        createdAt
-        updatedAt
-        owner
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
       }
       createdAt
       updatedAt
@@ -33,13 +36,16 @@ export const updateProject = /* GraphQL */ `
       id
       name
       events {
-        id
-        projectID
-        time
-        note
-        createdAt
-        updatedAt
-        owner
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
       }
       createdAt
       updatedAt
@@ -56,13 +62,16 @@ export const deleteProject = /* GraphQL */ `
       id
       name
       events {
-        id
-        projectID
-        time
-        note
-        createdAt
-        updatedAt
-        owner
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
       }
       createdAt
       updatedAt
@@ -77,9 +86,19 @@ export const createEvent = /* GraphQL */ `
   ) {
     createEvent(input: $input, condition: $condition) {
       id
-      projectID
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        createdAt
+        updatedAt
+        owner
+      }
       time
       note
+      filenames
       createdAt
       updatedAt
       owner
@@ -93,9 +112,19 @@ export const updateEvent = /* GraphQL */ `
   ) {
     updateEvent(input: $input, condition: $condition) {
       id
-      projectID
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        createdAt
+        updatedAt
+        owner
+      }
       time
       note
+      filenames
       createdAt
       updatedAt
       owner
@@ -109,9 +138,19 @@ export const deleteEvent = /* GraphQL */ `
   ) {
     deleteEvent(input: $input, condition: $condition) {
       id
-      projectID
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        createdAt
+        updatedAt
+        owner
+      }
       time
       note
+      filenames
       createdAt
       updatedAt
       owner

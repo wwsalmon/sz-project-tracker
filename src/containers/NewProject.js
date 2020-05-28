@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Auth, API, graphqlOperation } from 'aws-amplify';
-import { withRouter, Link } from 'react-router-dom';
+import { API, graphqlOperation } from 'aws-amplify';
+import { withRouter } from 'react-router-dom';
 
 class NewProject extends Component{
     constructor(props){

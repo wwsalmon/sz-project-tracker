@@ -1,12 +1,13 @@
 type Project @model @auth(rules: [{allow: owner}]) {
   id: ID!
   name: String!
-  events: [Event]!
+  events: [Event!]! @connection(name: "ProjectEvents")
 }
 
 type Event @model @auth(rules: [{allow: owner}]) {
   id: ID!
-  projectID: String!
-  time: AWSDate!
+  project: Project! @connection(name: "ProjectEvents")
+  time: AWSDateTime!
   note: String!
+  filenames: [String!]
 }

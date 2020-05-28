@@ -7,13 +7,16 @@ export const onCreateProject = /* GraphQL */ `
       id
       name
       events {
-        id
-        projectID
-        time
-        note
-        createdAt
-        updatedAt
-        owner
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
       }
       createdAt
       updatedAt
@@ -27,13 +30,16 @@ export const onUpdateProject = /* GraphQL */ `
       id
       name
       events {
-        id
-        projectID
-        time
-        note
-        createdAt
-        updatedAt
-        owner
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
       }
       createdAt
       updatedAt
@@ -47,13 +53,16 @@ export const onDeleteProject = /* GraphQL */ `
       id
       name
       events {
-        id
-        projectID
-        time
-        note
-        createdAt
-        updatedAt
-        owner
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
       }
       createdAt
       updatedAt
@@ -65,9 +74,19 @@ export const onCreateEvent = /* GraphQL */ `
   subscription OnCreateEvent($owner: String!) {
     onCreateEvent(owner: $owner) {
       id
-      projectID
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        createdAt
+        updatedAt
+        owner
+      }
       time
       note
+      filenames
       createdAt
       updatedAt
       owner
@@ -78,9 +97,19 @@ export const onUpdateEvent = /* GraphQL */ `
   subscription OnUpdateEvent($owner: String!) {
     onUpdateEvent(owner: $owner) {
       id
-      projectID
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        createdAt
+        updatedAt
+        owner
+      }
       time
       note
+      filenames
       createdAt
       updatedAt
       owner
@@ -91,9 +120,19 @@ export const onDeleteEvent = /* GraphQL */ `
   subscription OnDeleteEvent($owner: String!) {
     onDeleteEvent(owner: $owner) {
       id
-      projectID
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        createdAt
+        updatedAt
+        owner
+      }
       time
       note
+      filenames
       createdAt
       updatedAt
       owner

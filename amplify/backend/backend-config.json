@@ -22,5 +22,11 @@
 				}
 			}
 		}
+	},
+	"storage": {
+		"projectTrackerUploads": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
+		}
 	}
 }

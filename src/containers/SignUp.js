@@ -72,7 +72,7 @@ class SignUp extends Component {
         const { username, password, email } = this.state;
         this.setState({isLoading: true});
         try {
-            const user = await Auth.signUp({
+            await Auth.signUp({
                 username, password,
                 attributes: {
                     email,
