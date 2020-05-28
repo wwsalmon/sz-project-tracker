@@ -11,7 +11,7 @@ import EventImage from "../components/EventImage";
 import { SRLWrapper } from "simple-react-lightbox";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisV, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faGlobe } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProjectItem(props) {
     const event = props.event;
@@ -67,12 +67,12 @@ export default function ProjectItem(props) {
     return (
         <div className={isPrivate ? "projectItemPrivate" : ""}>
             <hr></hr>
-            <div className="md:flex py-8 hover:bg-gray-100 rounded relative">
+            <div className={`md:flex py-8 ${isPrivate ? "hover:bg-gray-100" : "hover:bg-blue-100"} rounded relative`}>
                 <div className="w-32 flex-none flex md:block mb-4 md:mb-0">
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {isPrivate && (<FontAwesomeIcon className="opacity-25 ml-2 md:ml-0 md:my-4" icon={faLock}></FontAwesomeIcon>)}
+                    {!isPrivate && (<FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}></FontAwesomeIcon>)}
                 </div>
                 <div className="content mr-6 md:mr-0">
                     {Parser(markdownConverter.makeHtml(event.note))}
