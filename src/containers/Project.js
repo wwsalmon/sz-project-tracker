@@ -13,6 +13,7 @@ export default function Project() {
     const [events, setEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
+    const [showHidden, setShowHidden] = useState(true);
     let projectData;
 
     function loadProject() {
@@ -49,7 +50,7 @@ export default function Project() {
         try {
             projectData = await loadProject();
             setProjName(projectData.data.getProject.name);
-            const sortedEvents = projectData.data.getProject.events.items.sort((a,b)=>{
+            const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
                 return new Date(b.time) - new Date(a.time);
             });
             setEvents(sortedEvents);
@@ -61,7 +62,7 @@ export default function Project() {
         }
     }
 
-    function removeLocal(eventID){
+    function removeLocal(eventID) {
         setEvents(events.filter(event => event.id !== eventID));
     }
 
@@ -89,9 +90,19 @@ export default function Project() {
                     <hr className="sep"></hr>
                     <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}></ProjectNewEvent>
                     <hr className="sep"></hr>
+
+                    {showHidden ? (
+                        <button class="button ml-auto block ~neutral my-4" onClick={() => setShowHidden(false)}>Hide x updates marked "hidden"</button>
+                    ) : (
+                        <div className="aside align-center ~info flex">
+                            <span className="leading-8">x updates hidden.</span>
+                            <button class="button ml-auto bg-transparent" onClick={() => setShowHidden(true)}>Show</button>
+                        </div>
+                    )}
+
                     {events.map((event, i, arr) => (
                         <div key={event.id}>
-                            { 
+                            {
                                 (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
                                     <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
                                 )

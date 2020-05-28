@@ -13,7 +13,12 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
     const [newFiles, setNewFiles] = useState([]);
-    const [MDEUrl, SetMDEUrl] = useState("");
+
+    const [showNote, setShowNote] = useState(true);
+    const [showUpload, setShowUpload] = useState(true);
+    const [showAudio, setShowAudio] = useState(false);
+    const [showVideo, setShowVideo] = useState(false);
+
     const [canSubmit, setCanSubmit] = useState(true);
     const pond = useRef();
 
@@ -59,17 +64,20 @@ mutation {
     }
 
     return (
-        <form onSubmit={handleCreateEvent}>
+        <div>
             <p className="label my-4">Create New Update</p>
-            <SimpleMDE
-                value={newNote}
-                onChange={setNewNote}
-                options={{
-                    spellChecker: false,
-                    // uploadImage: true,
-                    // imageUploadFunction: handleMDEImageUpload
-                }}
-            />
+            {showNote && (
+                <SimpleMDE
+                    value={newNote}
+                    onChange={setNewNote}
+                    options={{
+                        spellChecker: false,
+                        // uploadImage: true,
+                        // imageUploadFunction: handleMDEImageUpload
+                    }}
+                />
+            )}
+            {showUpload && (
             <FilePond.FilePond server={
                 {
                     process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
@@ -109,7 +117,19 @@ mutation {
                 oninit={handleFilePondInit}
                 onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
             ></FilePond.FilePond>
-            <button type="submit" disabled={!canSubmit} value="Create Update" className="button field w-auto block my-4">Create Update</button>
-        </form>
+            )}
+            
+            <div className="flex my-4">
+                <button className={`button mr-2 ~neutral ${showNote ? "!low" : "!normal"}`} onClick={() => setShowNote(!showNote)}>{!showNote ? "Add Note" : "Remove Note"}</button>
+                <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
+                <button className={`button mx-2 ~neutral ${showAudio ? "!low" : "!normal"}`} onClick={() => setShowAudio(!showAudio)}>{!showAudio ? "Record Audio" : "Remove Audio"}</button>
+                <button className={`button mx-2 ~neutral ${showVideo ? "!low" : "!normal"}`} onClick={() => setShowVideo(!showVideo)}>{!showVideo ? "Record Video" : "Remove Video"}</button>
+            </div>
+            <hr></hr>
+            <div className="flex">
+                <button onClick={handleCreateEvent} disabled={!canSubmit} className="button field w-auto block my-4">Create Update</button>
+                <button onClick={handleCreateEvent} disabled={!canSubmit} className=" mx-4 button ~info !low w-auto block my-4">Create Update & Post to Twitter</button>
+            </div>
+        </div>
     )
 }

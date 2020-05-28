@@ -61,7 +61,11 @@ export default function ProjectItem(props) {
                         ))}
                     </div>
                 </SRLWrapper>
-                <button className="button" onClick={(e) => handleDeleteEvent(e, event.id, event.filenames)}>Delete</button>
+                <div className="flex">
+                    <button className="button mr-2" onClick={(e) => handleDeleteEvent(e, event.id, event.filenames)}>Delete</button>
+                    <button className="button mx-2">Edit</button>
+                    <button className="button mx-2">Hide</button>
+                </div>
             </div>
         </div>
     )
