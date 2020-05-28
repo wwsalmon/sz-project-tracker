@@ -11,13 +11,17 @@ export const getProject = /* GraphQL */ `
           id
           time
           note
+          hidden
           filenames
+          audio
+          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      archived
       createdAt
       updatedAt
       owner
@@ -37,6 +41,7 @@ export const listProjects = /* GraphQL */ `
         events {
           nextToken
         }
+        archived
         createdAt
         updatedAt
         owner
@@ -55,13 +60,17 @@ export const getEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        archived
         createdAt
         updatedAt
         owner
       }
       time
       note
+      hidden
       filenames
+      audio
+      video
       createdAt
       updatedAt
       owner
@@ -80,13 +89,17 @@ export const listEvents = /* GraphQL */ `
         project {
           id
           name
+          archived
           createdAt
           updatedAt
           owner
         }
         time
         note
+        hidden
         filenames
+        audio
+        video
         createdAt
         updatedAt
         owner

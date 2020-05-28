@@ -3,6 +3,8 @@ import { useParams, useHistory } from "react-router-dom";
 import { API, graphqlOperation, Auth } from "aws-amplify";
 import { format } from 'date-fns';
 
+import "./Project.css";
+
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
 
@@ -14,6 +16,7 @@ export default function Project() {
     const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
     const [showHidden, setShowHidden] = useState(true);
+    const [numHidden, setNumHidden] = useState(0);
     let projectData;
 
     function loadProject() {
@@ -28,6 +31,7 @@ export default function Project() {
                         note
                         filenames
                         time
+                        hidden
                     }
                 }
             }
@@ -53,6 +57,7 @@ export default function Project() {
             const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
                 return new Date(b.time) - new Date(a.time);
             });
+            setNumHidden(sortedEvents.filter(event => event.hidden).length);
             setEvents(sortedEvents);
             setIsLoading(false);
             setIsInit(true);
@@ -64,6 +69,10 @@ export default function Project() {
 
     function removeLocal(eventID) {
         setEvents(events.filter(event => event.id !== eventID));
+    }
+
+    function changeHiddenLocal(eventID, hide) {
+        setNumHidden(hide ? numHidden + 1 : numHidden - 1);
     }
 
     // breaks a lot of things, just gonna not use it for now
@@ -91,25 +100,27 @@ export default function Project() {
                     <hr className="sep"></hr>
 
                     {showHidden ? (
-                        <button className="button ml-auto block ~neutral my-4" onClick={() => setShowHidden(false)}>Hide x updates marked "hidden"</button>
+                        <button className="button ml-auto block ~neutral my-4" disabled={numHidden === 0} onClick={() => setShowHidden(false)}>Hide {numHidden} updates marked "hidden"</button>
                     ) : (
                         <div className="aside align-center ~info flex">
-                            <span className="leading-8">x updates hidden.</span>
+                            <span className="leading-8">{numHidden} updates hidden.</span>
                             <button className="button ml-auto bg-transparent" onClick={() => setShowHidden(true)}>Show</button>
                         </div>
                     )}
 
-                    {events.map((event, i, arr) => (
-                        <div key={event.id}>
-                            {
-                                (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
-                                    <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
-                                )
-                            }
-                            <hr></hr>
-                            <ProjectItem removeLocal={removeLocal} event={event}></ProjectItem>
-                        </div>
+                    <div className={!showHidden && "projectsHideHidden"}>
+                    {events.map((event, i, arr) => 
+                        (
+                                <div key={event.id}>
+                                    {
+                                    (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
+                                        <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
+                                    )
+                                }
+                                <ProjectItem changeHiddenLocal={changeHiddenLocal} removeLocal={removeLocal} event={event}></ProjectItem>
+                            </div>                     
                     ))}
+                    </div>
                 </>
             )}
         </div>

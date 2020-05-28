@@ -14,13 +14,17 @@ export const createProject = /* GraphQL */ `
           id
           time
           note
+          hidden
           filenames
+          audio
+          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      archived
       createdAt
       updatedAt
       owner
@@ -40,13 +44,17 @@ export const updateProject = /* GraphQL */ `
           id
           time
           note
+          hidden
           filenames
+          audio
+          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      archived
       createdAt
       updatedAt
       owner
@@ -66,13 +74,17 @@ export const deleteProject = /* GraphQL */ `
           id
           time
           note
+          hidden
           filenames
+          audio
+          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      archived
       createdAt
       updatedAt
       owner
@@ -92,13 +104,17 @@ export const createEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        archived
         createdAt
         updatedAt
         owner
       }
       time
       note
+      hidden
       filenames
+      audio
+      video
       createdAt
       updatedAt
       owner
@@ -118,13 +134,17 @@ export const updateEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        archived
         createdAt
         updatedAt
         owner
       }
       time
       note
+      hidden
       filenames
+      audio
+      video
       createdAt
       updatedAt
       owner
@@ -144,13 +164,17 @@ export const deleteEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        archived
         createdAt
         updatedAt
         owner
       }
       time
       note
+      hidden
       filenames
+      audio
+      video
       createdAt
       updatedAt
       owner

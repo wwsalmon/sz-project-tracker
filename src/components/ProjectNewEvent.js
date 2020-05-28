@@ -35,7 +35,7 @@ export default function ProjectNewEvent(props) {
         const filenames = `[${newFiles.map(file => `"${file.name}"`)}]`;
         const newNoteQuery = `
 mutation {
-  createEvent(input: {eventProjectId: "${props.projectId}", time: "${currentDate.toISOString()}", filenames: ${filenames}, note: """${newNote}"""}) {
+  createEvent(input: {eventProjectId: "${props.projectId}", time: "${currentDate.toISOString()}", filenames: ${filenames}, note: """${newNote}""", hidden: ${false}}) {
     id
     note
     time
@@ -49,6 +49,10 @@ mutation {
             props.setEvents([newEvent.data.createEvent, ...props.events]);
             setNewNote("");
             setNewFiles([]);
+            setShowNote(false);
+            setShowUpload(false);
+            setShowAudio(false);
+            setShowVideo(false);
         }
         catch (error) {
             console.warn(error);

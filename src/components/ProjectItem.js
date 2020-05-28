@@ -11,28 +11,31 @@ import EventImage from "../components/EventImage";
 import { SRLWrapper } from "simple-react-lightbox";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 export default function ProjectItem(props) {
+    const event = props.event;
     const [showOptions, setShowOptions] = useState(false);
+    const [isHidden, setIsHidden] = useState(event.hidden);
     const removeLocal = props.removeLocal;
+    const changeHiddenLocal = props.changeHiddenLocal;
 
-    async function handleDeleteEvent(e, eventID, filenames) {
+    async function handleDeleteEvent(e) {
         e.preventDefault();
         const query = `
         mutation{
-            deleteEvent(input: {id: "${eventID}"}){ note id }
+            deleteEvent(input: {id: "${event.id}"}){ id }
         }
         `
         try {
             await API.graphql(graphqlOperation(query));
-            removeLocal(eventID);
+            removeLocal(event.id);
         }
         catch (error) {
             console.log(error);
         }
 
-        for (const filename of filenames) {
+        for (const filename of event.filenames) {
             try {
                 await Storage.vault.remove(filename);
             }
@@ -42,6 +45,18 @@ export default function ProjectItem(props) {
         }
     }
 
+    async function handleToggleHidden(e){
+        e.preventDefault();
+        changeHiddenLocal(event.id, !isHidden);
+        setIsHidden(!isHidden);
+        const query = `
+        mutation{
+            updateEvent(input: {id: "${event.id}", hidden: ${!isHidden}}){ id }
+        }
+        `
+        API.graphql(graphqlOperation(query)).then(res => console.log(res)).catch(e => console.log(e));
+    }
+
     const markdownConverter = new Showdown.Converter({
         tables: true,
         simplifiedAutoLink: true,
@@ -49,31 +64,37 @@ export default function ProjectItem(props) {
         tasklists: true
     });
 
-    const event = props.event;
-
     return (
-        <div className="md:flex py-8 hover:bg-gray-100 rounded relative">
-            <p className="w-32 supra flex-none">{
-                format(new Date(event.time), "h:mm a")
-            }</p>
-            <div className="content">
-                {Parser(markdownConverter.makeHtml(event.note))}
-                <SRLWrapper>
-                    <div className="flex items-center">
-                        {event.filenames.map(filename => (
-                            <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex" s3key={filename} key={filename}></EventImage>
-                        ))}
-                    </div>
-                </SRLWrapper>
-            </div>
-            <button className="ml-auto button self-start" onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
-            {showOptions && (
-                <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border">
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={(e) => handleDeleteEvent(e, event.id, event.filenames)}>Delete</button>
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left">Edit</button>
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left">Hide</button>
+        <div className={isHidden && "projectItemHidden"}>
+            <hr></hr>
+            <div className="md:flex py-8 hover:bg-gray-100 rounded relative">
+                <div className="w-32 flex-none">
+                    <p className="supra">{
+                        format(new Date(event.time), "h:mm a")
+                    }</p>
+                    {isHidden && (<FontAwesomeIcon className=" opacity-25 my-4" icon={faEyeSlash}></FontAwesomeIcon>)}
                 </div>
-            )}
+                <div className="content">
+                    {Parser(markdownConverter.makeHtml(event.note))}
+                    <SRLWrapper>
+                        <div className="flex items-center">
+                            {event.filenames.map(filename => (
+                                <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex" s3key={filename} key={filename}></EventImage>
+                            ))}
+                        </div>
+                    </SRLWrapper>
+                </div>
+                <button className="ml-auto button self-start" onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
+                {showOptions && (
+                    <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border z-10">
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left">Edit</button>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleHidden}>
+                            {isHidden ? "Show" : "Hide"}
+                        </button>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }
