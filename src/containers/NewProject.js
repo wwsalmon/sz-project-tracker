@@ -24,19 +24,18 @@ class NewProject extends Component{
         const query = `
             mutation {
                 createProject(input: {
-                    name: "${this.state.projectName}"
+                    name: "${this.state.projectName}",
+                    archived: ${false}
                 }){
-                    id name createdAt updatedAt
+                    id name createdAt updatedAt archived
                 }
             }
             `
-        try{
-            await API.graphql(graphqlOperation(query));
-            this.history.push("/projects")
-        }
-        catch(error){
+        API.graphql(graphqlOperation(query)).then(res => {
+            this.history.push(`/projects/${res.data.createProject.id}`)
+        }).catch(e => {
             console.log(e);
-        }
+        });
     }
 
     render() {
