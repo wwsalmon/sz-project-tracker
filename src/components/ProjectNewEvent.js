@@ -10,9 +10,12 @@ import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
+import {v1 as uuidv1} from 'uuid';
+
 export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
     const [newFiles, setNewFiles] = useState([]);
+    const [fileUUIDs, setFileUUIDs] = useState([]);
 
     const [showNote, setShowNote] = useState(false);
     const [showUpload, setShowUpload] = useState(false);
@@ -31,11 +34,12 @@ export default function ProjectNewEvent(props) {
     async function handleCreateEvent(e) {
         e.preventDefault();
         console.log(newNote);
+        console.log("fileUUIDs: ", typeof fileUUIDs, fileUUIDs);
         const currentDate = new Date();
-        const filenames = `[${newFiles.map(file => `"${file.name}"`)}]`;
+        const newFileUUIDs = `[${fileUUIDs.map(d => `"${d}"`)}]`;
         const newNoteQuery = `
 mutation {
-  createEvent(input: {eventProjectId: "${props.projectId}", time: "${currentDate.toISOString()}", filenames: ${filenames}, note: """${newNote}""", hidden: ${false}}) {
+  createEvent(input: {eventProjectId: "${props.projectId}", time: "${currentDate.toISOString()}", filenames: ${newFileUUIDs}, note: """${newNote}""", hidden: ${false}}) {
     id
     note
     time
@@ -93,13 +97,19 @@ mutation {
             <FilePond.FilePond server={
                 {
                     process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
-                        Storage.vault.put(file.name, file, {
+                        const extArray = file.name.split('.');
+                        const ext = extArray[extArray.length - 1];
+                        console.log(ext);
+                        const uuid = uuidv1() + `.${ext}`;
+
+                        Storage.vault.put(uuid, file, {
                             progressCallback(thisProgress) {
                                 progress(thisProgress.lengthComputable, thisProgress.loaded, thisProgress.total);
                             }
                         }).then(res => {
                             load(res.key);
                             setCanSubmit(true);
+                            setFileUUIDs([...fileUUIDs, uuid]);
                         }).catch(e => {
                             console.log(e);
                             error(e);
@@ -114,9 +124,13 @@ mutation {
                         }
                     },
                     revert: (uniqueFileId, load, error) => {
+                        console.log(uniqueFileId);
                         try {
                             Storage.vault.remove(uniqueFileId)
-                                .then(() => load());
+                                .then(() => {
+                                    setFileUUIDs(fileUUIDs.filter(d => d != uniqueFileId));
+                                    load();
+                                });
                         } catch (e) {
                             error(e);
                         }
