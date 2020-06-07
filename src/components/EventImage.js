@@ -2,7 +2,6 @@ import { Storage } from 'aws-amplify';
 import React, { useState, useEffect } from 'react';
 
 export default function EventImage(props){
-    console.log(props);
     const [imgUrl, setImgUrl] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 

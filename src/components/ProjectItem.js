@@ -1,5 +1,5 @@
 
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
 
@@ -25,6 +25,18 @@ export default function ProjectItem(props) {
     const [newNote, setNewNote] = useState(event.note);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
+    const showMoreButton = useRef(null);
+
+    window.addEventListener('click', e => {
+        const isButton = e.target !== showMoreButton.current
+        && e.target.parentElement !== showMoreButton.current
+        && e.target.parentElement !== null // a little jank but otherwise .parentElement.parentElement spits out errors
+        && e.target.parentElement.parentElement !== showMoreButton.current;
+
+        if (isButton){
+            setShowOptions(false);
+        }
+    });
 
     async function handleDeleteEvent(e) {
         e.preventDefault();
@@ -137,7 +149,7 @@ export default function ProjectItem(props) {
                         ))}
                     </div>
                 </div>
-                <button className="ml-auto button self-start absolute right-0 top-8 md:static" onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
+                <button className="ml-auto button self-start absolute right-0 top-8 md:static" id={event.id + "-showMoreButton"} ref={showMoreButton} onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
                 {showOptions && (
                     <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border z-10">
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
