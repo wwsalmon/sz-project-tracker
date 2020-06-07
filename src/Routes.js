@@ -20,9 +20,7 @@ export default function Routes() {
             <Route exact path="/signup">
                 <SignUp />
             </Route>
-            <Route exact path="/projects">
-                <Projects />
-            </Route>           
+            <Route exact path="/projects" render={(props) => <Projects {...props} />}/>
             <Route exact path="/projects/new">
                 <NewProject />
             </Route>

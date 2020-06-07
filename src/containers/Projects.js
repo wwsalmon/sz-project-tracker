@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { API, graphqlOperation, Auth } from 'aws-amplify';
 
-export default function Projects() {
+export default function Projects(props) {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
@@ -71,6 +71,9 @@ export default function Projects() {
             {/* {isLoading && (
                 <p className="aside ~info">Loading...</p>
             )} */}
+            {(props.location !== undefined) && (props.location.state !== undefined) && props.location.state.justLoggedIn && (
+                <p className="aside ~info my-4">Logged in!</p>
+            )}
             {isInit && (
                 <>
                     <Link to="/projects/new"><button className="button !normal ~neutral my-4">New Project</button></Link>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Auth } from 'aws-amplify';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 export default class Login extends Component {
     constructor(props) {
@@ -114,9 +114,7 @@ export default class Login extends Component {
                 )}
                 {authState === "signedIn" && (
                     <>
-                        <p className="aside ~info my-4">Logged in!</p>
-                        <button className="button !normal ~neutral my-4" onClick={this.signOut}>Log out</button>
-                        <Link to="/projects"><button className="button !high ~neutral my-4">Go to projects</button></Link>
+                        <Redirect to={{pathname: "/projects", state: {justLoggedIn: true}}}></Redirect>
                     </>
                 )}
                 {authState === "confirm" && (
