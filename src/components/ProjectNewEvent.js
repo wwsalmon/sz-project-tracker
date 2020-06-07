@@ -148,8 +148,8 @@ mutation {
                 <div className="flex my-4">
                     <button className={`button mr-2 ~neutral ${showNote ? "!low" : "!normal"}`} onClick={() => setShowNote(!showNote)}>{!showNote ? "Add Note" : "Remove Note"}</button>
                     <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
-                    <button className={`button mx-2 ~neutral ${showAudio ? "!low" : "!normal"}`} onClick={() => setShowAudio(!showAudio)}>{!showAudio ? "Record Audio" : "Remove Audio"}</button>
-                    <button className={`button mx-2 ~neutral ${showVideo ? "!low" : "!normal"}`} onClick={() => setShowVideo(!showVideo)}>{!showVideo ? "Record Video" : "Remove Video"}</button>
+                    {/* <button className={`button mx-2 ~neutral ${showAudio ? "!low" : "!normal"}`} onClick={() => setShowAudio(!showAudio)}>{!showAudio ? "Record Audio" : "Remove Audio"}</button>
+                    <button className={`button mx-2 ~neutral ${showVideo ? "!low" : "!normal"}`} onClick={() => setShowVideo(!showVideo)}>{!showVideo ? "Record Video" : "Remove Video"}</button> */}
                 </div>
             </div>
             <hr></hr>
