@@ -8,8 +8,8 @@ export default class Login extends Component {
         this.state = {
             isLoading: true,
             authState: "loading",
-            username: "wwsalmon",
-            password: "Passw0rd!",
+            username: "",
+            password: "",
             code: ""
         };
         this.handleFieldUsername = this.handleFieldUsername.bind(this);

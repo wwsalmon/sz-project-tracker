@@ -8,9 +8,9 @@ class SignUp extends Component {
         this.state = {
             isLoading: true,
             authState: "loading",
-            username: "wwsalmon",
-            email: "wwsamson12309@gmail.com",
-            password: "Passw0rd!",
+            username: "",
+            email: "",
+            password: "",
             code: ""
         };
         this.handleFieldEmail = this.handleFieldEmail.bind(this);
