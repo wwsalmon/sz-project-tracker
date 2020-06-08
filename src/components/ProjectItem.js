@@ -15,28 +15,17 @@ import EventImage from "../components/EventImage";
 import { SRLWrapper } from "simple-react-lightbox";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEllipsisV, faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+
+import MoreButton from "../components/MoreButton";
 
 export default function ProjectItem(props) {
     const event = props.event;
-    const [showOptions, setShowOptions] = useState(false);
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [isEdit, setIsEdit] = useState(false);
     const [newNote, setNewNote] = useState(event.note);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
-    const showMoreButton = useRef(null);
-
-    window.addEventListener('click', e => {
-        const isButton = e.target !== showMoreButton.current
-        && e.target.parentElement !== showMoreButton.current
-        && e.target.parentElement !== null // a little jank but otherwise .parentElement.parentElement spits out errors
-        && e.target.parentElement.parentElement !== showMoreButton.current;
-
-        if (isButton){
-            setShowOptions(false);
-        }
-    });
 
     async function handleDeleteEvent(e) {
         e.preventDefault();
@@ -149,7 +138,8 @@ export default function ProjectItem(props) {
                         ))}
                     </div>
                 </div>
-                <button className="ml-auto button self-start absolute right-0 top-8 md:static" id={event.id + "-showMoreButton"} ref={showMoreButton} onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
+                
+                {/* <button className="ml-auto button self-start absolute right-0 top-8 md:static" id={event.id + "-showMoreButton"} ref={showMoreButton} onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
                 {showOptions && (
                     <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border z-10">
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
@@ -158,7 +148,15 @@ export default function ProjectItem(props) {
                             {isPrivate ? "Make public" : "Make private"}
                         </button>
                     </div>
-                )}
+                )} */}
+
+                <MoreButton className="ml-auto button self-start absolute right-0 top-8 md:static" uid={event.id}>
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
+                    {!isEdit && <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleHidden}>
+                        {isPrivate ? "Make public" : "Make private"}
+                    </button>                    
+                </MoreButton>
             </div>
         </div>
     )
