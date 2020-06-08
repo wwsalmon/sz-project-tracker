@@ -8,6 +8,8 @@ export default function Projects(props) {
     const [isInit, setIsInit] = useState(false);
     const [projects, setProjects] = useState([]);
 
+    console.log(props.location);
+
     const listQuery = `
     query {
         listProjects{
@@ -73,6 +75,9 @@ export default function Projects(props) {
             )} */}
             {(props.location !== undefined) && (props.location.state !== undefined) && props.location.state.justLoggedIn && (
                 <p className="aside ~info my-4">Logged in!</p>
+            )}
+            {(props.location !== undefined) && (props.location.state !== undefined) && props.location.state.projectDeleted && (
+                <p className="aside ~info my-4">Project deleted.</p>
             )}
             {isInit && (
                 <>

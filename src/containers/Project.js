@@ -7,6 +7,7 @@ import "./Project.css";
 
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
+import MoreButton from "../components/MoreButton";
 
 export default function Project() {
     const { id } = useParams();
@@ -75,26 +76,55 @@ export default function Project() {
         setNumPrivate(hide ? numPrivate + 1 : numPrivate - 1);
     }
 
-    // breaks a lot of things, just gonna not use it for now
-    // async function handleMDEImageUpload(file, onSuccess, onError) {
-    //     document.addEventListener("FilePond:processfile", () => {
-    //         Storage.vault.get(file.name).then(res => onSuccess(res)).catch(error => onError(error.toString()));
-    //     });
-    //     pond.current.addFile(file);
-    // }
+    async function deleteProject(e) {
+        e.preventDefault();
+        const deleteQuery = `
+            mutation {
+                deleteProject(input: {
+                    id: "${id}"
+                }){
+                    name id
+                }
+            }
+        `
+        API.graphql(graphqlOperation(deleteQuery)).then(() => {
+            history.push("/projects", {projectDeleted: true}); // add "project deleted" prop
+        }).catch(e => console.log(e));
+    }
+
+    async function renameProject(e) {
+        e.preventDefault();
+        const renameQuery = `
+            mutation {
+                updateProject(input: {
+                    id: "${id}",
+                    name: "${projName}
+                }){
+                    id
+                }
+            }
+        `
+        API.graphql(graphqlOperation(renameQuery)).then(res => {
+            console.log(res); // add "project deleted" prop
+        }).catch(e => console.log(e));
+    }
 
     useEffect(() => {
         onLoad();
     }, [id]);
 
     return (
-        <div>
+        <div className="relative">
             {/* {isLoading && (
                 <p className="aside ~info">Loading...</p>
             )} */}
             {isInit && (
                 <>
                     <h1 className="heading">{projName}</h1>
+                    <MoreButton className="button absolute right-0 top-0">
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={renameProject}>Rename Project</button>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
+                    </MoreButton>
                     <hr className="sep"></hr>
                     <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}></ProjectNewEvent>
                     <hr className="sep"></hr>
