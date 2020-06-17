@@ -1,7 +1,7 @@
 const {describe} = require("mocha");
 const {expect} = require("chai");
 
-const {loadProject} = require("./src/lib/projectLib");
+const loadProject = require("./src/lib/projectLib");
 
 describe("Demo test: ", function() {
     it("1 === 1 should be true", function (){

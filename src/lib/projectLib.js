@@ -20,3 +20,5 @@ export function loadProject(id) {
     `
     return API.graphql(graphqlOperation(query));
 }
+
+module.exports = loadProject;
