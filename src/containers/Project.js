@@ -14,59 +14,10 @@ export default function Project() {
     const history = useHistory();
     const [projName, setProjName] = useState("");
     const [events, setEvents] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
     const [showPrivate, setShowPrivate] = useState(true);
     const [numPrivate, setNumPrivate] = useState(0);
-    let projectData;
-
-    function loadProject() {
-        const query = `
-        query {
-            getProject(id: "${id}") {
-                id
-                name
-                events{
-                    items{
-                        id
-                        note
-                        filenames
-                        time
-                        hidden
-                    }
-                }
-            }
-        }
-    `
-        return API.graphql(graphqlOperation(query));
-    }
-
-    async function onLoad() {
-        try {
-            console.log("checking authentication");
-            await Auth.currentAuthenticatedUser();
-            console.log("authenticated");
-        }
-        catch (e) {
-            console.log(e);
-            history.push("/");
-        }
-
-        try {
-            projectData = await loadProject();
-            setProjName(projectData.data.getProject.name);
-            const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
-                return new Date(b.time) - new Date(a.time);
-            });
-            setNumPrivate(sortedEvents.filter(event => event.hidden).length);
-            setEvents(sortedEvents);
-            setIsLoading(false);
-            setIsInit(true);
-        }
-        catch (e) {
-            console.log(e);
-        }
-    }
 
     function removeLocal(eventID) {
         setEvents(events.filter(event => event.id !== eventID));
@@ -110,6 +61,56 @@ export default function Project() {
     }
 
     useEffect(() => {
+        let projectData;
+
+        function loadProject() {
+            const query = `
+        query {
+            getProject(id: "${id}") {
+                id
+                name
+                events{
+                    items{
+                        id
+                        note
+                        filenames
+                        time
+                        hidden
+                    }
+                }
+            }
+        }
+    `
+            return API.graphql(graphqlOperation(query));
+        }
+
+        async function onLoad() {
+            try {
+                console.log("checking authentication");
+                await Auth.currentAuthenticatedUser();
+                console.log("authenticated");
+            }
+            catch (e) {
+                console.log(e);
+                // history.push("/");
+            }
+
+            try {
+                projectData = await loadProject();
+                setProjName(projectData.data.getProject.name);
+                const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
+                    return new Date(b.time) - new Date(a.time);
+                });
+                setNumPrivate(sortedEvents.filter(event => event.hidden).length);
+                setEvents(sortedEvents);
+                // setIsLoading(false);
+                setIsInit(true);
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+        
         onLoad();
     }, [id]);
 

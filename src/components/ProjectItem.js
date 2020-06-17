@@ -1,5 +1,5 @@
 
-import React, {useState, useRef} from "react";
+import React, {useState} from "react";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
 
@@ -11,8 +11,6 @@ import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
 
 import EventImage from "../components/EventImage";
-
-import { SRLWrapper } from "simple-react-lightbox";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGlobe } from "@fortawesome/free-solid-svg-icons";
@@ -127,7 +125,7 @@ export default function ProjectItem(props) {
                                 }}
                             />
                             <div className="flex">
-                                <button onClick={handleEditEvent} disabled={newNote == event.note} className="button field w-auto block my-4 mr-2">Save Changes</button>
+                                <button onClick={handleEditEvent} disabled={newNote === event.note} className="button field w-auto block my-4 mr-2">Save Changes</button>
                                 <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
                             </div>
                         </>

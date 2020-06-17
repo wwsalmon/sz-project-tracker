@@ -5,21 +5,21 @@ export default function EventImage(props){
     const [imgUrl, setImgUrl] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    async function onLoad(){
-        Storage.vault.get(props.s3key)
-        .then(res => {
-            setImgUrl(res);
-            setIsLoading(false);
-        })
-        .catch(e => {
-            console.log(e);
-            setIsLoading(false);
-        });
-    }
-
     useEffect(() => {
+        async function onLoad() {
+            Storage.vault.get(props.s3key)
+                .then(res => {
+                    setImgUrl(res);
+                    setIsLoading(false);
+                })
+                .catch(e => {
+                    console.log(e);
+                    setIsLoading(false);
+                });
+        }
+
         onLoad();
-    }, []);
+    }, [props.s3key]);
 
     return (
         <div className={props.className}>
@@ -27,7 +27,7 @@ export default function EventImage(props){
                 <p>Loading...</p>
             )}
             {!isLoading && (
-                <img src={imgUrl}></img>
+                <img alt="Update attachment" src={imgUrl}></img>
             )}
         </div>
     )

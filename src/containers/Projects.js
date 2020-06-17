@@ -4,45 +4,15 @@ import { API, graphqlOperation, Auth } from 'aws-amplify';
 
 export default function Projects(props) {
     const history = useHistory();
-    const [isLoading, setIsLoading] = useState(true);
+    // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
     const [projects, setProjects] = useState([]);
 
     console.log(props.location);
 
-    const listQuery = `
-    query {
-        listProjects{
-        items{
-            id
-            name      
-        }
-        }
-    }
-    `
-    function loadProjects() {
-        return API.graphql(graphqlOperation(listQuery));
-    }
-
-    async function onLoad() {
-        try {
-            console.log("checking authentication");
-            await Auth.currentAuthenticatedUser();
-            console.log("authenticated");
-        }
-        catch (e) {
-            console.log(e);
-            history.push("/login");
-        }
-        const projects = await loadProjects();
-        setProjects(projects);
-        setIsLoading(false);
-        setIsInit(true);
-    }
-
     async function deleteProject(e, projectID) {
         e.preventDefault();
-        setIsLoading(true);
+        // setIsLoading(true);
         const deleteQuery = `
             mutation {
                 deleteProject(input: {
@@ -54,19 +24,48 @@ export default function Projects(props) {
         `
         try {
             await API.graphql(graphqlOperation(deleteQuery));
-            const projects = await loadProjects();
-            setIsLoading(false);
-            setProjects(projects);
+            setProjects(projects.filter(p => p.id !== projectID));
         }
         catch (error) {
-            setIsLoading(false);
+            // setIsLoading(false);
             console.log(error);
         }
     }
 
     useEffect(() => {
+        console.log("running projects useeffect");
+        const listQuery = `
+    query {
+        listProjects{
+        items{
+            id
+            name      
+        }
+        }
+    }
+    `
+        function loadProjects() {
+            return API.graphql(graphqlOperation(listQuery));
+        }
+
+        async function onLoad() {
+            try {
+                console.log("checking authentication");
+                await Auth.currentAuthenticatedUser();
+                console.log("authenticated");
+            }
+            catch (e) {
+                console.log(e);
+                // history.push("/login");
+            }
+            const projects = await loadProjects();
+            setProjects(projects);
+            // setIsLoading(false);
+            setIsInit(true);
+        }
+
         onLoad();
-    }, []);
+    }, [history.push]);
 
     return (
         <div>

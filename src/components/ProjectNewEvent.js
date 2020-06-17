@@ -128,7 +128,7 @@ mutation {
                         try {
                             Storage.vault.remove(uniqueFileId)
                                 .then(() => {
-                                    setFileUUIDs(fileUUIDs.filter(d => d != uniqueFileId));
+                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
                                     load();
                                 });
                         } catch (e) {
