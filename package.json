@@ -30,7 +30,7 @@
   "scripts": {
     "start": "npm run watch:css && react-scripts start",
     "build": "npm run build:css && react-scripts build",
-    "test": "react-scripts test",
+    "test": "nyc mocha ./test",
     "eject": "react-scripts eject",
     "build:css": "postcss src/assets/tailwind.css -o src/assets/main.css",
     "watch:css": "postcss src/assets/tailwind.css -o src/assets/main.css"
@@ -53,8 +53,12 @@
   "devDependencies": {
     "a17t": "^0.1.4",
     "autoprefixer": "^9.8.0",
+    "chai": "^4.2.0",
     "cross-env": "^7.0.2",
+    "mocha": "^7.2.0",
+    "nyc": "^15.1.0",
     "postcss-cli": "^7.1.1",
+    "sinon": "^9.0.2",
     "tailwindcss": "^1.4.6"
   }
 }

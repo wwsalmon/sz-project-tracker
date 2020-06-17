@@ -9,6 +9,8 @@ import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
 import MoreButton from "../components/MoreButton";
 
+import { loadProject } from "../lib/projectLib";
+
 export default function Project() {
     const { id } = useParams();
     const history = useHistory();
@@ -19,27 +21,6 @@ export default function Project() {
     const [showPrivate, setShowPrivate] = useState(true);
     const [numPrivate, setNumPrivate] = useState(0);
     let projectData;
-
-    function loadProject() {
-        const query = `
-        query {
-            getProject(id: "${id}") {
-                id
-                name
-                events{
-                    items{
-                        id
-                        note
-                        filenames
-                        time
-                        hidden
-                    }
-                }
-            }
-        }
-    `
-        return API.graphql(graphqlOperation(query));
-    }
 
     async function onLoad() {
         try {
@@ -53,7 +34,7 @@ export default function Project() {
         }
 
         try {
-            projectData = await loadProject();
+            projectData = await loadProject(id);
             setProjName(projectData.data.getProject.name);
             const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
                 return new Date(b.time) - new Date(a.time);
