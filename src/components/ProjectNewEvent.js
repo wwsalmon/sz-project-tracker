@@ -11,6 +11,7 @@ import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
 import {v1 as uuidv1} from 'uuid';
+import { func } from "prop-types";
 
 export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
@@ -57,6 +58,43 @@ mutation {
             setShowUpload(false);
             setShowAudio(false);
             setShowVideo(false);
+        }
+        catch (error) {
+            console.warn(error);
+        }
+    }
+    
+
+    async function handleCreateEventTwitter(e) {
+        e.preventDefault();
+        console.log(newNote);
+        console.log("fileUUIDs: ", typeof fileUUIDs, fileUUIDs);
+        const currentDate = new Date();
+        const newFileUUIDs = `[${fileUUIDs.map(d => `"${d}"`)}]`;
+        const newNoteQuery = `
+mutation {
+  createEvent(input: {eventProjectId: "${props.projectId}", time: "${currentDate.toISOString()}", filenames: ${newFileUUIDs}, note: """${newNote}""", hidden: ${false}}) {
+    id
+    note
+    time
+    filenames
+  }
+}
+        `
+        console.log(newNoteQuery);
+        try {
+            const newEvent = await API.graphql(graphqlOperation(newNoteQuery));
+            props.setEvents([newEvent.data.createEvent, ...props.events]);
+            setNewNote("");
+            setNewFiles([]);
+            setShowNote(false);
+            setShowUpload(false);
+            setShowAudio(false);
+            setShowVideo(false);
+            //Twitter placeholdertext implementation
+            var placeholdertext ='https:/twitter.com/intent/tweet?text=';
+            placeholdertext += encodeURI(newNote);
+            window.open(placeholdertext);
         }
         catch (error) {
             console.warn(error);
@@ -128,7 +166,7 @@ mutation {
                         try {
                             Storage.vault.remove(uniqueFileId)
                                 .then(() => {
-                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
+                                    setFileUUIDs(fileUUIDs.filter(d => d != uniqueFileId));
                                     load();
                                 });
                         } catch (e) {
@@ -157,7 +195,7 @@ mutation {
                 <div className="flex">
                     <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="button field w-auto block my-4 mr-2">Create Update</button>
                     {(canSubmit && (showNote || showUpload || showAudio || showVideo)) && (<button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">Cancel</button>)}
-                    <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="mx-4 button ~info !low w-auto block my-2">Create Update & Post to Twitter</button>
+                    <button onClick={handleCreateEventTwitter} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="mx-4 button ~info !low w-auto block my-2">Create Update & Post to Twitter</button>
                 </div>
             </div>
         </div>
