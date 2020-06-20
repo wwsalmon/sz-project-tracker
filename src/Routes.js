@@ -7,6 +7,7 @@ import SignUp from "./containers/SignUp";
 import NewProject from "./containers/NewProject";
 import Project from "./containers/Project";
 import Projects from "./containers/Projects";
+import PublicProject from "./containers/PublicProject";
 
 export default function Routes() {
     return (
@@ -26,6 +27,9 @@ export default function Routes() {
             </Route>
             <Route exact path="/projects/:id">
                 <Project />
+            </Route>
+            <Route exact path="/public/:id">
+                <PublicProject />
             </Route>
         </Switch>
     );
