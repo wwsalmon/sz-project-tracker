@@ -61,6 +61,7 @@ export default function Project() {
     }
 
     useEffect(() => {
+        console.log("useeffect");
         let projectData;
 
         function loadProject() {
@@ -92,7 +93,7 @@ export default function Project() {
             }
             catch (e) {
                 console.log(e);
-                // history.push("/");
+                history.push("/");
             }
 
             try {
@@ -112,7 +113,7 @@ export default function Project() {
         }
         
         onLoad();
-    }, [id]);
+    }, [id, history]);
 
     return (
         <div className="relative">

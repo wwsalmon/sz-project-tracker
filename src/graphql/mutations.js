@@ -16,18 +16,36 @@ export const createProject = /* GraphQL */ `
           note
           hidden
           filenames
-          audio
-          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      public
       archived
       createdAt
       updatedAt
       owner
+      publicProject {
+        id
+        name
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
     }
   }
 `;
@@ -46,18 +64,36 @@ export const updateProject = /* GraphQL */ `
           note
           hidden
           filenames
-          audio
-          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      public
       archived
       createdAt
       updatedAt
       owner
+      publicProject {
+        id
+        name
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
     }
   }
 `;
@@ -76,18 +112,36 @@ export const deleteProject = /* GraphQL */ `
           note
           hidden
           filenames
-          audio
-          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      public
       archived
       createdAt
       updatedAt
       owner
+      publicProject {
+        id
+        name
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
     }
   }
 `;
@@ -104,20 +158,52 @@ export const createEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        public
         archived
         createdAt
         updatedAt
         owner
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
       }
       time
       note
       hidden
       filenames
-      audio
-      video
       createdAt
       updatedAt
       owner
+      publicEvent {
+        id
+        event {
+          id
+          time
+          note
+          hidden
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        filenames
+        createdAt
+        updatedAt
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
+        owner
+      }
     }
   }
 `;
@@ -134,20 +220,52 @@ export const updateEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        public
         archived
         createdAt
         updatedAt
         owner
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
       }
       time
       note
       hidden
       filenames
-      audio
-      video
       createdAt
       updatedAt
       owner
+      publicEvent {
+        id
+        event {
+          id
+          time
+          note
+          hidden
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        filenames
+        createdAt
+        updatedAt
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
+        owner
+      }
     }
   }
 `;
@@ -164,17 +282,424 @@ export const deleteEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        public
         archived
         createdAt
         updatedAt
         owner
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
       }
       time
       note
       hidden
       filenames
-      audio
-      video
+      createdAt
+      updatedAt
+      owner
+      publicEvent {
+        id
+        event {
+          id
+          time
+          note
+          hidden
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        filenames
+        createdAt
+        updatedAt
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
+        owner
+      }
+    }
+  }
+`;
+export const createPublicProject = /* GraphQL */ `
+  mutation CreatePublicProject(
+    $input: CreatePublicProjectInput!
+    $condition: ModelPublicProjectConditionInput
+  ) {
+    createPublicProject(input: $input, condition: $condition) {
+      id
+      name
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        public
+        archived
+        createdAt
+        updatedAt
+        owner
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      createdAt
+      updatedAt
+      owner
+      publicEvents {
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const updatePublicProject = /* GraphQL */ `
+  mutation UpdatePublicProject(
+    $input: UpdatePublicProjectInput!
+    $condition: ModelPublicProjectConditionInput
+  ) {
+    updatePublicProject(input: $input, condition: $condition) {
+      id
+      name
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        public
+        archived
+        createdAt
+        updatedAt
+        owner
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      createdAt
+      updatedAt
+      owner
+      publicEvents {
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const deletePublicProject = /* GraphQL */ `
+  mutation DeletePublicProject(
+    $input: DeletePublicProjectInput!
+    $condition: ModelPublicProjectConditionInput
+  ) {
+    deletePublicProject(input: $input, condition: $condition) {
+      id
+      name
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        public
+        archived
+        createdAt
+        updatedAt
+        owner
+        publicProject {
+          id
+          name
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      createdAt
+      updatedAt
+      owner
+      publicEvents {
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const createPublicEvent = /* GraphQL */ `
+  mutation CreatePublicEvent(
+    $input: CreatePublicEventInput!
+    $condition: ModelPublicEventConditionInput
+  ) {
+    createPublicEvent(input: $input, condition: $condition) {
+      id
+      event {
+        id
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        hidden
+        filenames
+        createdAt
+        updatedAt
+        owner
+        publicEvent {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      time
+      note
+      filenames
+      createdAt
+      updatedAt
+      publicProject {
+        id
+        name
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const updatePublicEvent = /* GraphQL */ `
+  mutation UpdatePublicEvent(
+    $input: UpdatePublicEventInput!
+    $condition: ModelPublicEventConditionInput
+  ) {
+    updatePublicEvent(input: $input, condition: $condition) {
+      id
+      event {
+        id
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        hidden
+        filenames
+        createdAt
+        updatedAt
+        owner
+        publicEvent {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      time
+      note
+      filenames
+      createdAt
+      updatedAt
+      publicProject {
+        id
+        name
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const deletePublicEvent = /* GraphQL */ `
+  mutation DeletePublicEvent(
+    $input: DeletePublicEventInput!
+    $condition: ModelPublicEventConditionInput
+  ) {
+    deletePublicEvent(input: $input, condition: $condition) {
+      id
+      event {
+        id
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        hidden
+        filenames
+        createdAt
+        updatedAt
+        owner
+        publicEvent {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      time
+      note
+      filenames
+      createdAt
+      updatedAt
+      publicProject {
+        id
+        name
+        project {
+          id
+          name
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const createUser = /* GraphQL */ `
+  mutation CreateUser(
+    $input: CreateUserInput!
+    $condition: ModelUserConditionInput
+  ) {
+    createUser(input: $input, condition: $condition) {
+      username
+      email
+      profilePic
+      realname
+      twitter
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const updateUser = /* GraphQL */ `
+  mutation UpdateUser(
+    $input: UpdateUserInput!
+    $condition: ModelUserConditionInput
+  ) {
+    updateUser(input: $input, condition: $condition) {
+      username
+      email
+      profilePic
+      realname
+      twitter
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const deleteUser = /* GraphQL */ `
+  mutation DeleteUser(
+    $input: DeleteUserInput!
+    $condition: ModelUserConditionInput
+  ) {
+    deleteUser(input: $input, condition: $condition) {
+      username
+      email
+      profilePic
+      realname
+      twitter
       createdAt
       updatedAt
       owner
