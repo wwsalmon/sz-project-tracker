@@ -22,6 +22,7 @@ export default function ProjectItem(props) {
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [isEdit, setIsEdit] = useState(false);
     const [newNote, setNewNote] = useState(event.note);
+    const [publicId, setPublicId] = useState(event.publicEvent === null ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
 
@@ -88,7 +89,6 @@ export default function ProjectItem(props) {
                 `
                 const createPublicData = await API.graphql(graphqlOperation(createPublicEventQ));
                 const publicEventId = createPublicData.data.createPublicEvent.id;
-                // if (publicEventId === )
                 const updateEventQ2 = `
                     mutation{
                         updateEvent(input: {id: "${event.id}", eventPublicEventId: "${publicEventId}"}){
@@ -97,6 +97,7 @@ export default function ProjectItem(props) {
                     }
                 `
                 await API.graphql(graphqlOperation(updateEventQ2));
+                setPublicId(publicEventId);
             } else { // public -> private
                 const updateEventQ = `
                     mutation{
@@ -117,6 +118,7 @@ export default function ProjectItem(props) {
                     }
                 `
                     await API.graphql(graphqlOperation(deletePublicEventQ));
+                    setPublicId(false);
                 }
             }
             setIsPrivate(!isPrivate);
@@ -133,11 +135,11 @@ export default function ProjectItem(props) {
 
     async function handleEditEvent(e){
         e.preventDefault();
-        const query = `
+        let query = `
         mutation{
-            updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }
-        }
-        `
+            updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }`
+        query += publicId ? `updatePublicEvent(input: {id: "${publicId}", note: """${newNote}"""}){ id }` : "";
+        query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
             event.note = newNote;

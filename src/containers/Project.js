@@ -123,6 +123,9 @@ export default function Project() {
                         filenames
                         time
                         hidden
+                        publicEvent{
+                            id
+                        }
                     }
                 }
                 publicProject{

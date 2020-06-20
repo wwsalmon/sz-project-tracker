@@ -3,7 +3,7 @@ import { useParams, useHistory } from "react-router-dom";
 import { API } from "aws-amplify";
 import { format } from 'date-fns';
 
-import PublicItem from "../components/ProjectItem";
+import PublicItem from "../components/PublicItem";
 
 export default function PublicProject() {
     const { id } = useParams();
