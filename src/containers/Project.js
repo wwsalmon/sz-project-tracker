@@ -8,12 +8,14 @@ import "./Project.css";
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
 import MoreButton from "../components/MoreButton";
+import {create} from "filepond";
 
 export default function Project() {
     const { id } = useParams();
     const history = useHistory();
     const [projName, setProjName] = useState("");
     const [events, setEvents] = useState([]);
+    const [publicId, setPublicId] = useState(false); // false if private, link if public
     // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
     const [showPrivate, setShowPrivate] = useState(true);
@@ -25,6 +27,49 @@ export default function Project() {
 
     function changeHiddenLocal(eventID, hide) {
         setNumPrivate(hide ? numPrivate + 1 : numPrivate - 1);
+    }
+
+    async function makePublic(e){
+        e.preventDefault();
+        const createQuery = `
+            mutation {
+                createPublicProject(input: {
+                    name: "${projName}",
+                    publicProjectProjectId: "${id}"
+                }){id name project{id}}
+            }                    
+        `
+        API.graphql(graphqlOperation(createQuery)).then(res => {
+            const publicProject = res.data.createPublicProject.id;
+            const updateProject = `
+                mutation{
+                    updateProject(input: {id: "${id}", projectPublicProjectId: "${publicProject}", public: true}){
+                        public publicProject{
+                            id
+                        }
+                    }
+                }
+            `
+            API.graphql(graphqlOperation(updateProject)).then(res => {
+                console.log(res);
+                setPublicId(publicProject);
+            }).catch(e => console.log(e));
+        }).catch(e => console.log(e));
+    }
+
+    async function makePrivate(e){
+        e.preventDefault();
+        const deleteQuery = `
+            mutation {
+                deletePublicProject(input: {id: "${publicId}"}){id name}
+                updateProject(input: {id: "${id}", public: false}){ public }
+            }                    
+        `
+        API.graphql(graphqlOperation(deleteQuery)).then(res => {
+            console.log("public deleted", res);
+            setPublicId(false);
+        })
+            .catch(e => console.log(e))
     }
 
     async function deleteProject(e) {
@@ -70,6 +115,7 @@ export default function Project() {
             getProject(id: "${id}") {
                 id
                 name
+                public
                 events{
                     items{
                         id
@@ -78,6 +124,9 @@ export default function Project() {
                         time
                         hidden
                     }
+                }
+                publicProject{
+                    id        
                 }
             }
         }
@@ -99,6 +148,9 @@ export default function Project() {
             try {
                 projectData = await loadProject();
                 setProjName(projectData.data.getProject.name);
+                if (projectData.data.getProject.public){
+                    setPublicId(projectData.data.getProject.publicProject.id)
+                } else setPublicId(false);
                 const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
                     return new Date(b.time) - new Date(a.time);
                 });
@@ -126,7 +178,11 @@ export default function Project() {
                     <MoreButton className="button absolute right-0 top-0">
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={renameProject}>Rename Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={publicId ? makePrivate : makePublic}>
+                            {publicId ? "Make private" : "Make public"}
+                        </button>
                     </MoreButton>
+                    <p className="badge ~neutral !normal mt-4">{publicId ? `Public id: ${publicId}` : "Private project"}</p>
                     <hr className="sep"></hr>
                     <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}></ProjectNewEvent>
                     <hr className="sep"></hr>

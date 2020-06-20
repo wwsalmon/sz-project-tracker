@@ -142,7 +142,7 @@ mutation {
                 allowMultiple={true}
                 oninit={handleFilePondInit}
                 onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
-            ></FilePond.FilePond>
+            />
             )}
             <div className="overflow-auto">
                 <div className="flex my-4">
