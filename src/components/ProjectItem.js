@@ -214,7 +214,7 @@ export default function ProjectItem(props) {
                     </div>
                 )} */}
 
-                <MoreButton className="ml-auto button self-start absolute right-0 top-8 md:static" uid={event.id}>
+                <MoreButton className="right-0" uid={event.id}>
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
                     {!isEdit && <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleHidden}>

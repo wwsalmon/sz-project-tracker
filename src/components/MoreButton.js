@@ -21,13 +21,16 @@ export default function MoreButton(props){
     });
 
     return (
-        <>
-            <button className={props.className} id={uid + "-showMoreButton"} ref={thisButton} onClick={() => setIsExpanded(!isExpanded)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
+        <div className={`absolute whitespace-no-wrap ${props.className}`}>
+            <button className="opacity-50 focus:outline-none hover:bg-gray-300 px-2" id={uid + "-showMoreButton"} ref={thisButton}
+                    onClick={() => setIsExpanded(!isExpanded)}>
+                <FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon>
+            </button>
             { isExpanded && (
-                <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border z-10">
+                <div className="flex absolute flex-col bg-white right-0 rounded mt-8 top-0 py-2 border z-10">
                     {props.children}
                 </div>
             )}
-        </>
+        </div>
     )
 }

@@ -95,7 +95,7 @@ export default function Projects(props) {
                         {projects.map((project) => (
                             <div key={project.id} className="card border relative overflow-visible">
                                 <Link to={`/projects/${project.id}`}><p>{project.name}</p></Link>
-                                <MoreButton className="absolute top-4 right-4">
+                                <MoreButton className="top-4 right-4">
                                     <button
                                         className="button ~critical !low"
                                         type="button"

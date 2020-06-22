@@ -175,7 +175,7 @@ export default function Project() {
             {isInit && (
                 <>
                     <h1 className="heading">{projName}</h1>
-                    <MoreButton className="button absolute right-0 top-0">
+                    <MoreButton className="right-0 top-0">
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={renameProject}>Rename Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={publicId ? makePrivate : makePublic}>
