@@ -1,15 +1,15 @@
 import React from 'react';
 import Routes from "./Routes";
-import SimpleReactLightbox from "simple-react-lightbox";
 import Navbar from "./components/Navbar";
+import {ProvideAuth} from "./lib/authLib";
 
 export default function App() {
   return (
-    <SimpleReactLightbox>
+  <ProvideAuth>
       <Navbar></Navbar>
       <div className="max-w-6xl mx-auto px-4 pt-24">
         <Routes />
       </div>
-    </SimpleReactLightbox>
+  </ProvideAuth>
   )
 }
