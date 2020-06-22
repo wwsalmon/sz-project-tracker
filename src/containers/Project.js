@@ -64,8 +64,7 @@ export default function Project() {
                 updateProject(input: {id: "${id}", public: false}){ public }
             }                    
         `
-        API.graphql(graphqlOperation(deleteQuery)).then(res => {
-            console.log("public deleted", res);
+        API.graphql(graphqlOperation(deleteQuery)).then(() => {
             setPublicId(false);
         })
             .catch(e => console.log(e))
@@ -105,7 +104,6 @@ export default function Project() {
     }
 
     useEffect(() => {
-        console.log("useeffect");
         let projectData;
 
         function loadProject() {

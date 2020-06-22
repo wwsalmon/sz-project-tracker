@@ -20,7 +20,6 @@ export default function PublicProject() {
 
     useEffect(() => {
         setIsInit(false);
-        console.log("useEffect hook called");
 
         let projectData;
 
