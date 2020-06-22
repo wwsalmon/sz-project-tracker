@@ -22,6 +22,7 @@ export default function ProjectItem(props) {
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [isEdit, setIsEdit] = useState(false);
     const [newNote, setNewNote] = useState(event.note);
+    const [publicId, setPublicId] = useState(event.publicEvent === null ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
 
@@ -50,16 +51,81 @@ export default function ProjectItem(props) {
         }
     }
 
-    async function handleToggleHidden(e){
+    async function handleToggleHidden(e) {
         e.preventDefault();
-        changeHiddenLocal(event.id, !isPrivate);
-        setIsPrivate(!isPrivate);
-        const query = `
-        mutation{
-            updateEvent(input: {id: "${event.id}", hidden: ${!isPrivate}}){ id }
+
+        /*
+
+        private -> public:
+        update private event and get public project id
+        create new public event with all info of private event
+        update private event to link to public event
+
+        public -> private:
+        update private event and get link to public event
+        delete public event
+
+        */
+
+        try{
+
+            if (isPrivate){ // private -> public
+                const newFileUUIDs = `[${event.filenames.map(d => `"${d}"`)}]`;
+                const updateEventQ1 = `
+                    mutation{
+                        updateEvent(input: {id: "${event.id}", hidden: false}){
+                            hidden project { publicProject{ id } }
+                        }
+                    }
+                `;
+                const update1Data = await API.graphql(graphqlOperation(updateEventQ1));
+                console.log(update1Data);
+                const publicProjectId = update1Data.data.updateEvent.project.publicProject.id;
+                // if (publicProjectId === undefined) throw "Project is not public, failed to make update public";
+                const createPublicEventQ = `
+                    mutation{
+                        createPublicEvent(input: {filenames: ${newFileUUIDs}, note: """${newNote}""", time: "${event.time}", publicEventPublicProjectId: "${publicProjectId}"}){ id filenames note time publicProject { id }}
+                    }    
+                `
+                const createPublicData = await API.graphql(graphqlOperation(createPublicEventQ));
+                const publicEventId = createPublicData.data.createPublicEvent.id;
+                const updateEventQ2 = `
+                    mutation{
+                        updateEvent(input: {id: "${event.id}", eventPublicEventId: "${publicEventId}"}){
+                            publicEvent { id }
+                        }
+                    }
+                `
+                await API.graphql(graphqlOperation(updateEventQ2));
+                setPublicId(publicEventId);
+            } else { // public -> private
+                const updateEventQ = `
+                    mutation{
+                        updateEvent(input: {id: "${event.id}", hidden: true}){
+                            hidden publicEvent{ id }
+                        }
+                    }                    
+                `
+                const updateData = await API.graphql(graphqlOperation(updateEventQ))
+                const publicEventData = updateData.data.updateEvent.publicEvent;
+                if (publicEventData === null){
+                    console.warn( "No public event found for this event.");
+                } else{
+                    const publicEventId = publicEventData.id;
+                    const deletePublicEventQ = `
+                    mutation{
+                        deletePublicEvent(input: {id: "${publicEventId}"}){ id }
+                    }
+                `
+                    await API.graphql(graphqlOperation(deletePublicEventQ));
+                    setPublicId(false);
+                }
+            }
+            setIsPrivate(!isPrivate);
+            changeHiddenLocal(event.id, !isPrivate);
+        } catch(e){
+            console.log(e);
         }
-        `
-        API.graphql(graphqlOperation(query)).then(res => console.log(res)).catch(e => console.log(e));
     }
 
     function handleToggleEdit(e){
@@ -69,11 +135,11 @@ export default function ProjectItem(props) {
 
     async function handleEditEvent(e){
         e.preventDefault();
-        const query = `
+        let query = `
         mutation{
-            updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }
-        }
-        `
+            updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }`
+        query += publicId ? `updatePublicEvent(input: {id: "${publicId}", note: """${newNote}"""}){ id }` : "";
+        query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
             event.note = newNote;
