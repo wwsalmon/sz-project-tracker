@@ -64,7 +64,7 @@ export default function Projects(props) {
             }
             catch (e) {
                 console.log(e);
-                // history.push("/login");
+                history.push("/login");
             }
             const projects = await loadProjects();
             setProjects(projects);
@@ -72,9 +72,8 @@ export default function Projects(props) {
             setIsInit(true);
         }
 
-        onLoad();
-    }, [history.push]);
-   
+        onLoad
+    }, [history]);
 
     return (
         
