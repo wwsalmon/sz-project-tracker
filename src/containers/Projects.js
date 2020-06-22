@@ -6,7 +6,7 @@ import { API, graphqlOperation, Auth } from 'aws-amplify';
 
 export default function Projects(props) {
     const history = useHistory();
-    const [showModal, setShowModal] = React.useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
