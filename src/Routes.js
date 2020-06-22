@@ -28,7 +28,7 @@ export default function Routes() {
             <Route exact path="/projects/:id">
                 <Project />
             </Route>
-            <Route exact path="/public/:id">
+            <Route exact path="/public/:id/:postid?">
                 <PublicProject />
             </Route>
         </Switch>

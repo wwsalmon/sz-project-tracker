@@ -8,7 +8,6 @@ import "./Project.css";
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
 import MoreButton from "../components/MoreButton";
-import {create} from "filepond";
 
 export default function Project() {
     const { id } = useParams();
