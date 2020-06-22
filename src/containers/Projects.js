@@ -34,7 +34,6 @@ export default function Projects(props) {
             // setIsLoading(false);
             console.log(error);
         }
-        window.location.reload();
 
     }
     
@@ -66,13 +65,13 @@ export default function Projects(props) {
                 console.log(e);
                 history.push("/login");
             }
-            const projects = await loadProjects();
-            setProjects(projects);
+            const projectsData = await loadProjects();
+            setProjects(projectsData.data.listProjects.items);
             // setIsLoading(false);
             setIsInit(true);
         }
 
-        onLoad
+        onLoad();
     }, [history]);
 
     return (
@@ -92,7 +91,7 @@ export default function Projects(props) {
                     <Link to="/projects/new"><button className="button !normal ~neutral my-4">New Project</button></Link>
                     <p className="label my-4">Active Projects</p>
                     <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3 my-4">
-                        {projects.data.listProjects.items.map((project) => (
+                        {projects.map((project) => (
                             <div key={project.id} className="card border">
                                 <Link to={`/projects/${project.id}`}><p>{project.name}</p></Link>
                                 

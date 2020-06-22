@@ -22,7 +22,7 @@ export default function ProjectItem(props) {
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [isEdit, setIsEdit] = useState(false);
     const [newNote, setNewNote] = useState(event.note);
-    const [publicId, setPublicId] = useState(event.publicEvent === null ? false : event.publicEvent.id);
+    const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
 
