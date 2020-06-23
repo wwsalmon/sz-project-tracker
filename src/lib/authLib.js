@@ -27,7 +27,7 @@ function useProvideAuth(){
     }
 
     const signInWithGoogle = () => {
-        Auth.federatedSignIn({ provider: 'Google' });
+        return Auth.federatedSignIn({ provider: 'Google' });
     }
 
     const signUp = (username, password, email) => {
