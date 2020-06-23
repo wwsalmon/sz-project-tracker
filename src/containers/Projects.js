@@ -1,18 +1,18 @@
 import React, {useState, useEffect} from 'react';
-import {Link, useHistory} from 'react-router-dom';
-import {API, graphqlOperation, Auth} from 'aws-amplify';
+import {Link, useHistory } from 'react-router-dom';
+import {API, graphqlOperation} from 'aws-amplify';
 import MoreButton from "../components/MoreButton";
+import {useAuth} from "../lib/authLib";
 
 
 export default function Projects(props) {
     const history = useHistory();
     const [showModal, setShowModal] = useState(false);
+    const auth = useAuth();
 
     // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
     const [projects, setProjects] = useState([]);
-
-    console.log(props.location);
 
     async function deleteProject(e, projectID) {
         e.preventDefault();
@@ -56,13 +56,9 @@ export default function Projects(props) {
 
 
         async function onLoad() {
-            try {
-                console.log("checking authentication");
-                await Auth.currentAuthenticatedUser();
-                console.log("authenticated");
-            } catch (e) {
-                console.log(e);
-                history.push("/login");
+            if (auth.authState !== "signedIn"){
+                history.push({pathname: "/login", state: {message: "You must be logged in to access projects."}});
+                return;
             }
             const projectsData = await loadProjects();
             setProjects(projectsData.data.listProjects.items);

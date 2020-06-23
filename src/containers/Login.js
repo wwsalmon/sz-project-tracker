@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import {useAuth} from "../lib/authLib";
 
-export default function Login(){
+export default function Login(props){
     const [isLoading, setIsLoading] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [code, setCode] = useState("");
+    const propState = props.location.state;
+    const [message, setMessage] = useState(propState === undefined ? false : propState.message);
     const auth = useAuth();
 
     return (
         <>
+            {message && (<p className="aside my-4 ~warning">{message}</p>)}
             {isLoading && (<p className="aside ~info my-4">Loading...</p>)}
             {
                 {
