@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
@@ -8,21 +8,19 @@ export default function MoreButton(props){
     const [isExpanded, setIsExpanded] = useState(false);
     const thisButton = useRef(null);
 
-    window.addEventListener('click', e => {
-        const secondParent = (e.target.parentElement !== null) ? e.target.parentElement.parentElement !== thisButton.current : true;
+    useEffect(() => {
+        window.addEventListener('click', e => {
+            const isNotButton = e.target !== thisButton.current && !(thisButton.current.contains(e.target));
+            if (isNotButton) {
+                setIsExpanded(false);
+            }
+        });
+    }, []);
 
-        const isNotButton = e.target !== thisButton.current
-            && e.target.parentElement !== thisButton.current
-            && secondParent;
-
-        if (isNotButton) {
-            setIsExpanded(false);
-        }
-    });
 
     return (
-        <div className={`absolute whitespace-no-wrap ${props.className}`}>
-            <button className="opacity-50 focus:outline-none hover:bg-gray-300 px-2" id={uid + "-showMoreButton"} ref={thisButton}
+        <div className={`absolute whitespace-no-wrap ${props.className}`} ref={thisButton}>
+            <button className="opacity-50 focus:outline-none hover:bg-gray-300 px-2" id={uid + "-showMoreButton"}
                     onClick={() => setIsExpanded(!isExpanded)}>
                 <FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon>
             </button>
