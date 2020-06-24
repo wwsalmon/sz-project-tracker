@@ -11,7 +11,6 @@ import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
 import {v1 as uuidv1} from 'uuid';
-import { func } from "prop-types";
 
 export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
@@ -166,7 +165,7 @@ mutation {
                         try {
                             Storage.vault.remove(uniqueFileId)
                                 .then(() => {
-                                    setFileUUIDs(fileUUIDs.filter(d => d != uniqueFileId));
+                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
                                     load();
                                 });
                         } catch (e) {
