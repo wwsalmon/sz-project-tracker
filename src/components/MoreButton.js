@@ -27,7 +27,7 @@ export default function MoreButton(props){
                 <FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon>
             </button>
             { isExpanded && (
-                <div className="flex absolute flex-col bg-white right-0 rounded mt-8 top-0 py-2 border z-10">
+                <div className="flex absolute flex-col bg-white bg-opacity-100 right-0 rounded mt-8 top-0 py-2 border z-10">
                     {props.children}
                 </div>
             )}

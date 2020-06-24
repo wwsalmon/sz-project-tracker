@@ -38,7 +38,6 @@ export default function Projects(props) {
 
 
     useEffect(() => {
-        console.log("running projects useeffect");
         const listQuery = `
     query {
         listProjects{
@@ -67,7 +66,7 @@ export default function Projects(props) {
         }
 
         onLoad();
-    }, [history]);
+    }, [history, auth.authState]);
 
     return (
 

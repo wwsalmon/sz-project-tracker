@@ -15,6 +15,6 @@ export default function SignOut(props){
     }
 
     return(
-        <button className={props.className} onClick={signOut}>Sign out</button>
+        <button className={"button focus:outline-none" + props.className} onClick={signOut}>Sign out</button>
     )
 }

@@ -9,8 +9,9 @@ export default function Login(props){
     const [code, setCode] = useState("");
     const [error, setError] = useState(false);
     const propState = props.location.state;
-    const [message, setMessage] = useState(propState === undefined ? false : propState.message);
     const auth = useAuth();
+
+    const message = propState === undefined ? false : propState.message
 
     return (
         <>

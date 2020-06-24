@@ -20,9 +20,9 @@ function useProvideAuth(){
 
     const signIn = (username, password) => {
         return Auth.signIn(username, password).then(res => {
-            setAuthState("signedIn");
             console.log(res);
             setUser(res);
+            setAuthState("signedIn");
         })
     }
 
@@ -47,8 +47,8 @@ function useProvideAuth(){
 
     const signOut = () => {
         return Auth.signOut().then(() => {
-            setUser(false);
             setAuthState("signedOut");
+            setUser(false);
         })
     }
 
