@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {API, graphqlOperation, Auth} from 'aws-amplify';
 import MoreButton from "../components/MoreButton";
-
+import DeleteModal from "../components/DeleteModal";
 
 export default function Projects(props) {
     const history = useHistory();
@@ -105,7 +105,6 @@ export default function Projects(props) {
                                         Delete Project
                                     </button>
                                 </MoreButton>
-
 
 
                                 {showModal ? (

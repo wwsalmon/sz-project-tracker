@@ -15,6 +15,7 @@
     "filepond": "^4.13.7",
     "filepond-plugin-image-preview": "^4.6.4",
     "html-react-parser": "^0.10.5",
+    "postcss": "^7.0.32",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-filepond": "^7.0.1",
