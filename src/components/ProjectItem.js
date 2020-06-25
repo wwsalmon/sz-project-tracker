@@ -134,6 +134,7 @@ export default function ProjectItem(props) {
         e.preventDefault();
         setIsEdit(true);
     }
+    
 
     function deleteAttachment(filename)
     {   
@@ -174,6 +175,7 @@ export default function ProjectItem(props) {
         let query = `
         mutation{
             updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }`
+            query += publicId ? `updatePublicEvent(input: {id: "${publicId}", note: """${newNote}"""}){ id }` : "";
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
@@ -227,8 +229,10 @@ export default function ProjectItem(props) {
                             />
                             <div className="flex">
                                 <button onClick={handleEditEvent} disabled={newNote === event.note} className="button field w-auto block my-4 mr-2">Save Changes</button>
+
                                 <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
-                                <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
+
+                                <button onClick={} className="button field w-auto block my-4 mr-2">Add Attachment</button>
                             </div>
                         </>
                     ) : Parser(markdownConverter.makeHtml(event.note))}
