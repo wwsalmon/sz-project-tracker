@@ -8,14 +8,6 @@ export default function MoreButton(props){
     const [isExpanded, setIsExpanded] = useState(false);
     const thisButton = useRef(null);
 
-    useEffect(() => {	
-        window.addEventListener('click', e => {	
-            const isNotButton = e.target !== thisButton.current && !(thisButton.current.contains(e.target));	
-            if (isNotButton) {	
-                setIsExpanded(false);	
-            }	
-        });	
-    }, []);
 
 
     return (

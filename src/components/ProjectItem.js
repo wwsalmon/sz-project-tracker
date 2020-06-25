@@ -163,6 +163,7 @@ export default function ProjectItem(props) {
         }).catch(e => console.log(e));
         try{
             Storage.vault.remove(filename);
+            setIsEdit(false);
         }
         catch(e)
         {
@@ -232,7 +233,6 @@ export default function ProjectItem(props) {
 
                                 <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
 
-                                <button onClick={} className="button field w-auto block my-4 mr-2">Add Attachment</button>
                             </div>
                         </>
                     ) : Parser(markdownConverter.makeHtml(event.note))}
