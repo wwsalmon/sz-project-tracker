@@ -2,6 +2,7 @@ import React from 'react';
 import Routes from "./Routes";
 import Navbar from "./components/Navbar";
 import {ProvideAuth} from "./lib/authLib";
+import "./App.css";
 
 export default function App() {
   return (

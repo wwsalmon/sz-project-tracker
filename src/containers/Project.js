@@ -122,6 +122,11 @@ export default function Project() {
                         filenames
                         time
                         hidden
+                        project{
+                            publicProject{
+                                id
+                            }
+                        }
                         publicEvent{
                             id
                         }
@@ -181,7 +186,7 @@ export default function Project() {
                     </MoreButton>
                     <p className="badge ~neutral !normal mt-4">{publicId ? `Public id: ${publicId}` : "Private project"}</p>
                     <hr className="sep"/>
-                    <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}/>
+                    <ProjectNewEvent setEvents={setEvents} publicId={publicId} events={events} projectId={id}/>
                     <hr className="sep"/>
 
                     {showPrivate ? (
@@ -202,7 +207,11 @@ export default function Project() {
                                         <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
                                     )
                                 }
-                                <ProjectItem changeHiddenLocal={changeHiddenLocal} removeLocal={removeLocal} event={event}/>
+                                <ProjectItem changeHiddenLocal={changeHiddenLocal}
+                                             removeLocal={removeLocal}
+                                             event={event}
+                                             publicId={publicId}
+                                />
                             </div>                     
                     ))}
                     </div>

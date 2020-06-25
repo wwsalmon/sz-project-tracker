@@ -30,9 +30,8 @@ export default function ProjectItem(props) {
         e.preventDefault();
         const query = `
         mutation{
-            deleteEvent(input: {id: "${event.id}"}){ id }
-        }
-        `
+            deleteEvent(input: {id: "${event.id}"}){ id }`
+            + (publicId ? `deletePublicEvent(input: {id: "${publicId}"}){ id }` : "") + "}";
         try {
             await API.graphql(graphqlOperation(query));
             removeLocal(event.id);
@@ -68,7 +67,9 @@ export default function ProjectItem(props) {
         */
 
         try{
-
+            if (event.project.publicProject === null){
+                throw new Error("Project not public");
+            }
             if (isPrivate){ // private -> public
                 const newFileUUIDs = `[${event.filenames.map(d => `"${d}"`)}]`;
                 const updateEventQ1 = `
@@ -84,7 +85,10 @@ export default function ProjectItem(props) {
                 // if (publicProjectId === undefined) throw "Project is not public, failed to make update public";
                 const createPublicEventQ = `
                     mutation{
-                        createPublicEvent(input: {filenames: ${newFileUUIDs}, note: """${newNote}""", time: "${event.time}", publicEventPublicProjectId: "${publicProjectId}"}){ id filenames note time publicProject { id }}
+                        createPublicEvent(input: {filenames: ${newFileUUIDs},
+                        note: """${newNote}""",
+                        time: "${event.time}",
+                        publicEventPublicProjectId: "${publicProjectId}"}){ id filenames note time publicProject { id }}
                     }    
                 `
                 const createPublicData = await API.graphql(graphqlOperation(createPublicEventQ));
@@ -217,7 +221,10 @@ export default function ProjectItem(props) {
                 <MoreButton className="right-0" uid={event.id}>
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
                     {!isEdit && <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleHidden}>
+                    <button disabled={!props.publicId}
+                            className="button hover:bg-gray-100 py-2 px-4 text-left"
+                            onClick={handleToggleHidden}
+                    >
                         {isPrivate ? "Make public" : "Make private"}
                     </button>                    
                 </MoreButton>
