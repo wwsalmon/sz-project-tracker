@@ -25,6 +25,8 @@ export default function ProjectItem(props) {
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
+    const [showUpload, setShowUpload] = useState(false);
+
 
     async function handleDeleteEvent(e) {
         e.preventDefault();
@@ -133,12 +135,45 @@ export default function ProjectItem(props) {
         setIsEdit(true);
     }
 
+    function deleteAttachment(filename)
+    {   
+        var str="";
+        console.log(event.filenames);
+        const index = event.filenames.indexOf(filename);
+                if (index > -1) {
+                event.filenames.splice(index, 1);
+                                }
+        console.log(event.filenames);
+        event.filenames.map(filename =>{str=str+'"';str=str+filename;str=str+'"';str=str+','});
+        var newstr= str.substring(0,str.length-1);
+        let query = `
+        mutation{
+            updateEvent(
+                input: {
+                    id: "${event.id}",
+                    filenames : [ ${newstr} ]  
+                }
+                    )
+            { id }
+        }`
+        
+        API.graphql(graphqlOperation(query)).then(res => {
+            console.log(res);
+        }).catch(e => console.log(e));
+        try{
+            Storage.vault.remove(filename);
+        }
+        catch(e)
+        {
+            console.log(e);
+        }
+    }
+
     async function handleEditEvent(e){
         e.preventDefault();
         let query = `
         mutation{
             updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }`
-        query += publicId ? `updatePublicEvent(input: {id: "${publicId}", note: """${newNote}"""}){ id }` : "";
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
@@ -193,15 +228,24 @@ export default function ProjectItem(props) {
                             <div className="flex">
                                 <button onClick={handleEditEvent} disabled={newNote === event.note} className="button field w-auto block my-4 mr-2">Save Changes</button>
                                 <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
+                                <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
                             </div>
                         </>
                     ) : Parser(markdownConverter.makeHtml(event.note))}
+                    {isEdit ?(
+                        <>
                     <div className="flex items-center">
-                        {event.filenames.map(filename => (
+                        {event.filenames.map(filename => (<>
+                            <button className="button ~critical !low" onClick={()=>deleteAttachment(filename)}>x</button>
                             <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex" s3key={filename} key={filename}></EventImage>
+                        </>
                         ))}
                     </div>
+                    </>
+                    ):console.log()
+                    }
                 </div>
+
                 
                 {/* <button className="ml-auto button self-start absolute right-0 top-8 md:static" id={event.id + "-showMoreButton"} ref={showMoreButton} onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
                 {showOptions && (
