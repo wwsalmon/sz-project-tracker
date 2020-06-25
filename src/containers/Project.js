@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { API, graphqlOperation, Auth } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import { format } from 'date-fns';
+import {useAuth} from "../lib/authLib";
 
 import "./Project.css";
 
@@ -19,6 +20,7 @@ export default function Project() {
     const [isInit, setIsInit] = useState(false);
     const [showPrivate, setShowPrivate] = useState(true);
     const [numPrivate, setNumPrivate] = useState(0);
+    const auth = useAuth();
 
     function removeLocal(eventID) {
         setEvents(events.filter(event => event.id !== eventID));
@@ -135,14 +137,9 @@ export default function Project() {
         }
 
         async function onLoad() {
-            try {
-                console.log("checking authentication");
-                await Auth.currentAuthenticatedUser();
-                console.log("authenticated");
-            }
-            catch (e) {
-                console.log(e);
-                history.push("/");
+            if (auth.authState !== "signedIn"){
+                history.push({pathname: "/login", state: {message: "You must be logged in to edit projects."}});
+                return;
             }
 
             try {
@@ -165,7 +162,7 @@ export default function Project() {
         }
         
         onLoad();
-    }, [id, history]);
+    }, [id, history, auth.authState]);
 
     return (
         <div className="relative">
@@ -183,9 +180,9 @@ export default function Project() {
                         </button>
                     </MoreButton>
                     <p className="badge ~neutral !normal mt-4">{publicId ? `Public id: ${publicId}` : "Private project"}</p>
-                    <hr className="sep"></hr>
-                    <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}></ProjectNewEvent>
-                    <hr className="sep"></hr>
+                    <hr className="sep"/>
+                    <ProjectNewEvent setEvents={setEvents} events={events} projectId={id}/>
+                    <hr className="sep"/>
 
                     {showPrivate ? (
                         <button className="button ml-auto block ~neutral my-4" disabled={numPrivate === 0} onClick={() => setShowPrivate(false)}>Show only public updates</button>
@@ -205,7 +202,7 @@ export default function Project() {
                                         <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
                                     )
                                 }
-                                <ProjectItem changeHiddenLocal={changeHiddenLocal} removeLocal={removeLocal} event={event}></ProjectItem>
+                                <ProjectItem changeHiddenLocal={changeHiddenLocal} removeLocal={removeLocal} event={event}/>
                             </div>                     
                     ))}
                     </div>
