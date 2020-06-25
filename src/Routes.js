@@ -8,6 +8,7 @@ import NewProject from "./containers/NewProject";
 import Project from "./containers/Project";
 import Projects from "./containers/Projects";
 import PublicProject from "./containers/PublicProject";
+import GoogleRedirect from "./containers/GoogleRedirect";
 
 export default function Routes() {
     return (
@@ -18,6 +19,9 @@ export default function Routes() {
             <Route exact path="/login" render={(props) => <Login {...props} />}/>
             <Route exact path="/signup">
                 <SignUp />
+            </Route>
+            <Route exact path="/googleredirect">
+                <GoogleRedirect/>
             </Route>
             <Route exact path="/projects" render={(props) => <Projects {...props} />}/>
             <Route exact path="/projects/new">

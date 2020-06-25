@@ -1,7 +1,7 @@
 // lots of code from https://usehooks.com/useAuth/
 
 import React, { useState, useEffect, useContext, createContext } from "react";
-import { Auth } from 'aws-amplify';
+import { Auth, Hub } from 'aws-amplify';
 
 const authContext = createContext();
 
@@ -20,7 +20,6 @@ function useProvideAuth(){
 
     const signIn = (username, password) => {
         return Auth.signIn(username, password).then(res => {
-            console.log(res);
             setUser(res);
             setAuthState("signedIn");
         })
@@ -34,6 +33,16 @@ function useProvideAuth(){
         return Auth.signUp({username, password, attributes: {email}}).then(res => {
             console.log(res);
             setAuthState("getConfirm");
+        });
+    }
+
+    const checkGoogle = () => {
+        return new Promise(resolve => {
+            Hub.listen("auth", () => {
+                checkCurrentAuth().then(res => {
+                    resolve(res);
+                });
+            });
         });
     }
 
@@ -52,15 +61,28 @@ function useProvideAuth(){
         })
     }
 
+    const checkCurrentAuth = () => {
+        return new Promise(resolve => {
+            Auth.currentAuthenticatedUser().then(res => {
+                setUser(res);
+                setAuthState("signedIn");
+                resolve("success");
+            }).catch(e => {
+                console.log(e);
+                setUser(false);
+                setAuthState("signedOut");
+                resolve(e);
+            });
+        })
+    }
+
     useEffect(() => {
-        Auth.currentAuthenticatedUser().then(res => {
-            setUser(res);
-            setAuthState("signedIn");
+        checkCurrentAuth().then(res => {
+            console.log(res);
         }).catch(e => {
-            setUser(false);
-            setAuthState("signedOut");
+            console.log(e);
         });
     }, []);
 
-    return {user, authState, signIn, signInWithGoogle, signUp, confirmSignUp, signOut};
+    return {user, authState, signIn, signInWithGoogle, checkGoogle, signUp, confirmSignUp, signOut};
 }
