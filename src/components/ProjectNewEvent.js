@@ -11,6 +11,7 @@ import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
 import {v1 as uuidv1} from 'uuid';
+import utf8 from "utf8";
 
 export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
@@ -52,7 +53,7 @@ export default function ProjectNewEvent(props) {
               eventProjectId: "${props.projectId}",
               time: "${currentDate.toISOString()}",
               filenames: ${newFileUUIDs},
-              note: """${newNote}""",
+              note: """${utf8.encode(newNote)}""",
               hidden: ${!isPublic}}) {
                 id
                 note
@@ -83,7 +84,7 @@ export default function ProjectNewEvent(props) {
                         publicEventPublicProjectId: "${publicProjectId}",
                         time: "${currentDate.toISOString()}",
                         filenames: ${newFileUUIDs},
-                        note: """${newNote}"""}){ id }                         
+                        note: """${utf8.encode(newNote)}"""}){ id }                         
                 }`;
                 const publicEventData = await API.graphql(graphqlOperation(createPublicQuery));
                 const publicEventId = publicEventData.data.createPublicEvent.id;

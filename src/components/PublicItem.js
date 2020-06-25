@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
+import utf8 from "utf8";
 
 export default function PublicItem(props) {
     const event = props.event;
@@ -27,7 +28,7 @@ export default function PublicItem(props) {
                     </Link>
                 </div>
                 <div className="content mr-6 md:mr-0 flex-1">
-                    {Parser(markdownConverter.makeHtml(event.note))}
+                    {Parser(markdownConverter.makeHtml(utf8.decode(event.note)))}
                 </div>
             </div>
         </div>

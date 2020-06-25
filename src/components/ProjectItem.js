@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import { Link } from "react-router-dom";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
+import utf8 from "utf8";
 
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
@@ -19,10 +20,11 @@ import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import MoreButton from "../components/MoreButton";
 
 export default function ProjectItem(props) {
-    const event = props.event;
+    const [event, setEvent] = useState(props.event);
+    let decodedNote = utf8.decode(props.event.note);
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [isEdit, setIsEdit] = useState(false);
-    const [newNote, setNewNote] = useState(event.note);
+    const [newNote, setNewNote] = useState(decodedNote);
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
@@ -81,13 +83,12 @@ export default function ProjectItem(props) {
                     }
                 `;
                 const update1Data = await API.graphql(graphqlOperation(updateEventQ1));
-                console.log(update1Data);
                 const publicProjectId = update1Data.data.updateEvent.project.publicProject.id;
                 // if (publicProjectId === undefined) throw "Project is not public, failed to make update public";
                 const createPublicEventQ = `
                     mutation{
                         createPublicEvent(input: {filenames: ${newFileUUIDs},
-                        note: """${newNote}""",
+                        note: """${utf8.encode(newNote)}""",
                         time: "${event.time}",
                         publicEventPublicProjectId: "${publicProjectId}"}){ id filenames note time publicProject { id }}
                     }    
@@ -97,21 +98,22 @@ export default function ProjectItem(props) {
                 const updateEventQ2 = `
                     mutation{
                         updateEvent(input: {id: "${event.id}", eventPublicEventId: "${publicEventId}"}){
-                            publicEvent { id }
+                            id hidden filenames note time publicEvent { id } project { publicProject { id } }
                         }
                     }
                 `
-                await API.graphql(graphqlOperation(updateEventQ2));
+                const update2Data = await API.graphql(graphqlOperation(updateEventQ2));
+                setEvent(update2Data.data.updateEvent);
                 setPublicId(publicEventId);
             } else { // public -> private
                 const updateEventQ = `
                     mutation{
                         updateEvent(input: {id: "${event.id}", hidden: true}){
-                            hidden publicEvent{ id }
+                            id hidden filenames note time publicEvent { id } project { publicProject { id } }
                         }
                     }                    
                 `
-                const updateData = await API.graphql(graphqlOperation(updateEventQ))
+                const updateData = await API.graphql(graphqlOperation(updateEventQ));
                 const publicEventData = updateData.data.updateEvent.publicEvent;
                 if (publicEventData === null){
                     console.warn( "No public event found for this event.");
@@ -125,6 +127,7 @@ export default function ProjectItem(props) {
                     await API.graphql(graphqlOperation(deletePublicEventQ));
                     setPublicId(false);
                 }
+                setEvent(updateData.data.updateEvent);
             }
             setIsPrivate(!isPrivate);
             changeHiddenLocal(event.id, !isPrivate);
@@ -147,21 +150,20 @@ export default function ProjectItem(props) {
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
-            event.note = newNote;
+            decodedNote = newNote;
             setIsEdit(false);
         }).catch(e => console.log(e));
     }
 
     function handleCancelEdit(e){
         e.preventDefault();
-        if (newNote !== event.note){
+        if (newNote !== decodedNote){
             if (window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
-                setNewNote(event.note);
+                setNewNote(decodedNote);
                 setIsEdit(false);
             }
         }
         else {
-            setNewNote(event.note);
             setIsEdit(false);
         }        
     }
@@ -200,11 +202,11 @@ export default function ProjectItem(props) {
                                 }}
                             />
                             <div className="flex">
-                                <button onClick={handleEditEvent} disabled={newNote === event.note} className="button field w-auto block my-4 mr-2">Save Changes</button>
+                                <button onClick={handleEditEvent} disabled={newNote === decodedNote} className="button field w-auto block my-4 mr-2">Save Changes</button>
                                 <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
                             </div>
                         </>
-                    ) : Parser(markdownConverter.makeHtml(event.note))}
+                    ) : Parser(markdownConverter.makeHtml(decodedNote))}
                     <div className="flex items-center">
                         {event.filenames.map(filename => (
                             <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex" s3key={filename} key={filename}></EventImage>
