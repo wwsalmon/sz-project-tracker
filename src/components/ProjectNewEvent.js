@@ -143,8 +143,8 @@ export default function ProjectNewEvent(props) {
         if (createEventStatus.status === "success"){
             const twitterUrl = 'https:/twitter.com/intent/tweet?text=';
             const maxTweetLength = 280 - 23 - 5;
-            const noteText = newNote.length < maxTweetLength ? encodeURI(newNote + " ") :
-                encodeURI(newNote.substring(0,280 - 23 - 5) + "... ");
+            const noteText = newNote.length < maxTweetLength ? encodeURIComponent(newNote + " ") :
+                encodeURIComponent(newNote.substring(0,280 - 23 - 5) + "... ");
             const noteUrl = "https://sz-project-tracker-v0.netlify.app/public/"
                 + props.publicId + "/" + createEventStatus.publicEventId;
             window.open(twitterUrl + noteText + noteUrl);
