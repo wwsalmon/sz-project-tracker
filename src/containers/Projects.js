@@ -3,11 +3,10 @@ import {Link, useHistory } from 'react-router-dom';
 import {API, graphqlOperation} from 'aws-amplify';
 import MoreButton from "../components/MoreButton";
 import {useAuth} from "../lib/authLib";
-
+import Modal from "../components/Modal";
 
 export default function Projects(props) {
     const history = useHistory();
-    const [showModal, setShowModal] = useState(false);
     const auth = useAuth();
 
     // const [isLoading, setIsLoading] = useState(true);
@@ -91,38 +90,19 @@ export default function Projects(props) {
                             <div key={project.id} className="card border relative overflow-visible">
                                 <Link to={`/projects/${project.id}`}><p>{project.name}</p></Link>
                                 <MoreButton className="top-4 right-4">
-                                    <button
-                                        className="button ~critical !low"
-                                        type="button"
-                                        style={{transition: "all .15s ease"}}
-                                        onClick={() => setShowModal(true)}
+                                    <Modal
+                                        buttonClassName="button ~critical !low"
+                                        buttonText="Delete Project"
                                     >
-                                        Delete Project
-                                    </button>
+                                        <p className="my-4">
+                                            Are you sure you want to delete project <b>{project.name}</b>?
+                                        </p>
+                                        <button
+                                            className="button ~critical !high"
+                                            onClick={(e) => deleteProject(e, project.id)}>Delete
+                                        </button>
+                                    </Modal>
                                 </MoreButton>
-
-
-
-                                {showModal ? (
-                                    <>
-                                        <div className="flex items-center justify-center fixed inset-0 z-50" onClick={() => setShowModal(false)}>
-                                            <div className="relative card bg-white">
-                                                <button className="" onClick={() => setShowModal(false)}>
-                                                    <span className="opacity-5 outline-none focus:outline-none">×</span>
-                                                </button>
-                                                <p className="my-4">
-                                                    Are you sure you want to delete project <b>{project.name}</b>?
-                                                </p>
-                                                <button
-                                                    className="button ~critical !high"
-                                                    onClick={(e) => deleteProject(e, project.id)}>Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="opacity-25 fixed inset-0 z-40 bg-black"/>
-                                    </>
-                                ) : null}
-
                             </div>
                         ))}
                     </div>
