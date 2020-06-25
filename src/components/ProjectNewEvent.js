@@ -59,6 +59,9 @@ export default function ProjectNewEvent(props) {
                 time
                 filenames
                 hidden
+                publicEvent{
+                    id
+                }
                 project{
                     publicProject{
                         id
@@ -89,21 +92,35 @@ export default function ProjectNewEvent(props) {
                     updateEvent(input: {
                         id: "${privateEventId}",
                         eventPublicEventId: "${publicEventId}"
-                    }){ id }
+                    }){
+                        id
+                        note
+                        time
+                        filenames
+                        hidden
+                        publicEvent{
+                            id
+                        }
+                        project{
+                            publicProject{
+                                id
+                            }
+                        }
+                    }
                 }`;
                 return new Promise(resolve => {
-                    API.graphql(graphqlOperation(updatePrivateQuery)).then(() => {
-                        afterCreateEvent(createPrivateData.data.createEvent);
-                        resolve("success");
+                    API.graphql(graphqlOperation(updatePrivateQuery)).then(res => {
+                        afterCreateEvent(res.data.updateEvent);
+                        resolve({"status": "success", "publicEventId": publicEventId});
                     });
                 });
             } else{
                 afterCreateEvent(createPrivateData.data.createEvent);
-                return new Promise(resolve => {resolve("success")});
+                return new Promise(resolve => {resolve({"status": "success"})});
             }
         } catch(e){
             return new Promise(resolve => {
-                resolve(e);
+                resolve({"status": "failure", "error": e});
             });
         }
 
@@ -121,11 +138,15 @@ export default function ProjectNewEvent(props) {
     }
 
     async function handleCreateEventTwitter(e) {
-        const createdEvent = await handleCreateEvent(e);
-        if (createdEvent === "success"){
-            let twitterUrl ='https:/twitter.com/intent/tweet?text=';
-            twitterUrl += encodeURI(newNote);
-            window.open(twitterUrl);
+        const createEventStatus = await handleCreateEvent(e);
+        if (createEventStatus.status === "success"){
+            const twitterUrl = 'https:/twitter.com/intent/tweet?text=';
+            const maxTweetLength = 280 - 23 - 5;
+            const noteText = newNote.length < maxTweetLength ? encodeURI(newNote + " ") :
+                encodeURI(newNote.substring(0,280 - 23 - 5) + "... ");
+            const noteUrl = "https://sz-project-tracker-v0.netlify.app/public/"
+                + props.publicId + "/" + createEventStatus.publicEventId;
+            window.open(twitterUrl + noteText + noteUrl);
         }
     }
 
