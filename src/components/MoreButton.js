@@ -1,20 +1,29 @@
 import React, { useState, useRef, useEffect } from "react";
+import {v1 as uuidv1} from "uuid";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
 export default function MoreButton(props){
-    const uid = props.uid;
+    const uid = uuidv1();
     const [isExpanded, setIsExpanded] = useState(false);
     const thisButton = useRef(null);
 
     useEffect(() => {
-        window.addEventListener('click', e => {
-            const isNotButton = e.target !== thisButton.current && !(thisButton.current.contains(e.target));
-            if (isNotButton) {
-                setIsExpanded(false);
+        const moreButtonClickHandler = e => {
+            if (thisButton.current !== null) {
+                const isNotButton = e.target !== thisButton.current && !(thisButton.current.contains(e.target));
+                if (isNotButton) {
+                    setIsExpanded(false);
+                }
             }
-        });
+        }
+
+        window.addEventListener('click', moreButtonClickHandler);
+
+        return function cleanup(){
+            window.removeEventListener("click", moreButtonClickHandler);
+        }
     }, []);
 
 
