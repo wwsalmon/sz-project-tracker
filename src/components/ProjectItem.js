@@ -182,7 +182,7 @@ export default function ProjectItem(props) {
                     }</p>
                     {!isPrivate && (<FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}></FontAwesomeIcon>)}
                 </div>
-                <div className="content mr-6 md:mr-0 flex-1">
+                <div className="content pr-8 mr-6 md:mr-0 flex-1">
                     {isEdit ? (
                         <>
                             <SimpleMDE
@@ -218,7 +218,7 @@ export default function ProjectItem(props) {
                     </div>
                 )} */}
 
-                <MoreButton className="right-0" uid={event.id}>
+                <MoreButton className="right-0 top-8" uid={event.id}>
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
                     {!isEdit && <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
                     <button disabled={!props.publicId}
