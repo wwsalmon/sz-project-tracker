@@ -1,5 +1,6 @@
 
 import React, {useState} from "react";
+import { Link } from "react-router-dom";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
 
@@ -180,7 +181,11 @@ export default function ProjectItem(props) {
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {!isPrivate && (<FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}></FontAwesomeIcon>)}
+                    {!isPrivate && (
+                        <Link to={`/public/${props.publicId}/${event.publicEvent.id}`}>
+                            <FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}/>
+                        </Link>
+                    )}
                 </div>
                 <div className="content pr-8 mr-6 md:mr-0 flex-1">
                     {isEdit ? (

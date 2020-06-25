@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import {useParams, useHistory, Link} from "react-router-dom";
 import { API, graphqlOperation } from "aws-amplify";
 import { format } from 'date-fns';
 import {useAuth} from "../lib/authLib";
@@ -176,7 +176,17 @@ export default function Project() {
             )} */}
             {isInit && (
                 <>
-                    <h1 className="heading">{projName}</h1>
+                    <div className="text-center">
+                        <p className="label mb-4"><Link to="/projects">&lt; Back to all projects</Link></p>
+                        <h1 className="heading">{projName}</h1>
+                        {publicId ? (
+                            <p className="content aside ~neutral !normal mt-8">
+                                This is a public project. Public updates are published at <Link to={`/public/${publicId}`}>{publicId}</Link>.
+                            </p>
+                        ) : (
+                            <p className="badge ~neutral !normal mt-4">Private project</p>
+                        )}
+                    </div>
                     <MoreButton className="right-0 top-0">
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={renameProject}>Rename Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
@@ -184,7 +194,6 @@ export default function Project() {
                             {publicId ? "Make private" : "Make public"}
                         </button>
                     </MoreButton>
-                    <p className="badge ~neutral !normal mt-4">{publicId ? `Public id: ${publicId}` : "Private project"}</p>
                     <hr className="sep"/>
                     <ProjectNewEvent setEvents={setEvents} publicId={publicId} events={events} projectId={id}/>
                     <hr className="sep"/>
