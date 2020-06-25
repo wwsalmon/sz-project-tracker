@@ -181,7 +181,8 @@ export default function Project() {
                         <h1 className="heading">{projName}</h1>
                         {publicId ? (
                             <p className="content aside ~neutral !normal mt-8">
-                                This is a public project. Public updates are published at <Link to={`/public/${publicId}`}>{publicId}</Link>.
+                                This is a public project. Public updates are published at <Link
+                                to={`/public/${publicId}`} target="_blank">{publicId}</Link>.
                             </p>
                         ) : (
                             <p className="badge ~neutral !normal mt-4">Private project</p>
