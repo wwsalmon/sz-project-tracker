@@ -10,7 +10,7 @@ import "./ProjectNewEvent.css";
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
 
-import * as FilePond from "react-filepond";
+import * as FilePond from 'react-filepond';
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
@@ -26,6 +26,7 @@ import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import MoreButton from "../components/MoreButton";
 
 export default function ProjectItem(props) {
+    
     const event = props.event;
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [newUploads, setNewUploads] = useState(false);
@@ -38,17 +39,16 @@ export default function ProjectItem(props) {
     const [canSubmit, setCanSubmit] = useState(true);
     const [fileUUIDs, setFileUUIDs] = useState([]);
     const [newFiles, setNewFiles] = useState([]);
+    const pond= useRef();    
 
 
-    const pond =useRef();
 
     function handleFilePondInit() {
         console.log("filepond init", pond);
     }
 
     function handleFilePondUpdate(fileItems) {
-        setNewFiles(fileItems.map(fileItem => fileItem.file));
-        console.log(fileItems.toString());
+        
     }
 
 
@@ -257,11 +257,10 @@ export default function ProjectItem(props) {
 
                                 <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>      
 
-                                <button onClick={()=>{window.location.reload()}} disabled={!newUploads} className="button field w-auto block my-4 mr-2">Save Attachment</button>                          
                             </div>
                             <FilePond.FilePond server={
                 {
-                    process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                    process: (fieldName, file, metadata, load, error, progress, abort,removeLocal,transfer, options) => {
                         const extArray = file.name.split('.');
                         const ext = extArray[extArray.length - 1];
                         console.log(ext);
@@ -282,7 +281,6 @@ export default function ProjectItem(props) {
                             console.log(event.filenames);
                             event.filenames.map(filename =>{str=str+'"';str=str+filename;str=str+'"';str=str+','});
                             let newstr=  str.substring(0,str.length-1);
-                            console.log(event.filenames.pop());
                                     let query = `
                                     mutation{
                                         updateEvent(
@@ -297,9 +295,10 @@ export default function ProjectItem(props) {
                                     API.graphql(graphqlOperation(query)).then(res => {
                                         console.log(res);
                                     }).catch(e => console.log(e));
-                            console.log(event.filenames.toString());
                             setNewUploads(true);
-
+                            removeLocal();
+                            setIsEdit(false);
+                            
                         }).catch(e => {
                             console.log(e);
                             error(e);
