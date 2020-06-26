@@ -11,7 +11,6 @@ import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
 
 import * as FilePond from 'react-filepond';
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
 import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
@@ -29,16 +28,15 @@ export default function ProjectItem(props) {
     
     const event = props.event;
     const [isPrivate, setIsPrivate] = useState(event.hidden);
-    const [newUploads, setNewUploads] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [newNote, setNewNote] = useState(event.note);
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
-    const [showUpload, setShowUpload] = useState(false);
-    const [canSubmit, setCanSubmit] = useState(true);
     const [fileUUIDs, setFileUUIDs] = useState([]);
+    //eslint-disable-next-line
     const [newFiles, setNewFiles] = useState([]);
+    
     const pond= useRef();    
 
 
@@ -169,6 +167,7 @@ export default function ProjectItem(props) {
                 event.filenames.splice(index, 1);
                                 }
         console.log(event.filenames);
+        //eslint-disable-next-line
         event.filenames.map(filename =>{str=str+'"';str=str+filename;str=str+'"';str=str+','});
         var newstr= str.substring(0,str.length-1);
         let query = `
@@ -272,13 +271,13 @@ export default function ProjectItem(props) {
                             }
                         }).then(res => {
                             load(res.key);
-                            setCanSubmit(true);
                             setFileUUIDs([...fileUUIDs, uuid]);
                             
                             console.log(event.filenames.push(uuid));
                             console.log(uuid);
                             let str="";
                             console.log(event.filenames);
+                            //eslint-disable-next-line
                             event.filenames.map(filename =>{str=str+'"';str=str+filename;str=str+'"';str=str+','});
                             let newstr=  str.substring(0,str.length-1);
                                     let query = `
@@ -295,20 +294,17 @@ export default function ProjectItem(props) {
                                     API.graphql(graphqlOperation(query)).then(res => {
                                         console.log(res);
                                     }).catch(e => console.log(e));
-                            setNewUploads(true);
                             removeLocal();
                             setIsEdit(false);
                             
                         }).catch(e => {
                             console.log(e);
                             error(e);
-                            setCanSubmit(true);
                         });
 
                         return {
                             abort: () => {
                                 abort();
-                                setCanSubmit(true);
                             }
                         }
                     },
