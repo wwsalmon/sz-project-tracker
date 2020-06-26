@@ -1,5 +1,5 @@
 
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
 
@@ -9,6 +9,14 @@ import "./ProjectNewEvent.css";
 
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
+
+import * as FilePond from "react-filepond";
+import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import "filepond/dist/filepond.min.css";
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+
+import {v1 as uuidv1} from 'uuid';
+
 
 import EventImage from "../components/EventImage";
 
@@ -20,12 +28,28 @@ import MoreButton from "../components/MoreButton";
 export default function ProjectItem(props) {
     const event = props.event;
     const [isPrivate, setIsPrivate] = useState(event.hidden);
+    const [newUploads, setNewUploads] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [newNote, setNewNote] = useState(event.note);
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
     const [showUpload, setShowUpload] = useState(false);
+    const [canSubmit, setCanSubmit] = useState(true);
+    const [fileUUIDs, setFileUUIDs] = useState([]);
+    const [newFiles, setNewFiles] = useState([]);
+
+
+    const pond =useRef();
+
+    function handleFilePondInit() {
+        console.log("filepond init", pond);
+    }
+
+    function handleFilePondUpdate(fileItems) {
+        setNewFiles(fileItems.map(fileItem => fileItem.file));
+        console.log(fileItems.toString());
+    }
 
 
     async function handleDeleteEvent(e) {
@@ -231,9 +255,84 @@ export default function ProjectItem(props) {
                             <div className="flex">
                                 <button onClick={handleEditEvent} disabled={newNote === event.note} className="button field w-auto block my-4 mr-2">Save Changes</button>
 
-                                <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
+                                <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>      
 
+                                <button onClick={()=>{window.location.reload()}} disabled={!newUploads} className="button field w-auto block my-4 mr-2">Save Attachment</button>                          
                             </div>
+                            <FilePond.FilePond server={
+                {
+                    process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                        const extArray = file.name.split('.');
+                        const ext = extArray[extArray.length - 1];
+                        console.log(ext);
+                        const uuid = uuidv1() + `.${ext}`;
+
+                        Storage.vault.put(uuid, file, {
+                            progressCallback(thisProgress) {
+                                progress(thisProgress.lengthComputable, thisProgress.loaded, thisProgress.total);
+                            }
+                        }).then(res => {
+                            load(res.key);
+                            setCanSubmit(true);
+                            setFileUUIDs([...fileUUIDs, uuid]);
+                            
+                            console.log(event.filenames.push(uuid));
+                            console.log(uuid);
+                            let str="";
+                            console.log(event.filenames);
+                            event.filenames.map(filename =>{str=str+'"';str=str+filename;str=str+'"';str=str+','});
+                            let newstr=  str.substring(0,str.length-1);
+                            console.log(event.filenames.pop());
+                                    let query = `
+                                    mutation{
+                                        updateEvent(
+                                            input: {
+                                                id: "${event.id}",
+                                                filenames : [ ${newstr} ]  
+                                            }
+                                                )
+                                        { id }
+                                    }`
+                                    
+                                    API.graphql(graphqlOperation(query)).then(res => {
+                                        console.log(res);
+                                    }).catch(e => console.log(e));
+                            console.log(event.filenames.toString());
+                            setNewUploads(true);
+
+                        }).catch(e => {
+                            console.log(e);
+                            error(e);
+                            setCanSubmit(true);
+                        });
+
+                        return {
+                            abort: () => {
+                                abort();
+                                setCanSubmit(true);
+                            }
+                        }
+                    },
+                    revert: (uniqueFileId, load, error) => {
+                        console.log(uniqueFileId);
+                        try {
+                            Storage.vault.remove(uniqueFileId)
+                                .then(() => {
+                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
+                                    load();
+                                });
+                        } catch (e) {
+                            error(e);
+                        }
+                    }
+                }
+            }
+                ref={pond}
+                files={newFiles}
+                allowMultiple={true}
+                oninit={handleFilePondInit}
+                onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
+            />
                         </>
                     ) : Parser(markdownConverter.makeHtml(event.note))}
                     {isEdit ?(
