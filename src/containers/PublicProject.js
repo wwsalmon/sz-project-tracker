@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import PublicItem from "../components/PublicItem";
 import Parser from "html-react-parser";
 import * as Showdown from "showdown";
+import utf8 from "utf8";
 
 export default function PublicProject() {
     let { id, postid } = useParams();
@@ -125,10 +126,13 @@ export default function PublicProject() {
                         </>
                     ) : (
                         <>
-                            <h1 className="heading my-4">{format(new Date(featuredEvent.time), "EEEE, MMMM d @ H:mm a")}</h1>
+                            <p className="label">
+                                <Link to={`/public/${id}`}>&lt; Back to project</Link>
+                            </p>
+                            <h1 className="heading my-4">{format(new Date(featuredEvent.time), "EEEE, MMMM d @ h:mm a")}</h1>
                             <p className="my-4">by <b>{owner}</b></p>
                             <div className="content mr-6 pt-4 md:mr-0 flex-1">
-                                {Parser(markdownConverter.makeHtml(featuredEvent.note))}
+                                {Parser(markdownConverter.makeHtml(utf8.decode(featuredEvent.note)))}
                             </div>
                             <hr className="sep"/>
                             <hr className="my-4"/>
@@ -138,8 +142,13 @@ export default function PublicProject() {
                         </>
                     )) : (
                         <>
-                            <h1 className="heading">{projName === "error" ? "Error: invalid project ID" : projName}</h1>
-                            { projName !== "error" && <p className="my-4">by <b>{owner}</b></p>}
+                            <div className="text-center">
+                                <p className="badge ~neutral !normal mb-8">Public project</p>
+                                <h1 className="heading text-center">
+                                    {projName === "error" ? "Error: invalid project ID" : projName}
+                                </h1>
+                                { projName !== "error" && <p className="my-4 text-center">by <b>{owner}</b></p>}
+                            </div>
                             <hr className="sep"/>
                         </>
                     )}

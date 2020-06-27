@@ -16,8 +16,8 @@
                         {
                             "authenticationType": "API_KEY",
                             "apiKeyConfig": {
-                                "description": "project tracker public access",
-                                "apiKeyExpirationDays": 7
+                                "description": "project tracker public access api key",
+                                "apiKeyExpirationDays": "365"
                             }
                         }
                     ],

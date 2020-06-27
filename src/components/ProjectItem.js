@@ -1,7 +1,9 @@
 
 import React, {useState, useRef} from "react";
+import { Link } from "react-router-dom";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
+import utf8 from "utf8";
 
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
@@ -25,11 +27,11 @@ import { faGlobe } from "@fortawesome/free-solid-svg-icons";
 import MoreButton from "../components/MoreButton";
 
 export default function ProjectItem(props) {
-    
-    const event = props.event;
+    const [event, setEvent] = useState(props.event);
+    let decodedNote = utf8.decode(props.event.note);
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [isEdit, setIsEdit] = useState(false);
-    const [newNote, setNewNote] = useState(event.note);
+    const [newNote, setNewNote] = useState(decodedNote);
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
@@ -54,9 +56,8 @@ export default function ProjectItem(props) {
         e.preventDefault();
         const query = `
         mutation{
-            deleteEvent(input: {id: "${event.id}"}){ id }
-        }
-        `
+            deleteEvent(input: {id: "${event.id}"}){ id }`
+            + (publicId ? `deletePublicEvent(input: {id: "${publicId}"}){ id }` : "") + "}";
         try {
             await API.graphql(graphqlOperation(query));
             removeLocal(event.id);
@@ -92,7 +93,9 @@ export default function ProjectItem(props) {
         */
 
         try{
-
+            if (event.project.publicProject === null){
+                throw new Error("Project not public");
+            }
             if (isPrivate){ // private -> public
                 const newFileUUIDs = `[${event.filenames.map(d => `"${d}"`)}]`;
                 const updateEventQ1 = `
@@ -103,12 +106,14 @@ export default function ProjectItem(props) {
                     }
                 `;
                 const update1Data = await API.graphql(graphqlOperation(updateEventQ1));
-                console.log(update1Data);
                 const publicProjectId = update1Data.data.updateEvent.project.publicProject.id;
                 // if (publicProjectId === undefined) throw "Project is not public, failed to make update public";
                 const createPublicEventQ = `
                     mutation{
-                        createPublicEvent(input: {filenames: ${newFileUUIDs}, note: """${newNote}""", time: "${event.time}", publicEventPublicProjectId: "${publicProjectId}"}){ id filenames note time publicProject { id }}
+                        createPublicEvent(input: {filenames: ${newFileUUIDs},
+                        note: """${utf8.encode(newNote)}""",
+                        time: "${event.time}",
+                        publicEventPublicProjectId: "${publicProjectId}"}){ id filenames note time publicProject { id }}
                     }    
                 `
                 const createPublicData = await API.graphql(graphqlOperation(createPublicEventQ));
@@ -116,21 +121,22 @@ export default function ProjectItem(props) {
                 const updateEventQ2 = `
                     mutation{
                         updateEvent(input: {id: "${event.id}", eventPublicEventId: "${publicEventId}"}){
-                            publicEvent { id }
+                            id hidden filenames note time publicEvent { id } project { publicProject { id } }
                         }
                     }
                 `
-                await API.graphql(graphqlOperation(updateEventQ2));
+                const update2Data = await API.graphql(graphqlOperation(updateEventQ2));
+                setEvent(update2Data.data.updateEvent);
                 setPublicId(publicEventId);
             } else { // public -> private
                 const updateEventQ = `
                     mutation{
                         updateEvent(input: {id: "${event.id}", hidden: true}){
-                            hidden publicEvent{ id }
+                            id hidden filenames note time publicEvent { id } project { publicProject { id } }
                         }
                     }                    
                 `
-                const updateData = await API.graphql(graphqlOperation(updateEventQ))
+                const updateData = await API.graphql(graphqlOperation(updateEventQ));
                 const publicEventData = updateData.data.updateEvent.publicEvent;
                 if (publicEventData === null){
                     console.warn( "No public event found for this event.");
@@ -144,6 +150,7 @@ export default function ProjectItem(props) {
                     await API.graphql(graphqlOperation(deletePublicEventQ));
                     setPublicId(false);
                 }
+                setEvent(updateData.data.updateEvent);
             }
             setIsPrivate(!isPrivate);
             changeHiddenLocal(event.id, !isPrivate);
@@ -204,21 +211,20 @@ export default function ProjectItem(props) {
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
-            event.note = newNote;
+            decodedNote = newNote;
             setIsEdit(false);
         }).catch(e => console.log(e));
     }
 
     function handleCancelEdit(e){
         e.preventDefault();
-        if (newNote !== event.note){
+        if (newNote !== decodedNote){
             if (window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
-                setNewNote(event.note);
+                setNewNote(decodedNote);
                 setIsEdit(false);
             }
         }
         else {
-            setNewNote(event.note);
             setIsEdit(false);
         }        
     }
@@ -238,9 +244,13 @@ export default function ProjectItem(props) {
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {!isPrivate && (<FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}></FontAwesomeIcon>)}
+                    {!isPrivate && (
+                        <Link to={`/public/${props.publicId}/${event.publicEvent.id}`} target="_blank">
+                            <FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}/>
+                        </Link>
+                    )}
                 </div>
-                <div className="content mr-6 md:mr-0 flex-1">
+                <div className="content pr-8 mr-6 md:mr-0 flex-1">
                     {isEdit ? (
                         <>
                             <SimpleMDE
@@ -253,10 +263,8 @@ export default function ProjectItem(props) {
                                 }}
                             />
                             <div className="flex">
-                                <button onClick={handleEditEvent} disabled={newNote === event.note} className="button field w-auto block my-4 mr-2">Save Changes</button>
-
-                                <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>      
-
+                                <button onClick={handleEditEvent} disabled={newNote === decodedNote} className="button field w-auto block my-4 mr-2">Save Changes</button>
+                                <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
                             </div>
                             <FilePond.FilePond server={
                 {
@@ -330,7 +338,7 @@ export default function ProjectItem(props) {
                 onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
             />
                         </>
-                    ) : Parser(markdownConverter.makeHtml(event.note))}
+                    ) : Parser(markdownConverter.makeHtml(decodedNote))}
                     {isEdit &&(
                         <>
                     <div className="flex items-center">
@@ -357,10 +365,13 @@ export default function ProjectItem(props) {
                     </div>
                 )} */}
 
-                <MoreButton className="right-0" uid={event.id}>
+                <MoreButton className="right-0 top-8" uid={event.id}>
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
                     {!isEdit && <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleHidden}>
+                    <button disabled={!props.publicId}
+                            className="button hover:bg-gray-100 py-2 px-4 text-left"
+                            onClick={handleToggleHidden}
+                    >
                         {isPrivate ? "Make public" : "Make private"}
                     </button>                    
                 </MoreButton>

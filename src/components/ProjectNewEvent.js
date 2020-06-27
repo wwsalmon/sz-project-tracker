@@ -11,11 +11,13 @@ import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
 import {v1 as uuidv1} from 'uuid';
+import utf8 from "utf8";
 
 export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
     const [newFiles, setNewFiles] = useState([]);
     const [fileUUIDs, setFileUUIDs] = useState([]);
+    const [isPublic, setIsPublic] = useState(false);
 
     const [showNote, setShowNote] = useState(false);
     const [showUpload, setShowUpload] = useState(false);
@@ -31,77 +33,127 @@ export default function ProjectNewEvent(props) {
         setCanSubmit(false);
     });
 
+    /*
+    process all the input
+    create a private event
+
+    if isPublic
+    get the private id
+    create a public event
+    get the public id
+    update the private event
+    */
     async function handleCreateEvent(e) {
         e.preventDefault();
-        console.log(newNote);
-        console.log("fileUUIDs: ", typeof fileUUIDs, fileUUIDs);
         const currentDate = new Date();
         const newFileUUIDs = `[${fileUUIDs.map(d => `"${d}"`)}]`;
         const newNoteQuery = `
-mutation {
-  createEvent(input: {eventProjectId: "${props.projectId}", time: "${currentDate.toISOString()}", filenames: ${newFileUUIDs}, note: """${newNote}""", hidden: ${false}}) {
-    id
-    note
-    time
-    filenames
-  }
-}
-        `
-        console.log(newNoteQuery);
-        try {
-            const newEvent = await API.graphql(graphqlOperation(newNoteQuery));
-            props.setEvents([newEvent.data.createEvent, ...props.events]);
-            setNewNote("");
-            setNewFiles([]);
-            setShowNote(false);
-            setShowUpload(false);
-            setShowAudio(false);
-            setShowVideo(false);
+        mutation {
+          createEvent(input: {
+              eventProjectId: "${props.projectId}",
+              time: "${currentDate.toISOString()}",
+              filenames: ${newFileUUIDs},
+              note: """${utf8.encode(newNote)}""",
+              hidden: ${!isPublic}}) {
+                id
+                note
+                time
+                filenames
+                hidden
+                publicEvent{
+                    id
+                }
+                project{
+                    publicProject{
+                        id
+                    }
+                }
+          }
+        }`;
+
+        try{
+            if (isPublic && !props.publicId) throw new Error("Can't create public update, project is private");
+            const createPrivateData = await API.graphql(graphqlOperation(newNoteQuery));
+            if (isPublic){
+                const privateEventId = createPrivateData.data.createEvent.id;
+                const publicProjectId = props.publicId;
+                const createPublicQuery = `
+                mutation{
+                   createPublicEvent(input: {
+                        publicEventEventId: "${privateEventId}",
+                        publicEventPublicProjectId: "${publicProjectId}",
+                        time: "${currentDate.toISOString()}",
+                        filenames: ${newFileUUIDs},
+                        note: """${utf8.encode(newNote)}"""}){ id }                         
+                }`;
+                const publicEventData = await API.graphql(graphqlOperation(createPublicQuery));
+                const publicEventId = publicEventData.data.createPublicEvent.id;
+                const updatePrivateQuery = `
+                mutation{
+                    updateEvent(input: {
+                        id: "${privateEventId}",
+                        eventPublicEventId: "${publicEventId}"
+                    }){
+                        id
+                        note
+                        time
+                        filenames
+                        hidden
+                        publicEvent{
+                            id
+                        }
+                        project{
+                            publicProject{
+                                id
+                            }
+                        }
+                    }
+                }`;
+                return new Promise(resolve => {
+                    API.graphql(graphqlOperation(updatePrivateQuery)).then(res => {
+                        afterCreateEvent(res.data.updateEvent);
+                        resolve({"status": "success", "publicEventId": publicEventId});
+                    });
+                });
+            } else{
+                afterCreateEvent(createPrivateData.data.createEvent);
+                return new Promise(resolve => {resolve({"status": "success"})});
+            }
+        } catch(e){
+            return new Promise(resolve => {
+                resolve({"status": "failure", "error": e});
+            });
         }
-        catch (error) {
-            console.warn(error);
-        }
+
     }
-    
+
+    function afterCreateEvent(eventObj){
+        props.setEvents([eventObj, ...props.events]);
+        setNewNote("Write a new update here...");
+        setNewFiles([]);
+        setIsPublic(false);
+        setShowNote(false);
+        setShowUpload(false);
+        setShowAudio(false);
+        setShowVideo(false);
+    }
 
     async function handleCreateEventTwitter(e) {
-        e.preventDefault();
-        console.log(newNote);
-        console.log("fileUUIDs: ", typeof fileUUIDs, fileUUIDs);
-        const currentDate = new Date();
-        const newFileUUIDs = `[${fileUUIDs.map(d => `"${d}"`)}]`;
-        const newNoteQuery = `
-mutation {
-  createEvent(input: {eventProjectId: "${props.projectId}", time: "${currentDate.toISOString()}", filenames: ${newFileUUIDs}, note: """${newNote}""", hidden: ${false}}) {
-    id
-    note
-    time
-    filenames
-  }
-}
-        `
-        console.log(newNoteQuery);
-        try {
-            const newEvent = await API.graphql(graphqlOperation(newNoteQuery));
-            props.setEvents([newEvent.data.createEvent, ...props.events]);
-            setNewNote("");
-            setNewFiles([]);
-            setShowNote(false);
-            setShowUpload(false);
-            setShowAudio(false);
-            setShowVideo(false);
-            //Twitter placeholdertext implementation
-            var placeholdertext ='https:/twitter.com/intent/tweet?text=';
-            placeholdertext += encodeURI(newNote);
-            window.open(placeholdertext);
-        }
-        catch (error) {
-            console.warn(error);
+        const createEventStatus = await handleCreateEvent(e);
+        if (createEventStatus.status === "success"){
+            const twitterUrl = 'https:/twitter.com/intent/tweet?text=';
+            const maxTweetLength = 280 - 23 - 5;
+            const noteText = newNote.length < maxTweetLength ? encodeURIComponent(newNote + " ") :
+                encodeURIComponent(newNote.substring(0,280 - 23 - 5) + "... ");
+            const noteUrl = "https://sz-project-tracker-v0.netlify.app/public/"
+                + props.publicId + "/" + createEventStatus.publicEventId;
+            window.open(twitterUrl + noteText + noteUrl);
         }
     }
 
-    async function handleCancelEvent(e) {
+    function handleCancelEvent(e) {
         e.preventDefault();
+        setIsPublic(false);
         setShowNote(false);
         setShowUpload(false);
         setShowAudio(false);
@@ -187,14 +239,32 @@ mutation {
                     <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
                     {/* <button className={`button mx-2 ~neutral ${showAudio ? "!low" : "!normal"}`} onClick={() => setShowAudio(!showAudio)}>{!showAudio ? "Record Audio" : "Remove Audio"}</button>
                     <button className={`button mx-2 ~neutral ${showVideo ? "!low" : "!normal"}`} onClick={() => setShowVideo(!showVideo)}>{!showVideo ? "Record Video" : "Remove Video"}</button> */}
+                    <label className={`mx-2 my-2 ${(canSubmit && props.publicId && (showNote || showUpload || showAudio || showVideo)) ? "" : "opacity-50"}`}>
+                        <input type="checkbox" checked={isPublic}
+                               onChange={e => setIsPublic(e.target.checked)}
+                               disabled={!(canSubmit && props.publicId && (showNote || showUpload || showAudio || showVideo))}
+                        />
+                        <span className="ml-2">Post publicly</span>
+                    </label>
                 </div>
             </div>
             <hr></hr>
             <div className="overflow-auto">
                 <div className="flex">
-                    <button onClick={handleCreateEvent} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="button field w-auto block my-4 mr-2">Create Update</button>
-                    {(canSubmit && (showNote || showUpload || showAudio || showVideo)) && (<button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">Cancel</button>)}
-                    <button onClick={handleCreateEventTwitter} disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))} className="mx-4 button ~info !low w-auto block my-2">Create Update & Post to Twitter</button>
+                    <button onClick={handleCreateEvent}
+                            disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))}
+                            className="button field w-auto block my-4 mr-2">Create Update</button>
+                    {(canSubmit && (showNote || showUpload || showAudio || showVideo)) && (
+                        <button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">
+                            Cancel
+                        </button>
+                    )}
+                    <button onClick={handleCreateEventTwitter}
+                            disabled={!(canSubmit && isPublic && props.publicId &&
+                                (showNote || showUpload || showAudio || showVideo))}
+                            className="mx-4 button ~info !low w-auto block my-2">
+                        Create Update & Post to Twitter
+                    </button>
                 </div>
             </div>
         </div>
