@@ -4,6 +4,7 @@ import { API, graphqlOperation, Auth } from "aws-amplify";
 import { format } from 'date-fns';
 
 import "./Project.css";
+import { saveAs } from 'file-saver';
 
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
@@ -86,6 +87,15 @@ export default function Project() {
         }).catch(e => console.log(e));
     }
 
+    async function exportProject(e)
+    {
+        
+
+        let JSONobj={"projectid":id, "name":projName,"public":publicId,"events":events};
+        let JSONtext=JSON.stringify(JSONobj);
+        let blob=new Blob([JSONtext],{type: "text/plain;charset=utf-8"});
+        saveAs(blob,projName+".json");
+    }   
     async function renameProject(e) {
         e.preventDefault();
         const renameQuery = `
@@ -102,6 +112,8 @@ export default function Project() {
             console.log(res); // add "project deleted" prop
         }).catch(e => console.log(e));
     }
+
+ 
 
     useEffect(() => {
         let projectData;
@@ -178,6 +190,7 @@ export default function Project() {
                     <MoreButton className="right-0 top-0">
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={renameProject}>Rename Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={exportProject}>Export Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={publicId ? makePrivate : makePublic}>
                             {publicId ? "Make private" : "Make public"}
                         </button>
