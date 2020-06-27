@@ -183,15 +183,16 @@ export default function ProjectItem(props) {
         
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
+            try{
+                Storage.vault.remove(filename);
+                setIsEdit(false);
+            }
+            catch(e)
+            {
+                console.log(e);
+            }
         }).catch(e => console.log(e));
-        try{
-            Storage.vault.remove(filename);
-            setIsEdit(false);
-        }
-        catch(e)
-        {
-            console.log(e);
-        }
+        
     }
 
     async function handleEditEvent(e){
@@ -199,7 +200,7 @@ export default function ProjectItem(props) {
         let query = `
         mutation{
             updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }`
-            query += publicId ? `updatePublicEvent(input: {id: "${publicId}", note: """${newNote}"""}){ id }` : "";
+        query += publicId ? `updatePublicEvent(input: {id: "${publicId}", note: """${newNote}"""}){ id }` : "";
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
@@ -330,7 +331,7 @@ export default function ProjectItem(props) {
             />
                         </>
                     ) : Parser(markdownConverter.makeHtml(event.note))}
-                    {isEdit ?(
+                    {isEdit &&(
                         <>
                     <div className="flex items-center">
                         {event.filenames.map(filename => (<>
@@ -340,7 +341,7 @@ export default function ProjectItem(props) {
                         ))}
                     </div>
                     </>
-                    ):console.log()
+                    )
                     }
                 </div>
 
