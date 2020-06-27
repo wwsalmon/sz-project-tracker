@@ -1,8 +1,7 @@
-
-import React, {useState} from "react";
-import { Link } from "react-router-dom";
-import { API, graphqlOperation, Storage } from "aws-amplify";
-import { format } from 'date-fns';
+import React, {useState, useRef} from "react";
+import {Link} from "react-router-dom";
+import {API, graphqlOperation, Storage} from "aws-amplify";
+import {format} from 'date-fns';
 import utf8 from "utf8";
 
 import SimpleMDE from "react-simplemde-editor";
@@ -12,10 +11,17 @@ import "./ProjectNewEvent.css";
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
 
+import * as FilePond from 'react-filepond';
+import "filepond/dist/filepond.min.css";
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+
+import {v1 as uuidv1} from 'uuid';
+
+
 import EventImage from "../components/EventImage";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faGlobe} from "@fortawesome/free-solid-svg-icons";
 
 import MoreButton from "../components/MoreButton";
 
@@ -23,11 +29,31 @@ export default function ProjectItem(props) {
     const [event, setEvent] = useState(props.event);
     let decodedNote = utf8.decode(props.event.note);
     const [isPrivate, setIsPrivate] = useState(event.hidden);
-    const [isEdit, setIsEdit] = useState(false);
-    const [newNote, setNewNote] = useState(decodedNote);
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
-    const removeLocal = props.removeLocal;
-    const changeHiddenLocal = props.changeHiddenLocal;
+
+    // new note states
+    const [isEdit, setIsEdit] = useState(false);
+    const [canSave, setCanSave] = useState(true);
+    const [newNote, setNewNote] = useState(decodedNote);
+    const [newFiles, setNewFiles] = useState([]);
+    const [fileUUIDs, setFileUUIDs] = useState(event.filenames);
+
+    // prop functions
+    const removeLocal = props.removeLocal; // for deleting update
+    const changeHiddenLocal = props.changeHiddenLocal; // for changing public status
+
+    const pond = useRef();
+
+    console.log(event);
+
+    function handleFilePondInit() {
+        console.log("filepond init", pond);
+    }
+
+    function handleFilePondUpdate(fileItems) {
+        setNewFiles(fileItems.map(fileItem => fileItem.file));
+    }
+
 
     async function handleDeleteEvent(e) {
         e.preventDefault();
@@ -35,19 +61,19 @@ export default function ProjectItem(props) {
         mutation{
             deleteEvent(input: {id: "${event.id}"}){ id }`
             + (publicId ? `deletePublicEvent(input: {id: "${publicId}"}){ id }` : "") + "}";
-        try {
-            await API.graphql(graphqlOperation(query));
+        API.graphql(graphqlOperation(query)).then(() => {
+            for (const filename of event.filenames){
+                Storage.vault.remove(filename);
+            }
             removeLocal(event.id);
-        }
-        catch (error) {
-            console.log(error);
-        }
+        }).catch(e => {
+           console.log(e);
+        });
 
         for (const filename of event.filenames) {
             try {
                 await Storage.vault.remove(filename);
-            }
-            catch (e) {
+            } catch (e) {
                 console.log(e);
             }
         }
@@ -69,11 +95,11 @@ export default function ProjectItem(props) {
 
         */
 
-        try{
-            if (event.project.publicProject === null){
+        try {
+            if (event.project.publicProject === null) {
                 throw new Error("Project not public");
             }
-            if (isPrivate){ // private -> public
+            if (isPrivate) { // private -> public
                 const newFileUUIDs = `[${event.filenames.map(d => `"${d}"`)}]`;
                 const updateEventQ1 = `
                     mutation{
@@ -115,9 +141,9 @@ export default function ProjectItem(props) {
                 `
                 const updateData = await API.graphql(graphqlOperation(updateEventQ));
                 const publicEventData = updateData.data.updateEvent.publicEvent;
-                if (publicEventData === null){
-                    console.warn( "No public event found for this event.");
-                } else{
+                if (publicEventData === null) {
+                    console.warn("No public event found for this event.");
+                } else {
                     const publicEventId = publicEventData.id;
                     const deletePublicEventQ = `
                     mutation{
@@ -131,41 +157,78 @@ export default function ProjectItem(props) {
             }
             setIsPrivate(!isPrivate);
             changeHiddenLocal(event.id, !isPrivate);
-        } catch(e){
+        } catch (e) {
             console.log(e);
         }
     }
 
-    function handleToggleEdit(e){
+    function handleToggleEdit(e) {
         e.preventDefault();
         setIsEdit(true);
     }
 
-    async function handleEditEvent(e){
+    function deleteAttachment(filename) {
+        const newFilenames = event.filenames.filter(x => x !== filename);
+        const newFileUUIDs = `[${newFilenames.map(d => `"${d}",`)}]`;
+        const query = `
+        mutation{
+            updateEvent(
+                input: {
+                    id: "${event.id}",
+                    filenames : ${newFileUUIDs}  
+                }
+                    )
+            { id filenames note hidden time }
+        }`
+        console.log(query);
+
+        API.graphql(graphqlOperation(query)).then(res => {
+            setEvent(res.data.updateEvent);
+            try {
+                Storage.vault.remove(filename);
+            } catch (e) {
+                console.log(e);
+            }
+        }).catch(e => console.log(e));
+
+    }
+
+    async function handleEditEvent(e) {
         e.preventDefault();
+        const allFileUUIDs = [...event.filenames, ...fileUUIDs];
+        const newFileUUIDs = `[${allFileUUIDs.map(d => `"${d}"`)}]`;
         let query = `
         mutation{
-            updateEvent(input: {id: "${event.id}", note: """${newNote}"""}){ id }`
-        query += publicId ? `updatePublicEvent(input: {id: "${publicId}", note: """${newNote}"""}){ id }` : "";
+            updateEvent(input: {id: "${event.id}", note: """${newNote}""", filenames: ${newFileUUIDs}})
+            {id hidden filenames note time publicEvent { id } project { publicProject { id } }}`
+        query += publicId ? `updatePublicEvent(input:{id: "${publicId}",
+                    note: """${newNote}""",
+                    filenames: ${newFileUUIDs}){ id }` : "";
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
+            setEvent(res.data.updateEvent);
             decodedNote = newNote;
+            setNewFiles([]);
             setIsEdit(false);
         }).catch(e => console.log(e));
     }
 
-    function handleCancelEdit(e){
+    async function handleCancelEdit(e) {
         e.preventDefault();
-        if (newNote !== decodedNote){
+        if (newNote !== decodedNote || fileUUIDs !== event.filenames) {
             if (window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
                 setNewNote(decodedNote);
+                setFileUUIDs(event.filenames); // delete S3 files as well
+                const filenamesToDelete = fileUUIDs.filter(x => event.filenames.indexOf(x) < 0);
+                for (const filename of filenamesToDelete) {
+                    await Storage.vault.remove(filename);
+                }
                 setIsEdit(false);
             }
-        }
-        else {
+        } else {
             setIsEdit(false);
-        }        
+        }
     }
 
     const markdownConverter = new Showdown.Converter({
@@ -183,7 +246,7 @@ export default function ProjectItem(props) {
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {!isPrivate && (
+                    {event.publicEvent && (
                         <Link to={`/public/${props.publicId}/${event.publicEvent.id}`} target="_blank">
                             <FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}/>
                         </Link>
@@ -202,18 +265,80 @@ export default function ProjectItem(props) {
                                 }}
                             />
                             <div className="flex">
-                                <button onClick={handleEditEvent} disabled={newNote === decodedNote} className="button field w-auto block my-4 mr-2">Save Changes</button>
-                                <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
+                                <button onClick={handleEditEvent}
+                                        disabled={(newNote === decodedNote || fileUUIDs === event.files) || !canSave}
+                                        className="button field w-auto block my-4 mr-2">Save Changes
+                                </button>
+                                <button onClick={handleCancelEdit}
+                                        className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit
+                                </button>
                             </div>
+                            <FilePond.FilePond server={
+                                {
+                                    process: (fieldName, file, metadata, load, error, progress, abort, removeLocal, transfer, options) => {
+                                        const extArray = file.name.split('.');
+                                        const ext = extArray[extArray.length - 1];
+                                        const uuid = uuidv1() + `.${ext}`;
+
+                                        Storage.vault.put(uuid, file, {
+                                            progressCallback(thisProgress) {
+                                                progress(thisProgress.lengthComputable, thisProgress.loaded, thisProgress.total);
+                                            }
+                                        }).then(res => {
+                                            load(res.key);
+                                            setCanSave(true);
+                                            setFileUUIDs([...fileUUIDs, uuid]);
+                                        }).catch(e => {
+                                            console.log(e);
+                                            error(e);
+                                            setCanSave(true);
+                                        });
+
+                                        return {
+                                            abort: () => {
+                                                abort();
+                                                setCanSave(true);
+                                            }
+                                        }
+                                    },
+                                    revert: (uniqueFileId, load, error) => {
+                                        console.log(uniqueFileId);
+                                        try {
+                                            Storage.vault.remove(uniqueFileId)
+                                                .then(() => {
+                                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
+                                                    load();
+                                                });
+                                        } catch (e) {
+                                            error(e);
+                                        }
+                                    }
+                                }
+                            }
+                                               ref={pond}
+                                               files={newFiles}
+                                               allowMultiple={true}
+                                               oninit={handleFilePondInit}
+                                               onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
+                            />
                         </>
                     ) : Parser(markdownConverter.makeHtml(decodedNote))}
                     <div className="flex items-center">
                         {event.filenames.map(filename => (
-                            <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex" s3key={filename} key={filename}></EventImage>
+                            <div key={filename}>
+                                {isEdit && (
+                                    <button className="button ~critical !low"
+                                            onClick={() => deleteAttachment(filename)}>x
+                                    </button>
+                                )}
+                                <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex"
+                                            s3key={filename} key={filename}/>
+                            </div>
                         ))}
                     </div>
                 </div>
-                
+
+
                 {/* <button className="ml-auto button self-start absolute right-0 top-8 md:static" id={event.id + "-showMoreButton"} ref={showMoreButton} onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
                 {showOptions && (
                     <div className="flex absolute flex-col bg-white right-0 rounded top-8 mt-8 py-2 border z-10">
@@ -226,14 +351,16 @@ export default function ProjectItem(props) {
                 )} */}
 
                 <MoreButton className="right-0 top-8" uid={event.id}>
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete</button>
-                    {!isEdit && <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete
+                    </button>
+                    {!isEdit &&
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
                     <button disabled={!props.publicId}
                             className="button hover:bg-gray-100 py-2 px-4 text-left"
                             onClick={handleToggleHidden}
                     >
                         {isPrivate ? "Make public" : "Make private"}
-                    </button>                    
+                    </button>
                 </MoreButton>
             </div>
         </div>
