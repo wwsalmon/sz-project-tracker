@@ -1,5 +1,5 @@
 
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import { Link } from "react-router-dom";
 import { API, graphqlOperation, Storage } from "aws-amplify";
 import { format } from 'date-fns';
@@ -11,6 +11,13 @@ import "./ProjectNewEvent.css";
 
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
+
+import * as FilePond from 'react-filepond';
+import "filepond/dist/filepond.min.css";
+import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
+
+import {v1 as uuidv1} from 'uuid';
+
 
 import EventImage from "../components/EventImage";
 
@@ -28,6 +35,22 @@ export default function ProjectItem(props) {
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
     const removeLocal = props.removeLocal;
     const changeHiddenLocal = props.changeHiddenLocal;
+    const [fileUUIDs, setFileUUIDs] = useState([]);
+    //eslint-disable-next-line
+    const [newFiles, setNewFiles] = useState([]);
+    
+    const pond= useRef();    
+
+
+
+    function handleFilePondInit() {
+        console.log("filepond init", pond);
+    }
+
+    function handleFilePondUpdate(fileItems) {
+        
+    }
+
 
     async function handleDeleteEvent(e) {
         e.preventDefault();
@@ -140,6 +163,44 @@ export default function ProjectItem(props) {
         e.preventDefault();
         setIsEdit(true);
     }
+    
+
+    function deleteAttachment(filename)
+    {   
+        var str="";
+        console.log(event.filenames);
+        const index = event.filenames.indexOf(filename);
+                if (index > -1) {
+                event.filenames.splice(index, 1);
+                                }
+        console.log(event.filenames);
+        //eslint-disable-next-line
+        event.filenames.map(filename =>{str=str+'"';str=str+filename;str=str+'"';str=str+','});
+        var newstr= str.substring(0,str.length-1);
+        let query = `
+        mutation{
+            updateEvent(
+                input: {
+                    id: "${event.id}",
+                    filenames : [ ${newstr} ]  
+                }
+                    )
+            { id }
+        }`
+        
+        API.graphql(graphqlOperation(query)).then(res => {
+            console.log(res);
+            try{
+                Storage.vault.remove(filename);
+                setIsEdit(false);
+            }
+            catch(e)
+            {
+                console.log(e);
+            }
+        }).catch(e => console.log(e));
+        
+    }
 
     async function handleEditEvent(e){
         e.preventDefault();
@@ -205,14 +266,93 @@ export default function ProjectItem(props) {
                                 <button onClick={handleEditEvent} disabled={newNote === decodedNote} className="button field w-auto block my-4 mr-2">Save Changes</button>
                                 <button onClick={handleCancelEdit} className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit</button>
                             </div>
+                            <FilePond.FilePond server={
+                {
+                    process: (fieldName, file, metadata, load, error, progress, abort,removeLocal,transfer, options) => {
+                        const extArray = file.name.split('.');
+                        const ext = extArray[extArray.length - 1];
+                        console.log(ext);
+                        const uuid = uuidv1() + `.${ext}`;
+
+                        Storage.vault.put(uuid, file, {
+                            progressCallback(thisProgress) {
+                                progress(thisProgress.lengthComputable, thisProgress.loaded, thisProgress.total);
+                            }
+                        }).then(res => {
+                            load(res.key);
+                            setFileUUIDs([...fileUUIDs, uuid]);
+                            
+                            console.log(event.filenames.push(uuid));
+                            console.log(uuid);
+                            let str="";
+                            console.log(event.filenames);
+                            //eslint-disable-next-line
+                            event.filenames.map(filename =>{str=str+'"';str=str+filename;str=str+'"';str=str+','});
+                            let newstr=  str.substring(0,str.length-1);
+                                    let query = `
+                                    mutation{
+                                        updateEvent(
+                                            input: {
+                                                id: "${event.id}",
+                                                filenames : [ ${newstr} ]  
+                                            }
+                                                )
+                                        { id }
+                                    }`
+                                    
+                                    API.graphql(graphqlOperation(query)).then(res => {
+                                        console.log(res);
+                                    }).catch(e => console.log(e));
+                            removeLocal();
+                            setIsEdit(false);
+                            
+                        }).catch(e => {
+                            console.log(e);
+                            error(e);
+                        });
+
+                        return {
+                            abort: () => {
+                                abort();
+                            }
+                        }
+                    },
+                    revert: (uniqueFileId, load, error) => {
+                        console.log(uniqueFileId);
+                        try {
+                            Storage.vault.remove(uniqueFileId)
+                                .then(() => {
+                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
+                                    load();
+                                });
+                        } catch (e) {
+                            error(e);
+                        }
+                    }
+                }
+            }
+                ref={pond}
+                files={newFiles}
+                allowMultiple={true}
+                oninit={handleFilePondInit}
+                onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
+            />
                         </>
                     ) : Parser(markdownConverter.makeHtml(decodedNote))}
+                    {isEdit &&(
+                        <>
                     <div className="flex items-center">
-                        {event.filenames.map(filename => (
+                        {event.filenames.map(filename => (<>
+                            <button className="button ~critical !low" onClick={()=>deleteAttachment(filename)}>x</button>
                             <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex" s3key={filename} key={filename}></EventImage>
+                        </>
                         ))}
                     </div>
+                    </>
+                    )
+                    }
                 </div>
+
                 
                 {/* <button className="ml-auto button self-start absolute right-0 top-8 md:static" id={event.id + "-showMoreButton"} ref={showMoreButton} onClick={() => setShowOptions(!showOptions)}><FontAwesomeIcon icon={faEllipsisV}></FontAwesomeIcon></button>
                 {showOptions && (
