@@ -188,7 +188,6 @@ export default function ProjectNewEvent(props) {
                     process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
                         const extArray = file.name.split('.');
                         const ext = extArray[extArray.length - 1];
-                        console.log(ext);
                         const uuid = uuidv1() + `.${ext}`;
 
                         Storage.vault.put(uuid, file, {
