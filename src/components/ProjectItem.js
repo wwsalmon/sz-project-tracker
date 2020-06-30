@@ -27,7 +27,7 @@ import MoreButton from "../components/MoreButton";
 
 export default function ProjectItem(props) {
     const [event, setEvent] = useState(props.event);
-    let decodedNote = utf8.decode(props.event.note);
+    const [decodedNote, setDecodedNote] = useState(utf8.decode(props.event.note));
     const [isPrivate, setIsPrivate] = useState(event.hidden);
     const [publicId, setPublicId] = useState((event.publicEvent === null || event.publicEvent === undefined) ? false : event.publicEvent.id);
 
@@ -36,15 +36,13 @@ export default function ProjectItem(props) {
     const [canSave, setCanSave] = useState(true);
     const [newNote, setNewNote] = useState(decodedNote);
     const [newFiles, setNewFiles] = useState([]);
-    const [fileUUIDs, setFileUUIDs] = useState(event.filenames);
+    const [fileUUIDs, setFileUUIDs] = useState([]);
 
     // prop functions
     const removeLocal = props.removeLocal; // for deleting update
     const changeHiddenLocal = props.changeHiddenLocal; // for changing public status
 
     const pond = useRef();
-
-    console.log(event);
 
     function handleFilePondInit() {
         console.log("filepond init", pond);
@@ -208,22 +206,24 @@ export default function ProjectItem(props) {
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
             setEvent(res.data.updateEvent);
-            decodedNote = newNote;
+            setDecodedNote(newNote);
             setNewFiles([]);
+            setFileUUIDs([]);
             setIsEdit(false);
         }).catch(e => console.log(e));
     }
 
     async function handleCancelEdit(e) {
         e.preventDefault();
-        if (newNote !== decodedNote || fileUUIDs !== event.filenames) {
+        if (newNote !== decodedNote || newFiles.length !== 0) {
             if (window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
                 setNewNote(decodedNote);
-                setFileUUIDs(event.filenames); // delete S3 files as well
                 const filenamesToDelete = fileUUIDs.filter(x => event.filenames.indexOf(x) < 0);
                 for (const filename of filenamesToDelete) {
                     await Storage.vault.remove(filename);
                 }
+                setNewFiles([]);
+                setFileUUIDs([]);
                 setIsEdit(false);
             }
         } else {
@@ -266,7 +266,7 @@ export default function ProjectItem(props) {
                             />
                             <div className="flex">
                                 <button onClick={handleEditEvent}
-                                        disabled={(newNote === decodedNote || fileUUIDs === event.files) || !canSave}
+                                        disabled={(newNote === decodedNote && newFiles.length === 0) || !canSave}
                                         className="button field w-auto block my-4 mr-2">Save Changes
                                 </button>
                                 <button onClick={handleCancelEdit}

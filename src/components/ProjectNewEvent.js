@@ -131,6 +131,7 @@ export default function ProjectNewEvent(props) {
         props.setEvents([eventObj, ...props.events]);
         setNewNote("Write a new update here...");
         setNewFiles([]);
+        setFileUUIDs([]);
         setIsPublic(false);
         setShowNote(false);
         setShowUpload(false);
