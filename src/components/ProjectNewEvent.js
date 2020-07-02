@@ -17,6 +17,9 @@ export default function ProjectNewEvent(props) {
     const [newNote, setNewNote] = useState("Write a new update here...");
     const [newFiles, setNewFiles] = useState([]);
     const [fileUUIDs, setFileUUIDs] = useState([]);
+
+    let fasterFileUUIDs = [];
+
     const [isPublic, setIsPublic] = useState(false);
 
     const [showNote, setShowNote] = useState(false);
@@ -198,7 +201,8 @@ export default function ProjectNewEvent(props) {
                         }).then(res => {
                             load(res.key);
                             setCanSubmit(true);
-                            setFileUUIDs([...fileUUIDs, uuid]);
+                            fasterFileUUIDs.push(uuid);
+                            setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
                         }).catch(e => {
                             console.log(e);
                             error(e);
@@ -217,7 +221,9 @@ export default function ProjectNewEvent(props) {
                         try {
                             Storage.vault.remove(uniqueFileId)
                                 .then(() => {
-                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
+                                    fasterFileUUIDs.filter(d => d !== uniqueFileId);
+                                    fileUUIDs.filter(d => d !== uniqueFileId);
+                                    setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
                                     load();
                                 });
                         } catch (e) {

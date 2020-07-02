@@ -37,6 +37,7 @@ export default function ProjectItem(props) {
     const [newNote, setNewNote] = useState(decodedNote);
     const [newFiles, setNewFiles] = useState([]);
     const [fileUUIDs, setFileUUIDs] = useState([]);
+    let fasterFileUUIDs = [];
 
     // prop functions
     const removeLocal = props.removeLocal; // for deleting update
@@ -287,7 +288,8 @@ export default function ProjectItem(props) {
                                         }).then(res => {
                                             load(res.key);
                                             setCanSave(true);
-                                            setFileUUIDs([...fileUUIDs, uuid]);
+                                            fasterFileUUIDs.push(uuid);
+                                            setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
                                         }).catch(e => {
                                             console.log(e);
                                             error(e);
@@ -306,7 +308,9 @@ export default function ProjectItem(props) {
                                         try {
                                             Storage.vault.remove(uniqueFileId)
                                                 .then(() => {
-                                                    setFileUUIDs(fileUUIDs.filter(d => d !== uniqueFileId));
+                                                    fasterFileUUIDs.filter(d => d !== uniqueFileId);
+                                                    fileUUIDs.filter(d => d !== uniqueFileId);
+                                                    setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
                                                     load();
                                                 });
                                         } catch (e) {
