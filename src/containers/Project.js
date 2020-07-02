@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useParams, useHistory, Link} from "react-router-dom";
 import { API, graphqlOperation } from "aws-amplify";
 import { format } from 'date-fns';
@@ -10,11 +10,13 @@ import { saveAs } from 'file-saver';
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
 import MoreButton from "../components/MoreButton";
+import Modal from "../components/Modal";
 
 export default function Project() {
     const { id } = useParams();
     const history = useHistory();
     const [projName, setProjName] = useState("");
+    const [newProjName, setNewProjName] = useState("");
     const [events, setEvents] = useState([]);
     const [publicId, setPublicId] = useState(false); // false if private, link if public
     // const [isLoading, setIsLoading] = useState(true);
@@ -23,12 +25,18 @@ export default function Project() {
     const [numPrivate, setNumPrivate] = useState(0);
     const auth = useAuth();
 
+    const renameModal = useRef();
+
     function removeLocal(eventID) {
         setEvents(events.filter(event => event.id !== eventID));
     }
 
     function changeHiddenLocal(eventID, hide) {
         setNumPrivate(hide ? numPrivate + 1 : numPrivate - 1);
+    }
+
+    function closeRenameModal(){
+        renameModal.current.closeModal();
     }
 
     async function makePublic(e){
@@ -104,13 +112,16 @@ export default function Project() {
             mutation {
                 updateProject(input: {
                     id: "${id}",
-                    name: "${projName}
+                    name: "${newProjName}"
                 }){
-                    id
+                    id name
                 }
             }
         `
         API.graphql(graphqlOperation(renameQuery)).then(res => {
+            setProjName(newProjName);
+            setNewProjName("");
+            closeRenameModal();
             console.log(res); // add "project deleted" prop
         }).catch(e => console.log(e));
     }
@@ -201,7 +212,21 @@ export default function Project() {
                         )}
                     </div>
                     <MoreButton className="right-0 top-0">
-                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={renameProject}>Rename Project</button>
+                        <Modal buttonClassName="hover:bg-gray-100 py-2 px-4 text-left"
+                                buttonText="Rename Project"
+                                ref={renameModal}>
+                            <p className="my-4">Enter a new name for this project:</p>
+                            <input type="text"
+                                   className="field ~neutral !normal my-1"
+                                    value={newProjName}
+                                    onChange={e => setNewProjName(e.target.value)}/>
+                            <div className="my-4">
+                                <button className="button ~info !normal"
+                                onClick={renameProject}>Rename project</button>
+                                <button className="button ~neutral !low opacity-50"
+                                onClick={closeRenameModal}>Cancel</button>
+                            </div>
+                        </Modal>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={exportProject}>Export Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={publicId ? makePrivate : makePublic}>

@@ -1,7 +1,11 @@
-import React, {useState} from "react";
+import React, {forwardRef, useImperativeHandle, useState} from "react";
 
-export default function Modal(props){
+const Modal = forwardRef((props, ref) => {
     const [showModal, setShowModal] = useState(false);
+
+    useImperativeHandle(ref, () => ({
+        closeModal(){setShowModal(false);}
+    }));
 
     return(
         <>
@@ -28,4 +32,6 @@ export default function Modal(props){
             )}
         </>
     )
-}
+});
+
+export default Modal;
