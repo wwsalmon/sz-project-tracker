@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
+import { Link, Redirect, useHistory } from 'react-router-dom';
 import {useAuth} from "../lib/authLib";
+import GoogleButton from "react-google-button";
 
 export default function Login(props){
     const [isLoading, setIsLoading] = useState(false);
@@ -9,6 +10,7 @@ export default function Login(props){
     const [code, setCode] = useState("");
     const [error, setError] = useState(false);
     const propState = props.location.state;
+    const history = useHistory();
     const auth = useAuth();
 
     const message = propState === undefined ? false : propState.message
@@ -21,35 +23,46 @@ export default function Login(props){
             {
                 {
                     signedOut: (
-                        <>
-                            <button className="button !normal ~neutral my-4" onClick={() => {
-                                auth.signInWithGoogle().then(res => {
-                                    console.log(res);
-                                })
-                            }}>
-                                Sign in with Google
-                            </button>
-                            <Link to="/signup"><button className="button !high ~neutral my-4">Sign up</button></Link>
-                            <h3>Or, login with username</h3>
+                        <div className="max-w-sm mx-auto">
+                            <h1 className="heading">Log in</h1>
+                            <hr className="my-8"/>
+                            <GoogleButton onClick={auth.signInWithGoogle}/>
+                            <hr className="my-8"/>
                             <form onSubmit={e => {
                                 e.preventDefault();
                                 setError(false);
                                 setIsLoading(true);
                                 auth.signIn(username, password).catch(e => {
-                                    console.log(e);
-                                    setError(e.message);
-                                    setIsLoading(false);
+                                    if (e.code === "UserNotConfirmedException"){
+                                        auth.setUsername(username);
+                                        auth.forceState("getConfirm");
+                                        history.push("/signup");
+                                    } else {
+                                        setError(e.message);
+                                        setIsLoading(false);
+                                    }
                                 });
                             }}>
-                                <p className="label">Username:</p>
-                                <input type="text" className="field ~neutral !normal w-auto my-1" value={username}
+                                <p className="label my-2">Username</p>
+                                <input type="text" className="field ~neutral !normal w-auto my-1 w-full"
+                                       value={username}
                                        onChange={e => setUsername(e.target.value)}/>
-                                <p className="label">Password:</p>
-                                <input type="password" className="field ~neutral !normal w-auto my-1" value={password}
+                                <p className="label my-2">Password</p>
+                                <input type="password" className="field ~neutral !normal w-auto my-1 w-full"
+                                       value={password}
                                        onChange={e => setPassword(e.target.value)}/>
-                                <input type="submit" className="button field w-auto block my-4"/>
+                                <div className="flex justify-end">
+                                    <input type="submit" className="button ~info !high w-auto block my-4"/>
+                                </div>
+                                <hr className="my-8"/>
+                                <div className="flex justify-between items-center">
+                                    <p className="label">Don't have an account?</p>
+                                    <Link to="/signup">
+                                        <button className="button !high ~neutral">Sign up</button>
+                                    </Link>
+                                </div>
                             </form>
-                        </>
+                        </div>
                     ), signedIn: (
                         <Redirect to={{pathname: "/projects", state: {justLoggedIn: true}}}/>
                     ), confirm: (

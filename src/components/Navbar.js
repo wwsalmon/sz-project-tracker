@@ -19,7 +19,7 @@ export default function Navbar(){
                             <>
                                 <div className="sz-navbar-item"><span><Link to="/projects">All Projects</Link></span></div>
                                 <div className="sm:ml-auto sz-navbar-item pr-6 relative">
-                                    <span className="opacity-50">Signed in as <b>{auth.user.attributes.name ? auth.user.attributes.name : auth.user.username}</b></span>
+                                    <span className="opacity-50">Signed in as <b>{auth.user.attributes.name || auth.user.username}</b></span>
                                     <MoreButton className="absolute right-0 top-0">
                                         <SignOut className="hover:bg-gray-100 py-2 px-4 text-left"/>
                                         <button className="hover:bg-gray-100 py-2 px-4 text-left">

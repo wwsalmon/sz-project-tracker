@@ -17,10 +17,12 @@ export const useAuth = () => {
 function useProvideAuth(){
     const [authState, setAuthState] = useState("loading");
     const [user, setUser] = useState(null);
+    const [username, setUsername] = useState("");
 
     const signIn = (username, password) => {
         return Auth.signIn(username, password).then(res => {
             setUser(res);
+            setUsername(res.username);
             setAuthState("signedIn");
         })
     }
@@ -31,7 +33,7 @@ function useProvideAuth(){
 
     const signUp = (username, password, email) => {
         return Auth.signUp({username, password, attributes: {email}}).then(res => {
-            console.log(res);
+            setUsername(res.username);
             setAuthState("getConfirm");
         });
     }
@@ -47,16 +49,15 @@ function useProvideAuth(){
     }
 
     const confirmSignUp = (username, code) => {
-        return Auth.confirmSignUp(username, code).then(res => {
-            console.log(res);
-            setUser(res);
-            setAuthState("signedIn");
+        return Auth.confirmSignUp(username, code).then(() => {
+            setAuthState("signedOut");
         });
     }
 
     const signOut = () => {
         return Auth.signOut().then(() => {
             setAuthState("signedOut");
+            setUsername("");
             setUser(false);
         })
     }
@@ -70,10 +71,19 @@ function useProvideAuth(){
             }).catch(e => {
                 console.log(e);
                 setUser(false);
+                setUsername("");
                 setAuthState("signedOut");
                 resolve(e);
             });
         })
+    }
+
+    const resendConfirmation = () => {
+        return Auth.resendSignUp(username);
+    }
+
+    const forceState = (state) => {
+        setAuthState(state);
     }
 
     useEffect(() => {
@@ -84,5 +94,6 @@ function useProvideAuth(){
         });
     }, []);
 
-    return {user, authState, signIn, signInWithGoogle, checkGoogle, signUp, confirmSignUp, signOut};
+    return {user, username, setUsername, authState, signIn, signInWithGoogle, checkGoogle,
+        signUp,confirmSignUp, signOut, forceState, resendConfirmation};
 }
