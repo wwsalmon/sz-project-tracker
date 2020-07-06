@@ -9,6 +9,7 @@ import Project from "./containers/Project";
 import Projects from "./containers/Projects";
 import PublicProject from "./containers/PublicProject";
 import GoogleRedirect from "./containers/GoogleRedirect";
+import Settings from "./containers/Settings";
 
 export default function Routes() {
     return (
@@ -32,6 +33,9 @@ export default function Routes() {
             </Route>
             <Route exact path="/public/:id/:postid?">
                 <PublicProject />
+            </Route>
+            <Route exact path="/settings">
+                <Settings/>
             </Route>
         </Switch>
     );

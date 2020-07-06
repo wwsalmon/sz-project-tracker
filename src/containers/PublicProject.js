@@ -13,6 +13,7 @@ export default function PublicProject() {
     if (postid === undefined) postid = false;
     const history = useHistory();
     const [projName, setProjName] = useState("");
+    const [projDescript, setProjDescript] = useState("");
     const [events, setEvents] = useState([]);
     const [owner, setOwner] = useState("");
     const [featuredEvent, setFeaturedEvent] = useState(false);
@@ -30,6 +31,7 @@ export default function PublicProject() {
                     getPublicProject(id: $id) {
                         id
                         name
+                        description
                         owner
                         publicEvents{
                             items{
@@ -72,6 +74,7 @@ export default function PublicProject() {
                 const projectItem = projectData.data.getPublicProject;
                 if (projectItem == null){setProjName("error")} else{
                     setProjName(projectData.data.getPublicProject.name);
+                    setProjDescript(projectData.data.getPublicProject.description);
                     setOwner(projectData.data.getPublicProject.owner);
                     const sortedEvents = projectData.data.getPublicProject.publicEvents.items.sort((a, b) => {
                         return new Date(b.time) - new Date(a.time);
@@ -148,6 +151,9 @@ export default function PublicProject() {
                                     {projName === "error" ? "Error: invalid project ID" : projName}
                                 </h1>
                                 { projName !== "error" && <p className="my-4 text-center">by <b>{owner}</b></p>}
+                                {projDescript !== null && (
+                                <div className="max-w-2xl my-4 mx-auto">{Parser(markdownConverter.makeHtml(projDescript))}</div>
+                                )}
                             </div>
                             <hr className="sep"/>
                         </>

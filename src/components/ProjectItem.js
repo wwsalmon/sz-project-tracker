@@ -6,7 +6,6 @@ import utf8 from "utf8";
 
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
-import "./ProjectNewEvent.css";
 
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
@@ -198,10 +197,10 @@ export default function ProjectItem(props) {
         const newFileUUIDs = `[${allFileUUIDs.map(d => `"${d}"`)}]`;
         let query = `
         mutation{
-            updateEvent(input: {id: "${event.id}", note: """${newNote}""", filenames: ${newFileUUIDs}})
+            updateEvent(input: {id: "${event.id}", note: """${utf8.encode(newNote)}""", filenames: ${newFileUUIDs}})
             {id hidden filenames note time publicEvent { id } project { publicProject { id } }}`
         query += publicId ? `updatePublicEvent(input:{id: "${publicId}",
-                    note: """${newNote}""",
+                    note: """${utf8.encode(newNote)}""",    
                     filenames: ${newFileUUIDs}){ id }` : "";
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {

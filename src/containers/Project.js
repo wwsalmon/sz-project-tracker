@@ -1,8 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useParams, useHistory, Link} from "react-router-dom";
-import { API, graphqlOperation } from "aws-amplify";
+import {API, graphqlOperation, Storage} from "aws-amplify";
 import { format } from 'date-fns';
 import {useAuth} from "../lib/authLib";
+import utf8 from "utf8";
 
 import "./Project.css";
 import { saveAs } from 'file-saver';
@@ -10,22 +11,28 @@ import { saveAs } from 'file-saver';
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
 import MoreButton from "../components/MoreButton";
-import Modal from "../components/Modal";
+
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
+
+import * as Showdown from "showdown";
+import Parser from 'html-react-parser';
 
 export default function Project() {
     const { id } = useParams();
     const history = useHistory();
     const [projName, setProjName] = useState("");
+    const [projDescript, setProjDescript] = useState("");
     const [newProjName, setNewProjName] = useState("");
+    const [newProjDescript, setNewProjDescript] = useState("");
     const [events, setEvents] = useState([]);
     const [publicId, setPublicId] = useState(false); // false if private, link if public
     // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
     const [showPrivate, setShowPrivate] = useState(true);
     const [numPrivate, setNumPrivate] = useState(0);
     const auth = useAuth();
-
-    const renameModal = useRef();
 
     function removeLocal(eventID) {
         setEvents(events.filter(event => event.id !== eventID));
@@ -35,16 +42,13 @@ export default function Project() {
         setNumPrivate(hide ? numPrivate + 1 : numPrivate - 1);
     }
 
-    function closeRenameModal(){
-        renameModal.current.closeModal();
-    }
-
     async function makePublic(e){
         e.preventDefault();
         const createQuery = `
             mutation {
                 createPublicProject(input: {
                     name: "${projName}",
+                    descript: "${utf8.encode(projDescript)}",
                     publicProjectProjectId: "${id}"
                 }){id name project{id}}
             }                    
@@ -97,36 +101,54 @@ export default function Project() {
         }).catch(e => console.log(e));
     }
 
-    async function exportProject(e)
-    {
-        
-
+    async function exportProject(e) {
         let JSONobj={"projectid":id, "name":projName,"public":publicId,"events":events};
         let JSONtext=JSON.stringify(JSONobj);
         let blob=new Blob([JSONtext],{type: "text/plain;charset=utf-8"});
         saveAs(blob,projName+".json");
-    }   
-    async function renameProject(e) {
-        e.preventDefault();
-        const renameQuery = `
+    }
+
+    async function editProjectInfo(){
+        let editQuery = `
             mutation {
                 updateProject(input: {
                     id: "${id}",
-                    name: "${newProjName}"
+                    name: "${newProjName}",
+                    description: "${newProjDescript}"
                 }){
                     id name
+                }           
+        `;
+        editQuery += publicId ? `
+                updatePublicProject(input: {
+                    id: "${publicId}",
+                    name: "${newProjName}",
+                    description: "${newProjDescript}"
+                }){
+                    id
                 }
-            }
-        `
-        API.graphql(graphqlOperation(renameQuery)).then(res => {
+        ` : "";
+        editQuery += "}";
+        API.graphql(graphqlOperation(editQuery)).then(res => {
             setProjName(newProjName);
-            setNewProjName("");
-            closeRenameModal();
+            setProjDescript(newProjDescript);
+            setIsEdit(false);
             console.log(res); // add "project deleted" prop
         }).catch(e => console.log(e));
     }
 
- 
+    function cancelEditProjectInfo(e){
+        e.preventDefault();
+        if (newProjDescript === projDescript && newProjName === projName) {
+            setIsEdit(false);
+        } else {
+            if (window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
+                setNewProjName(projName);
+                setNewProjDescript(projDescript);
+                setIsEdit(false);
+            }
+        }
+    }
 
     useEffect(() => {
         let projectData;
@@ -137,6 +159,7 @@ export default function Project() {
             getProject(id: "${id}") {
                 id
                 name
+                description
                 public
                 events{
                     items{
@@ -172,13 +195,21 @@ export default function Project() {
 
             try {
                 projectData = await loadProject();
-                setProjName(projectData.data.getProject.name);
+                const decodedDescript = projectData.data.getProject.description;
+                const dataProjName = projectData.data.getProject.name;
+                setProjName(dataProjName);
+                setNewProjName(dataProjName);
+                setProjDescript(decodedDescript);
+                setNewProjDescript(decodedDescript);
+
                 if (projectData.data.getProject.public){
                     setPublicId(projectData.data.getProject.publicProject.id)
                 } else setPublicId(false);
+
                 const sortedEvents = projectData.data.getProject.events.items.sort((a, b) => {
                     return new Date(b.time) - new Date(a.time);
                 });
+
                 setNumPrivate(sortedEvents.filter(event => event.hidden).length);
                 setEvents(sortedEvents);
                 // setIsLoading(false);
@@ -192,6 +223,13 @@ export default function Project() {
         onLoad();
     }, [id, history, auth.authState]);
 
+    const markdownConverter = new Showdown.Converter({
+        tables: true,
+        simplifiedAutoLink: true,
+        strikethrough: true,
+        tasklists: true
+    });
+
     return (
         <div className="relative">
             {/* {isLoading && (
@@ -201,7 +239,11 @@ export default function Project() {
                 <>
                     <div className="text-center">
                         <p className="label mb-4"><Link to="/projects">&lt; Back to all projects</Link></p>
-                        <h1 className="heading">{projName}</h1>
+                        {isEdit ? (
+                            <input type="text" className="heading block w-full text-center border" value={newProjName} onChange={e => setNewProjName(e.target.value)}/>
+                        ) : (
+                            <h1 className="heading">{projName}</h1>
+                        )}
                         {publicId ? (
                             <p className="content aside ~neutral !normal mt-8">
                                 This is a public project. Public updates are published at <Link
@@ -211,22 +253,37 @@ export default function Project() {
                             <p className="badge ~neutral !normal mt-4">Private project</p>
                         )}
                     </div>
-                    <MoreButton className="right-0 top-0">
-                        <Modal buttonClassName="hover:bg-gray-100 py-2 px-4 text-left"
-                                buttonText="Rename Project"
-                                ref={renameModal}>
-                            <p className="my-4">Enter a new name for this project:</p>
-                            <input type="text"
-                                   className="field ~neutral !normal my-1"
-                                    value={newProjName}
-                                    onChange={e => setNewProjName(e.target.value)}/>
-                            <div className="my-4">
-                                <button className="button ~info !normal"
-                                onClick={renameProject}>Rename project</button>
-                                <button className="button ~neutral !low opacity-50"
-                                onClick={closeRenameModal}>Cancel</button>
+                    {isEdit ? (
+                        <>
+                            <SimpleMDE
+                                value={newProjDescript}
+                                onChange={setNewProjDescript}
+                                options={{
+                                    spellChecker: false,
+                                }}
+                                className="mt-4 max-w-2xl mx-auto"
+                            />
+                            <div className="flex">
+                                <button onClick={editProjectInfo}
+                                        disabled={(newProjDescript === projDescript && newProjName === projName)}
+                                        className="button field w-auto block my-4 mr-2">Save Changes
+                                </button>
+                                <button onClick={cancelEditProjectInfo}
+                                        className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit
+                                </button>
                             </div>
-                        </Modal>
+                        </>
+                    ) : (
+                        <div className="max-w-2xl my-4 mx-auto text-center">
+                            {projDescript !== null ? Parser(markdownConverter.makeHtml(projDescript)) : (
+                                <p className="opacity-50">Set a project description or change the project name by clicking the three dots on the right and clicking "edit project info."</p>
+                            )}
+                        </div>
+                    )}
+                    <MoreButton className="right-0 top-0">
+                        {!isEdit && (
+                            <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={() => {setIsEdit(!isEdit)}}>Edit Project Info</button>
+                        )}
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={exportProject}>Export Project</button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={publicId ? makePrivate : makePublic}>
@@ -242,7 +299,8 @@ export default function Project() {
                     ) : (
                         <div className="aside align-center ~info md:flex">
                             <span className="leading-8">Showing only public updates</span>
-                                <button className="button ml-auto bg-transparent pl-0 underline" onClick={() => setShowPrivate(true)}>Show {numPrivate} private {numPrivate === 1 ? "update" : "updates"}</button>
+                            <button className="button ml-auto bg-transparent pl-0 underline"
+                                    onClick={() => setShowPrivate(true)}>Show {numPrivate} private {numPrivate === 1 ? "update" : "updates"}</button>
                         </div>
                     )}
 

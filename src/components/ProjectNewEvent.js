@@ -3,7 +3,6 @@ import { Storage, API, graphqlOperation } from "aws-amplify";
 
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
-import "./ProjectNewEvent.css";
 
 import * as FilePond from "react-filepond";
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';

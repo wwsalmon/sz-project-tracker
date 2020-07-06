@@ -9,7 +9,7 @@ export default function GoogleRedirect(){
     useEffect(() => {
         auth.checkGoogle().then(res => {
             if (res === "success"){
-                history.push("/projects", {state: {justLoggedIn: true}});
+                history.push({pathname: "/projects", state: {justLoggedIn: true}});
             } else{
                 history.push("/login");
             }
