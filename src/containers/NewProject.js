@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import { API, graphqlOperation } from 'aws-amplify';
 import utf8 from "utf8";
 
@@ -78,6 +78,8 @@ export default function NewProject(){
 
     return (
         <div className="max-w-2xl mx-auto">
+            <button className="label my-4" onClick={handleCancel}>&lt; Back to all projects</button>
+            <p className="label my-4">Creating new project</p>
             <p className="label my-4">Project name:</p>
             <input className="heading block w-full border p-2" type="text" value={projName} onChange={e => {setProjName(e.target.value)}}/>
             <p className="label my-4">Project description (optional):</p>

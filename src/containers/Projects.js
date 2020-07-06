@@ -4,6 +4,7 @@ import {API, graphqlOperation} from 'aws-amplify';
 import MoreButton from "../components/MoreButton";
 import {useAuth} from "../lib/authLib";
 import Modal from "../components/Modal";
+import { format } from 'date-fns';
 
 export default function Projects(props) {
     const history = useHistory();
@@ -38,15 +39,22 @@ export default function Projects(props) {
 
     useEffect(() => {
         const listQuery = `
-    query {
-        listProjects{
-        items{
-            id
-            name      
+        query {
+            listProjects{
+                items{
+                    id
+                    name
+                    public
+                    createdAt
+                    events{
+                        items{
+                            time
+                        }
+                    }     
+                }
+            }
         }
-        }
-    }
-    `
+        `;
 
         function loadProjects() {
             return API.graphql(graphqlOperation(listQuery));
@@ -59,7 +67,13 @@ export default function Projects(props) {
                 return;
             }
             const projectsData = await loadProjects();
-            setProjects(projectsData.data.listProjects.items);
+            let processedProjects = projectsData.data.listProjects.items;
+            for (const i in processedProjects){
+                const lastEventDate = processedProjects[i].events.items.map(x => new Date(x.time))
+                    .sort((a, b) => b - a)[0] || new Date(processedProjects[i].createdAt);
+                processedProjects[i]["lastEventDate"] = lastEventDate;
+            }
+            setProjects(processedProjects.sort((a, b) => b.lastEventDate - a.lastEventDate));
             // setIsLoading(false);
             setIsInit(true);
         }
@@ -81,14 +95,25 @@ export default function Projects(props) {
             )}
             {isInit && (
                 <>
-                    <Link to="/projects/new">
-                        <button className="button !normal ~neutral my-4">New Project</button>
-                    </Link>
-                    <p className="label my-4">Active Projects</p>
+                    <div className="flex my-8 justify-between items-center">
+                        <h1 className="heading">Your projects</h1>
+                        <Link to="/projects/new">
+                            <button className="button ~info !high">New Project</button>
+                        </Link>
+                    </div>
+                    <hr className="my-8"></hr>
                     <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3 my-4">
                         {projects.map((project) => (
                             <div key={project.id} className="card border relative overflow-visible">
-                                <Link to={`/projects/${project.id}`}><p>{project.name}</p></Link>
+                                <Link to={`/projects/${project.id}`}><p className="label">{project.name}</p></Link>
+                                <div className="opacity-50 content">
+                                    <p>Last update on {format(project.lastEventDate, "EEEE, MMMM d")}</p>
+                                    <p>
+                                        {project.public ? (
+                                            <Link to={`/public/${project.publicId}`} target="_blank">Public link</Link>
+                                        ) : <span className="chip ~neutral !normal">Private project</span>}
+                                    </p>
+                                </div>
                                 <MoreButton className="top-4 right-4">
                                     <Modal
                                         buttonClassName="button ~critical !low"
@@ -106,8 +131,6 @@ export default function Projects(props) {
                             </div>
                         ))}
                     </div>
-                    <hr className="my-16"></hr>
-                    <p className="label my-4">Archived</p>
                 </>
             )}
         </div>
