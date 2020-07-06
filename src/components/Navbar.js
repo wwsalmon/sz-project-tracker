@@ -17,7 +17,8 @@ export default function Navbar(){
                     {
                         auth.authState === "signedIn" ? (
                             <>
-                                <div className="sz-navbar-item"><span><Link to="/projects">All Projects</Link></span></div>
+                                <div className="sz-navbar-item sm:px-2"><span><Link to="/projects">All projects</Link></span></div>
+                                <div className="sz-navbar-item sm:px-2"><span><Link to="/projects/new">New project</Link></span></div>
                                 <div className="sm:ml-auto sz-navbar-item pr-6 relative">
                                     <span className="opacity-50">Signed in as <b>{auth.user.attributes.name || auth.user.username}</b></span>
                                     <MoreButton className="absolute right-0 top-0">

@@ -10,6 +10,7 @@ import Projects from "./containers/Projects";
 import PublicProject from "./containers/PublicProject";
 import GoogleRedirect from "./containers/GoogleRedirect";
 import Settings from "./containers/Settings";
+import ResetPassword from "./containers/ResetPassword";
 
 export default function Routes() {
     return (
@@ -33,6 +34,9 @@ export default function Routes() {
             </Route>
             <Route exact path="/public/:id/:postid?">
                 <PublicProject />
+            </Route>
+            <Route exact path="/resetpassword">
+                <ResetPassword/>
             </Route>
             <Route exact path="/settings">
                 <Settings/>

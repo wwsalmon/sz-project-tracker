@@ -18,10 +18,11 @@ export default function SignUp(){
         <>
             {isLoading && (<p className="aside ~info my-4">Loading...</p>)}
             {error && (<p className="aside my-4 ~critical">{error}</p>)}
+            <div className="max-w-sm mx-auto">
             {
                 {
                     signedOut: (
-                        <div className="max-w-sm mx-auto">
+                        <>
                             <h1 className="heading">Sign up</h1>
                             <hr className="my-8"/>
                             <GoogleButton label="Sign up with Google" onClick={auth.signInWithGoogle}/>
@@ -57,11 +58,11 @@ export default function SignUp(){
                                     <button className="button !high ~neutral">Log in</button>
                                 </Link>
                             </div>
-                        </div>
+                        </>
                     ), signedIn: (
                         <Redirect to={{pathname: "/projects", state: {justLoggedIn: true}}}/>
                     ), getConfirm: (
-                        <div className="max-w-sm mx-auto">
+                        <>
                             <h1 className="heading">Confirm your account</h1>
                             <hr className="my-8"/>
                             <form onSubmit={e => {
@@ -95,10 +96,11 @@ export default function SignUp(){
                                     </>
                                 )}
                             </div>
-                        </div>
+                        </>
                     )
                 }[auth.authState]
             }
+            </div>
         </>
     )
 }

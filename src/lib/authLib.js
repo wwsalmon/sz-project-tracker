@@ -86,6 +86,14 @@ function useProvideAuth(){
         setAuthState(state);
     }
 
+    const startResetPassword = (username) => {
+        return Auth.forgotPassword(username);
+    }
+
+    const confirmResetPassword = (username, code, password) => {
+        return Auth.forgotPasswordSubmit(username, code, password);
+    }
+
     useEffect(() => {
         checkCurrentAuth().then(res => {
             console.log(res);
@@ -95,5 +103,6 @@ function useProvideAuth(){
     }, []);
 
     return {user, username, setUsername, authState, signIn, signInWithGoogle, checkGoogle,
-        signUp,confirmSignUp, signOut, forceState, resendConfirmation};
+        signUp,confirmSignUp, signOut, forceState, resendConfirmation, startResetPassword,
+        confirmResetPassword};
 }

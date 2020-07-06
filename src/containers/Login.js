@@ -7,7 +7,6 @@ export default function Login(props){
     const [isLoading, setIsLoading] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [code, setCode] = useState("");
     const [error, setError] = useState(false);
     const propState = props.location.state;
     const history = useHistory();
@@ -54,8 +53,13 @@ export default function Login(props){
                                 <div className="flex justify-end">
                                     <input type="submit" className="button ~info !high w-auto block my-4"/>
                                 </div>
+                                <div className="content opacity-25">
+                                    <Link to="/resetpassword">
+                                        <p>Forgot your password?</p>
+                                    </Link>
+                                </div>
                                 <hr className="my-8"/>
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center my-4">
                                     <p className="label">Don't have an account?</p>
                                     <Link to="/signup">
                                         <button className="button !high ~neutral">Sign up</button>
@@ -66,19 +70,7 @@ export default function Login(props){
                     ), signedIn: (
                         <Redirect to={{pathname: "/projects", state: {justLoggedIn: true}}}/>
                     ), confirm: (
-                        <>
-                            <h3>Confirm your account</h3>
-                            <form onSubmit={e => {
-                                e.preventDefault();
-                                setIsLoading(true);
-                                auth.confirmSignUp(username, code).then(setIsLoading(false));
-                            }}>
-                                <p className="label">Enter the code sent to your email.</p>
-                                <input type="text" className="field ~neutral !normal w-auto my-1"
-                                       value={code} onChange={e => setCode(e.target.value)}/>
-                                <input type="submit" className="button field w-auto block my-4"/>
-                            </form>
-                        </>
+                        <Redirect to="signup"/>
                     ),
                 }[auth.authState]
             }
