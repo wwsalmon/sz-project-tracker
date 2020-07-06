@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useParams, useHistory, Link} from "react-router-dom";
-import {API, graphqlOperation, Storage} from "aws-amplify";
+import {API, graphqlOperation} from "aws-amplify";
 import { format } from 'date-fns';
 import {useAuth} from "../lib/authLib";
 import utf8 from "utf8";
@@ -87,18 +87,29 @@ export default function Project() {
 
     async function deleteProject(e) {
         e.preventDefault();
-        const deleteQuery = `
+        try{
+            const deleteReq = `
             mutation {
                 deleteProject(input: {
                     id: "${id}"
                 }){
-                    name id
+                    public publicProject{ id }
                 }
+            }`;
+            const deleteData = await API.graphql(graphqlOperation(deleteReq));
+            if (deleteData.data.deleteProject.public){
+                const deletePublicReq = `
+                mutation{
+                    deletePublicProject(input: {
+                        id: ${deleteData.data.deleteProject.publicProject.id}
+                    }){ id }
+                }`;
+                await API.graphql(graphqlOperation(deletePublicReq));
             }
-        `
-        API.graphql(graphqlOperation(deleteQuery)).then(() => {
-            history.push("/projects", {projectDeleted: true}); // add "project deleted" prop
-        }).catch(e => console.log(e));
+            history.push("/projects", {projectDeleted: true});
+        } catch(e) {
+            console.log(e);
+        }
     }
 
     async function exportProject(e) {
@@ -240,7 +251,7 @@ export default function Project() {
                     <div className="text-center">
                         <p className="label mb-4"><Link to="/projects">&lt; Back to all projects</Link></p>
                         {isEdit ? (
-                            <input type="text" className="heading block w-full text-center border" value={newProjName} onChange={e => setNewProjName(e.target.value)}/>
+                            <input type="text" className="heading block text-center border p-2 max-w-2xl w-full mx-auto" value={newProjName} onChange={e => setNewProjName(e.target.value)}/>
                         ) : (
                             <h1 className="heading">{projName}</h1>
                         )}
