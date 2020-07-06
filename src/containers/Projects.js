@@ -46,6 +46,9 @@ export default function Projects(props) {
                     name
                     public
                     createdAt
+                    publicProject{
+                        id
+                    }
                     events{
                         items{
                             time
@@ -103,14 +106,14 @@ export default function Projects(props) {
                     </div>
                     <hr className="my-8"></hr>
                     <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3 my-4">
-                        {projects.map((project) => (
+                        {projects.length > 0 ? projects.map((project) => (
                             <div key={project.id} className="card border relative overflow-visible">
                                 <Link to={`/projects/${project.id}`}><p className="label">{project.name}</p></Link>
                                 <div className="opacity-50 content">
                                     <p>Last update on {format(project.lastEventDate, "EEEE, MMMM d")}</p>
                                     <p>
                                         {project.public ? (
-                                            <Link to={`/public/${project.publicId}`} target="_blank">Public link</Link>
+                                            <Link to={`/public/${project.publicProject.id}`} target="_blank">Public link</Link>
                                         ) : <span className="chip ~neutral !normal">Private project</span>}
                                     </p>
                                 </div>
@@ -129,7 +132,9 @@ export default function Projects(props) {
                                     </Modal>
                                 </MoreButton>
                             </div>
-                        ))}
+                        )) : (
+                            <p className="content">You don't have any projects yet. <Link to="/projects/new">Create one now!</Link></p>
+                        )}
                     </div>
                 </>
             )}

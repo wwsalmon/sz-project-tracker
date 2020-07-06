@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import {v1 as uuidv1} from "uuid";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 
 export default function MoreButton(props){

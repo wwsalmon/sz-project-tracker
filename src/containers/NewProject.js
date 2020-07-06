@@ -79,10 +79,11 @@ export default function NewProject(){
     return (
         <div className="max-w-2xl mx-auto">
             <button className="label my-4" onClick={handleCancel}>&lt; Back to all projects</button>
-            <h1 className="heading my-4">Creating new project</h1>
+            <h1 className="heading my-4">New project</h1>
+            <hr className="my-8"/>
             <p className="label my-4">Project name:</p>
             <input className="subheading block w-full border p-2" type="text" value={projName} onChange={e => {setProjName(e.target.value)}}/>
-            <p className="label my-4">Project description (optional):</p>
+            <p className="label mt-8 mb-4">Project description (optional):</p>
             <SimpleMDE
                 value={projDescript}
                 onChange={setProjDescript}
