@@ -12,6 +12,7 @@ import GoogleRedirect from "./containers/GoogleRedirect";
 import Settings from "./containers/Settings";
 import ResetPassword from "./containers/ResetPassword";
 import Navbar from "./components/Navbar";
+import Test from "./containers/Test";
 
 export default function Routes() {
     return (
@@ -27,6 +28,9 @@ export default function Routes() {
             <Route>
                 <Navbar context="app"/>
                 <Route exact path="/login" render={(props) => <Login {...props} />}/>
+                <Route exact path="/test">
+                    <Test />
+                </Route>
                 <Route exact path="/signup">
                     <SignUp />
                 </Route>

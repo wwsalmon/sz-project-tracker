@@ -94,6 +94,10 @@ function useProvideAuth(){
         return Auth.forgotPasswordSubmit(username, code, password);
     }
 
+    const getCurrentCredentials = () => {
+        return Auth.currentCredentials();
+    }
+
     useEffect(() => {
         checkCurrentAuth().then(res => {
             console.log(res);
@@ -104,5 +108,5 @@ function useProvideAuth(){
 
     return {user, username, setUsername, authState, signIn, signInWithGoogle, checkGoogle,
         signUp,confirmSignUp, signOut, forceState, resendConfirmation, startResetPassword,
-        confirmResetPassword};
+        confirmResetPassword, getCurrentCredentials};
 }
