@@ -26,16 +26,19 @@ export default function EventImage(props){
     }, [props.s3key]);
 
     return (
-        <div className={props.className}>
-            {isLoading && (
+        <div className="p-2 bg-gray-200 mr-4" style={{width: 240, height: 120}}>
+            {isLoading ? (
                 <p>Loading...</p>
-            )}
-            {!isLoading && (
-                <div className={showLightbox ? "z-10 fixed inset-0 flex justify-center items-center" : ""}>
-                    <img onClick={() => !showLightbox && setShowLightbox(true)}
-                         alt="Update attachment"
+            ) : (
+                <div className={showLightbox ? "flex z-10 fixed inset-0 justify-center items-center" :
+                    "w-full h-full cursor-pointer relative"}
+                     onClick={() => !showLightbox && setShowLightbox(true)}>
+
+                    <img alt="Update attachment"
                          src={imgUrl}
-                         className={showLightbox ? "z-20 max-h-full max-w-full p-4" : "cursor-pointer"}/>
+                         className={"max-h-full " + (showLightbox ? "z-20 p-4" :
+                             "cursor-pointer block mx-auto relative top-1/2 -translate-y-1/2 transform")}/>
+
                     {showLightbox && (
                         <>
                             <div className="fixed top-4 z-30 cursor-pointer right-4 shield ~neutral !normal"
@@ -48,6 +51,7 @@ export default function EventImage(props){
                                  className="opacity-50 fixed inset-0 z-10 bg-black cursor-pointer"/>
                         </>
                     )}
+
                 </div>
             )}
         </div>

@@ -20,10 +20,16 @@ export default function Navbar(){
                     {
                         auth.authState === "signedIn" ? (
                             <>
-                                <div className="sz-navbar-item sm:px-2"><span><Link to="/projects"><FontAwesomeIcon icon={faStream} className="pr-1"/> All projects</Link></span></div>
-                                <div className="sz-navbar-item sm:px-2"><span><Link to="/projects/new"><FontAwesomeIcon icon={faPlus} className="pr-1"/> New project</Link></span></div>
+                                <div className="sz-navbar-item sm:px-2"><span><Link to="/projects">
+                                    <FontAwesomeIcon icon={faStream} className="pr-1"/> All projects
+                                </Link></span></div>
+                                <div className="sz-navbar-item sm:px-2"><span><Link to="/projects/new">
+                                    <FontAwesomeIcon icon={faPlus} className="pr-1"/> New project
+                                </Link></span></div>
                                 <div className="sm:ml-auto sz-navbar-item pr-6 relative">
-                                    <span className="opacity-50">Signed in as <b>{auth.user.attributes.name || auth.user.username}</b></span>
+                                    <span className="opacity-50">
+                                        Signed in as <b>{auth.user.attributes.name || auth.user.username}
+                                    </b></span>
                                     <MoreButton className="absolute right-0 top-0">
                                         <SignOut className="hover:bg-gray-100 py-2 px-4 text-left"/>
                                         <button className="hover:bg-gray-100 py-2 px-4 text-left">
@@ -34,8 +40,12 @@ export default function Navbar(){
                             </>
                         ) : (
                             <>
-                                <div className="sz-navbar-item sm:ml-auto"><span><Link to="/login">Log in</Link></span></div>
-                                <div className="sz-navbar-item"><span><Link to="/signup">Sign up</Link></span></div>
+                                <div className="sz-navbar-item sm:ml-auto">
+                                    <span><Link to="/login">Log in</Link></span>
+                                </div>
+                                <div className="sz-navbar-item">
+                                    <span><Link to="/signup">Sign up</Link></span>
+                                </div>
                             </>
                         )
                     }

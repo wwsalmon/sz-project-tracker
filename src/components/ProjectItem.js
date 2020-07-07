@@ -20,7 +20,7 @@ import {v1 as uuidv1} from 'uuid';
 import EventImage from "../components/EventImage";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faGlobe} from "@fortawesome/free-solid-svg-icons";
+import {faGlobe, faTimes} from "@fortawesome/free-solid-svg-icons";
 
 import MoreButton from "../components/MoreButton";
 
@@ -252,7 +252,8 @@ export default function ProjectItem(props) {
                         </Link>
                     )}
                 </div>
-                <div className="content pr-8 mr-6 md:mr-0 flex-1">
+                <div className="content pr-8 mr-6 md:mr-0 w-8" style={{flex: "1 0 0"}}>
+                    {/* w-8 is arbitrary here to get flex to work*/}
                     {isEdit ? (
                         <>
                             <SimpleMDE
@@ -264,15 +265,7 @@ export default function ProjectItem(props) {
                                     // imageUploadFunction: handleMDEImageUpload
                                 }}
                             />
-                            <div className="flex">
-                                <button onClick={handleEditEvent}
-                                        disabled={(newNote === decodedNote && newFiles.length === 0) || !canSave}
-                                        className="button field w-auto block my-4 mr-2">Save Changes
-                                </button>
-                                <button onClick={handleCancelEdit}
-                                        className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit
-                                </button>
-                            </div>
+                            <p className="label my-2">Attach new images to update</p>
                             <FilePond.FilePond server={
                                 {
                                     process: (fieldName, file, metadata, load, error, progress, abort, removeLocal, transfer, options) => {
@@ -324,20 +317,30 @@ export default function ProjectItem(props) {
                                                oninit={handleFilePondInit}
                                                onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
                             />
+                            <div className="flex">
+                                <button onClick={handleEditEvent}
+                                        disabled={(newNote === decodedNote && newFiles.length === 0) || !canSave}
+                                        className="button field w-auto block my-4 mr-2">Save Changes
+                                </button>
+                                <button onClick={handleCancelEdit}
+                                        className="button field ~warning !low w-auto block my-4 mr-2">Cancel Edit
+                                </button>
+                            </div>
                         </>
                     ) : Parser(markdownConverter.makeHtml(decodedNote))}
-                    <div className="flex items-center">
-                        {event.filenames.map(filename => (
-                            <div key={filename}>
-                                {isEdit && (
-                                    <button className="button ~critical !low"
-                                            onClick={() => deleteAttachment(filename)}>x
-                                    </button>
-                                )}
-                                <EventImage className="w-32 p-2 hover:bg-gray-200 content-center flex"
-                                            s3key={filename} key={filename}/>
-                            </div>
-                        ))}
+                    <div className="overflow-x-auto">
+                        <div className="flex pb-4">
+                            {event.filenames.map(filename => (
+                                <div key={filename}>
+                                    {isEdit && (
+                                        <button className="button ~critical !low"
+                                                onClick={() => deleteAttachment(filename)}><FontAwesomeIcon icon={faTimes}/>
+                                        </button>
+                                    )}
+                                    <EventImage s3key={filename} key={filename}/>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

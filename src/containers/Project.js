@@ -17,6 +17,8 @@ import "easymde/dist/easymde.min.css";
 
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
+import {faEye} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default function Project() {
     const { id } = useParams();
@@ -251,7 +253,7 @@ export default function Project() {
                     <div className="text-center">
                         <p className="label mb-4"><Link to="/projects">&lt; Back to all projects</Link></p>
                         {isEdit ? (
-                            <input type="text" className="heading block text-center border p-2 max-w-2xl w-full mx-auto" value={newProjName} onChange={e => setNewProjName(e.target.value)}/>
+                            <input type="text" className="field heading block max-w-2xl w-full mx-auto" value={newProjName} onChange={e => setNewProjName(e.target.value)}/>
                         ) : (
                             <h1 className="heading">{projName}</h1>
                         )}
@@ -274,7 +276,7 @@ export default function Project() {
                                 }}
                                 className="mt-4 max-w-2xl mx-auto"
                             />
-                            <div className="flex">
+                            <div className="flex max-w-2xl mx-auto">
                                 <button onClick={editProjectInfo}
                                         disabled={(newProjDescript === projDescript && newProjName === projName)}
                                         className="button field w-auto block my-4 mr-2">Save Changes
@@ -306,7 +308,10 @@ export default function Project() {
                     <hr className="sep"/>
 
                     {showPrivate ? (
-                        <button className="button ml-auto block ~neutral my-4" disabled={numPrivate === 0} onClick={() => setShowPrivate(false)}>Show only public updates</button>
+                        <button className="button ml-auto block ~neutral my-4" disabled={numPrivate === 0}
+                                onClick={() => setShowPrivate(false)}>
+                            <FontAwesomeIcon icon={faEye} className="pr-1"/> Show only public updates
+                        </button>
                     ) : (
                         <div className="aside align-center ~info md:flex">
                             <span className="leading-8">Showing only public updates</span>

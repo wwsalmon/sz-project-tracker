@@ -5,6 +5,8 @@ import MoreButton from "../components/MoreButton";
 import {useAuth} from "../lib/authLib";
 import Modal from "../components/Modal";
 import { format } from 'date-fns';
+import {faPlus} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default function Projects(props) {
     const history = useHistory();
@@ -101,7 +103,9 @@ export default function Projects(props) {
                     <div className="flex my-8 justify-between items-center">
                         <h1 className="heading">Your projects</h1>
                         <Link to="/projects/new">
-                            <button className="button ~info !high">New Project</button>
+                            <button className="button ~info !high">
+                                <FontAwesomeIcon icon={faPlus} className="pr-1"/> New Project
+                            </button>
                         </Link>
                     </div>
                     <hr className="my-8"></hr>

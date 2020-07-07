@@ -12,19 +12,20 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 import {v1 as uuidv1} from 'uuid';
 import utf8 from "utf8";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+
 export default function ProjectNewEvent(props) {
-    const [newNote, setNewNote] = useState("Write a new update here...");
+    const defaultNewNote = "Write a new update here...";
+
+    const [newNote, setNewNote] = useState(defaultNewNote);
     const [newFiles, setNewFiles] = useState([]);
     const [fileUUIDs, setFileUUIDs] = useState([]);
 
     let fasterFileUUIDs = [];
 
+    const [isEdit, setIsEdit] = useState(false);
     const [isPublic, setIsPublic] = useState(false);
-
-    const [showNote, setShowNote] = useState(false);
-    const [showUpload, setShowUpload] = useState(false);
-    const [showAudio, setShowAudio] = useState(false);
-    const [showVideo, setShowVideo] = useState(false);
 
     const [canSubmit, setCanSubmit] = useState(true);
     const pond = useRef();
@@ -131,14 +132,11 @@ export default function ProjectNewEvent(props) {
 
     function afterCreateEvent(eventObj){
         props.setEvents([eventObj, ...props.events]);
-        setNewNote("Write a new update here...");
+        setNewNote(defaultNewNote);
         setNewFiles([]);
         setFileUUIDs([]);
         setIsPublic(false);
-        setShowNote(false);
-        setShowUpload(false);
-        setShowAudio(false);
-        setShowVideo(false);
+        setIsEdit(false);
     }
 
     async function handleCreateEventTwitter(e) {
@@ -154,13 +152,19 @@ export default function ProjectNewEvent(props) {
         }
     }
 
-    function handleCancelEvent(e) {
+    async function handleCancelEvent(e) {
         e.preventDefault();
-        setIsPublic(false);
-        setShowNote(false);
-        setShowUpload(false);
-        setShowAudio(false);
-        setShowVideo(false);
+        if ((newNote === defaultNewNote && newFiles.length === 0) ||
+            window.confirm("You have unsaved changes. Are you sure you want to discard them?")){
+            for (const filename of fileUUIDs) {
+                await Storage.vault.remove(filename);
+            }
+            setNewNote(defaultNewNote);
+            setNewFiles([]);
+            setFileUUIDs([]);
+            setIsPublic(false);
+            setIsEdit(false);
+        }
     }
 
     function handleFilePondInit() {
@@ -171,10 +175,8 @@ export default function ProjectNewEvent(props) {
         setNewFiles(fileItems.map(fileItem => fileItem.file));
     }
 
-    return (
-        <div>
-            <p className="label my-4">Create New Update</p>
-            {showNote && (
+    return isEdit ? (
+            <div>
                 <SimpleMDE
                     value={newNote}
                     onChange={setNewNote}
@@ -184,94 +186,81 @@ export default function ProjectNewEvent(props) {
                         // imageUploadFunction: handleMDEImageUpload
                     }}
                 />
-            )}
-            {showUpload && (
-            <FilePond.FilePond server={
-                {
-                    process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
-                        const extArray = file.name.split('.');
-                        const ext = extArray[extArray.length - 1];
-                        const uuid = uuidv1() + `.${ext}`;
+                <p className="label my-2">Attach images to update</p>
+                <FilePond.FilePond server={
+                    {
+                        process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                            const extArray = file.name.split('.');
+                            const ext = extArray[extArray.length - 1];
+                            const uuid = uuidv1() + `.${ext}`;
 
-                        Storage.vault.put(uuid, file, {
-                            progressCallback(thisProgress) {
-                                progress(thisProgress.lengthComputable, thisProgress.loaded, thisProgress.total);
-                            }
-                        }).then(res => {
-                            load(res.key);
-                            setCanSubmit(true);
-                            fasterFileUUIDs.push(uuid);
-                            setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
-                        }).catch(e => {
-                            console.log(e);
-                            error(e);
-                            setCanSubmit(true);
-                        });
-
-                        return {
-                            abort: () => {
-                                abort();
+                            Storage.vault.put(uuid, file, {
+                                progressCallback(thisProgress) {
+                                    progress(thisProgress.lengthComputable, thisProgress.loaded, thisProgress.total);
+                                }
+                            }).then(res => {
+                                load(res.key);
                                 setCanSubmit(true);
+                                fasterFileUUIDs.push(uuid);
+                                setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
+                            }).catch(e => {
+                                console.log(e);
+                                error(e);
+                                setCanSubmit(true);
+                            });
+
+                            return {
+                                abort: () => {
+                                    abort();
+                                    setCanSubmit(true);
+                                }
                             }
-                        }
-                    },
-                    revert: (uniqueFileId, load, error) => {
-                        console.log(uniqueFileId);
-                        try {
-                            Storage.vault.remove(uniqueFileId)
-                                .then(() => {
-                                    fasterFileUUIDs.filter(d => d !== uniqueFileId);
-                                    fileUUIDs.filter(d => d !== uniqueFileId);
-                                    setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
-                                    load();
-                                });
-                        } catch (e) {
-                            error(e);
+                        },
+                        revert: (uniqueFileId, load, error) => {
+                            console.log(uniqueFileId);
+                            try {
+                                Storage.vault.remove(uniqueFileId)
+                                    .then(() => {
+                                        fasterFileUUIDs.filter(d => d !== uniqueFileId);
+                                        fileUUIDs.filter(d => d !== uniqueFileId);
+                                        setFileUUIDs([...fileUUIDs, ...fasterFileUUIDs]);
+                                        load();
+                                    });
+                            } catch (e) {
+                                error(e);
+                            }
                         }
                     }
                 }
-            }
-                ref={pond}
-                files={newFiles}
-                allowMultiple={true}
-                oninit={handleFilePondInit}
-                onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
-            />
-            )}
-            <div className="overflow-auto">
-                <div className="flex my-4">
-                    <button className={`button mr-2 ~neutral ${showNote ? "!low" : "!normal"}`} onClick={() => setShowNote(!showNote)}>{!showNote ? "Add Note" : "Remove Note"}</button>
-                    <button className={`button mx-2 ~neutral ${showUpload ? "!low" : "!normal"}`} onClick={() => setShowUpload(!showUpload)}>{!showUpload ? "Add Attachments" : "Remove Attachments"}</button>
-                    {/* <button className={`button mx-2 ~neutral ${showAudio ? "!low" : "!normal"}`} onClick={() => setShowAudio(!showAudio)}>{!showAudio ? "Record Audio" : "Remove Audio"}</button>
-                    <button className={`button mx-2 ~neutral ${showVideo ? "!low" : "!normal"}`} onClick={() => setShowVideo(!showVideo)}>{!showVideo ? "Record Video" : "Remove Video"}</button> */}
-                    <label className={`mx-2 my-2 ${(canSubmit && props.publicId && (showNote || showUpload || showAudio || showVideo)) ? "" : "opacity-50"}`}>
-                        <input type="checkbox" checked={isPublic}
-                               onChange={e => setIsPublic(e.target.checked)}
-                               disabled={!(canSubmit && props.publicId && (showNote || showUpload || showAudio || showVideo))}
-                        />
-                        <span className="ml-2">Post publicly</span>
-                    </label>
-                </div>
-            </div>
-            <hr></hr>
-            <div className="overflow-auto">
-                <div className="flex">
-                    <button onClick={handleCreateEvent}
-                            disabled={!(canSubmit && (showNote || showUpload || showAudio || showVideo))}
-                            className="button field w-auto block my-4 mr-2">Create Update</button>
-                    {(canSubmit && (showNote || showUpload || showAudio || showVideo)) && (
+                                   ref={pond}
+                                   files={newFiles}
+                                   allowMultiple={true}
+                                   oninit={handleFilePondInit}
+                                   onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
+                />
+                <div className="overflow-auto">
+                    <div className="flex">
+                        <button onClick={handleCreateEvent}
+                                disabled={!canSubmit}
+                                className="button ~info !high w-auto block my-4 mr-2">
+                            Create Update
+                        </button>
                         <button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">
                             Cancel
                         </button>
-                    )}
-                    <button onClick={handleCreateEventTwitter}
-                            disabled={!(canSubmit && isPublic && props.publicId &&
-                                (showNote || showUpload || showAudio || showVideo))}
-                            className="mx-4 button ~info !low w-auto block my-2">
-                        Create Update & Post to Twitter
-                    </button>
+                        <button onClick={handleCreateEventTwitter}
+                                disabled={!(canSubmit && isPublic && props.publicId)}
+                                className="mx-4 button ~info !low w-auto block my-2">
+                            Create Update & Post to Twitter
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    )
+        ) : (
+            <div className="flex justify-center">
+                <button className="button ~info !high" onClick={e => {e.preventDefault(); setIsEdit(true)}}>
+                    <FontAwesomeIcon icon={faPlus} className="pr-1"/> New update
+                </button>
+            </div>
+        );
 }
