@@ -7,6 +7,8 @@ import PublicItem from "../components/PublicItem";
 import Parser from "html-react-parser";
 import * as Showdown from "showdown";
 import utf8 from "utf8";
+import {Helmet} from "react-helmet";
+import getTitle from "../lib/getTitle";
 
 export default function PublicProject() {
     let { id, postid } = useParams();
@@ -114,6 +116,9 @@ export default function PublicProject() {
 
     return (
         <div className="relative">
+            <Helmet>
+                <title>{getTitle(projName + " by " + owner)}</title>
+            </Helmet>
             {/* {isLoading && (
                 <p className="aside ~info">Loading...</p>
             )} */}

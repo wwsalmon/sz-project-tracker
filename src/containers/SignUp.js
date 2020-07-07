@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import {useAuth} from "../lib/authLib";
 import { Redirect, Link, useHistory } from 'react-router-dom';
 import GoogleButton from "react-google-button";
+import {Helmet} from "react-helmet";
+import getTitle from "../lib/getTitle";
 
 export default function SignUp(){
     const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +18,9 @@ export default function SignUp(){
 
     return (
         <>
+            <Helmet>
+                <title>{getTitle("Sign up")}</title>
+            </Helmet>
             {isLoading && (<p className="aside ~info my-4">Loading...</p>)}
             {error && (<p className="aside my-4 ~critical">{error}</p>)}
             <div className="max-w-sm mx-auto">

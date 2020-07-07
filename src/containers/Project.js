@@ -19,6 +19,8 @@ import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
 import {faEye} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Helmet} from "react-helmet";
+import getTitle from "../lib/getTitle";
 
 export default function Project() {
     const {id} = useParams();
@@ -245,6 +247,9 @@ export default function Project() {
 
     return (
         <div className="relative">
+            <Helmet>
+                <title>{getTitle(projName)}</title>
+            </Helmet>
             {/* {isLoading && (
                 <p className="aside ~info">Loading...</p>
             )} */}

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {useAuth} from "../lib/authLib";
+import {Helmet} from "react-helmet";
+import getTitle from "../lib/getTitle";
 
 export default function ResetPassword(){
     const [username, setUsername] = useState("");
@@ -14,6 +16,9 @@ export default function ResetPassword(){
 
     return (
         <>
+            <Helmet>
+                <title>{getTitle("Reset password")}</title>
+            </Helmet>
             {error && (<p className="aside my-4 ~critical">{error}</p>)}
             <div className="max-w-sm mx-auto">
                 <h1 className="heading">Reset password</h1>

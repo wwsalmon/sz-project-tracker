@@ -7,6 +7,8 @@ import Modal from "../components/Modal";
 import { format } from 'date-fns';
 import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Helmet} from "react-helmet";
+import getTitle from "../lib/getTitle";
 
 export default function Projects(props) {
     const history = useHistory();
@@ -89,6 +91,9 @@ export default function Projects(props) {
     return (
 
         <div>
+            <Helmet>
+                <title>{getTitle("Projects")}</title>
+            </Helmet>
             {/* {isLoading && (
                 <p className="aside ~info">Loading...</p>
             )} */}

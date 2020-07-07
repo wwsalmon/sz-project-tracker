@@ -1,12 +1,17 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import {useAuth} from "../lib/authLib";
+import {Helmet} from "react-helmet";
+import getTitle from "../lib/getTitle";
 
 export default function Home() {
     const auth = useAuth();
 
     return (
         <>
+            <Helmet>
+                <title>{getTitle("Home")}</title>
+            </Helmet>
             <div className="text-center">
                 <h1 className="heading my-8">Project Tracker</h1>
                 <p className="max-w-3xl mx-auto content">Made by <a href="https://twitter.com/wwsalmon">Samson

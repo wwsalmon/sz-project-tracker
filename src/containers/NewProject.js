@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {useHistory} from "react-router-dom";
-import { API, graphqlOperation } from 'aws-amplify';
+import {API, graphqlOperation} from 'aws-amplify';
 import utf8 from "utf8";
 
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
+import {Helmet} from "react-helmet";
+import getTitle from "../lib/getTitle";
 
-export default function NewProject(){
+export default function NewProject() {
     const defaultName = "Enter a project name...";
     const [projName, setProjName] = useState(defaultName);
     const [projDescript, setProjDescript] = useState("");
@@ -14,9 +16,9 @@ export default function NewProject(){
 
     const history = useHistory();
 
-    async function handleCreate(e){
+    async function handleCreate(e) {
         e.preventDefault();
-        try{
+        try {
             const createReq = `
             mutation{
                 createProject(input: {
@@ -30,7 +32,7 @@ export default function NewProject(){
             `;
             const createData = await API.graphql(graphqlOperation(createReq));
             const createId = createData.data.createProject.id;
-            if (isPublic){
+            if (isPublic) {
                 const publicReq = `
                 mutation{
                     createPublicProject(input: {
@@ -61,15 +63,15 @@ export default function NewProject(){
                 await API.graphql(graphqlOperation(updateReq));
             }
             history.push(`/projects/${createId}`);
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
     }
 
-    function handleCancel(e){
+    function handleCancel(e) {
         e.preventDefault();
         if ((projName === defaultName && projDescript.length === 0) ||
-            window.confirm("You have unsaved changes. Are you sure you want to discard them?")){
+            window.confirm("You have unsaved changes. Are you sure you want to discard them?")) {
             setProjName(defaultName);
             setProjDescript("");
             history.push("/projects");
@@ -77,32 +79,40 @@ export default function NewProject(){
     }
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <button className="label my-4" onClick={handleCancel}>&lt; Back to all projects</button>
-            <h1 className="heading my-4">New project</h1>
-            <hr className="my-8"/>
-            <p className="label my-4">Project name:</p>
-            <input className="subheading block w-full border p-2" type="text" value={projName} onChange={e => {setProjName(e.target.value)}}/>
-            <p className="label mt-8 mb-4">Project description (optional):</p>
-            <SimpleMDE
-                value={projDescript}
-                onChange={setProjDescript}
-                options={{
-                    spellChecker: false,
-                }}
-                className="mt-4"
-            />
-            <button className="button ~info !high mr-2"
-                    onClick={handleCreate}>Create project</button>
-            <button className="button ~critical !low mr-2" onClick={handleCancel}>Cancel</button>
-            <label>
-                <input type="checkbox" checked={isPublic}
-                       onChange={e => {
-                           setIsPublic(e.target.checked)
-                       }}
+        <>
+            <Helmet>
+                <title>{getTitle("New project")}</title>
+            </Helmet>
+            <div className="max-w-2xl mx-auto">
+                <button className="label my-4" onClick={handleCancel}>&lt; Back to all projects</button>
+                <h1 className="heading my-4">New project</h1>
+                <hr className="my-8"/>
+                <p className="label my-4">Project name:</p>
+                <input className="subheading block w-full border p-2" type="text" value={projName} onChange={e => {
+                    setProjName(e.target.value)
+                }}/>
+                <p className="label mt-8 mb-4">Project description (optional):</p>
+                <SimpleMDE
+                    value={projDescript}
+                    onChange={setProjDescript}
+                    options={{
+                        spellChecker: false,
+                    }}
+                    className="mt-4"
                 />
-                <span className="ml-2">Make this project public?</span>
-            </label>
-        </div>
+                <button className="button ~info !high mr-2"
+                        onClick={handleCreate}>Create project
+                </button>
+                <button className="button ~critical !low mr-2" onClick={handleCancel}>Cancel</button>
+                <label>
+                    <input type="checkbox" checked={isPublic}
+                           onChange={e => {
+                               setIsPublic(e.target.checked)
+                           }}
+                    />
+                    <span className="ml-2">Make this project public?</span>
+                </label>
+            </div>
+        </>
     )
 }
