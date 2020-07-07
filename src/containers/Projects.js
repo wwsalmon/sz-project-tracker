@@ -98,17 +98,17 @@ export default function Projects(props) {
             {(props.location !== undefined) && (props.location.state !== undefined) && props.location.state.projectDeleted && (
                 <p className="aside ~info my-4">Project deleted.</p>
             )}
+            <div className="flex my-8 justify-between items-center">
+                <h1 className="heading">Your projects</h1>
+                <Link to="/projects/new">
+                    <button className="button ~info !high">
+                        <FontAwesomeIcon icon={faPlus} className="pr-1"/> New Project
+                    </button>
+                </Link>
+            </div>
+            <hr className="my-8"></hr>
             {isInit && (
                 <>
-                    <div className="flex my-8 justify-between items-center">
-                        <h1 className="heading">Your projects</h1>
-                        <Link to="/projects/new">
-                            <button className="button ~info !high">
-                                <FontAwesomeIcon icon={faPlus} className="pr-1"/> New Project
-                            </button>
-                        </Link>
-                    </div>
-                    <hr className="my-8"></hr>
                     <div className="project-container grid md:grid-cols-2 gap-2 lg:grid-cols-3 my-4">
                         {projects.length > 0 ? projects.map((project) => (
                             <div key={project.id} className="card border relative overflow-visible">

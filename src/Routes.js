@@ -11,35 +11,42 @@ import PublicProject from "./containers/PublicProject";
 import GoogleRedirect from "./containers/GoogleRedirect";
 import Settings from "./containers/Settings";
 import ResetPassword from "./containers/ResetPassword";
+import Navbar from "./components/Navbar";
+import {ProvideAuth} from "./lib/authLib";
 
 export default function Routes() {
     return (
         <Switch>
             <Route exact path="/">
+                <Navbar context="home"/>
                 <Home />
             </Route>
-            <Route exact path="/login" render={(props) => <Login {...props} />}/>
-            <Route exact path="/signup">
-                <SignUp />
-            </Route>
-            <Route exact path="/googleredirect">
-                <GoogleRedirect/>
-            </Route>
-            <Route exact path="/projects" render={(props) => <Projects {...props} />}/>
-            <Route exact path="/projects/new">
-                <NewProject />
-            </Route>
-            <Route exact path="/projects/:id">
-                <Project />
-            </Route>
             <Route exact path="/public/:id/:postid?">
+                <Navbar context="public"/>
                 <PublicProject />
             </Route>
-            <Route exact path="/resetpassword">
-                <ResetPassword/>
-            </Route>
-            <Route exact path="/settings">
-                <Settings/>
+            <Route>
+                <Navbar context="app"/>
+                <Route exact path="/login" render={(props) => <Login {...props} />}/>
+                <Route exact path="/signup">
+                    <SignUp />
+                </Route>
+                <Route exact path="/googleredirect">
+                    <GoogleRedirect/>
+                </Route>
+                <Route exact path="/projects" render={(props) => <Projects {...props} />}/>
+                <Route exact path="/projects/new">
+                    <NewProject />
+                </Route>
+                <Route exact path="/projects/:id">
+                    <Project />
+                </Route>
+                <Route exact path="/resetpassword">
+                    <ResetPassword/>
+                </Route>
+                <Route exact path="/settings">
+                    <Settings/>
+                </Route>
             </Route>
         </Switch>
     );

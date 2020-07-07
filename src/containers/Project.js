@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {useParams, useHistory, Link} from "react-router-dom";
 import {API, graphqlOperation} from "aws-amplify";
-import { format } from 'date-fns';
+import {format} from 'date-fns';
 import {useAuth} from "../lib/authLib";
 import utf8 from "utf8";
 
 import "./Project.css";
-import { saveAs } from 'file-saver';
+import {saveAs} from 'file-saver';
 
 import ProjectItem from "../components/ProjectItem";
 import ProjectNewEvent from "../components/ProjectNewEvent";
@@ -21,7 +21,7 @@ import {faEye} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default function Project() {
-    const { id } = useParams();
+    const {id} = useParams();
     const history = useHistory();
     const [projName, setProjName] = useState("");
     const [projDescript, setProjDescript] = useState("");
@@ -45,7 +45,7 @@ export default function Project() {
         setNumPrivate(hide ? numPrivate + 1 : numPrivate - 1);
     }
 
-    async function makePublic(e){
+    async function makePublic(e) {
         e.preventDefault();
         const createQuery = `
             mutation {
@@ -74,7 +74,7 @@ export default function Project() {
         }).catch(e => console.log(e));
     }
 
-    async function makePrivate(e){
+    async function makePrivate(e) {
         e.preventDefault();
         const deleteQuery = `
             mutation {
@@ -90,7 +90,7 @@ export default function Project() {
 
     async function deleteProject(e) {
         e.preventDefault();
-        try{
+        try {
             const deleteReq = `
             mutation {
                 deleteProject(input: {
@@ -100,7 +100,7 @@ export default function Project() {
                 }
             }`;
             const deleteData = await API.graphql(graphqlOperation(deleteReq));
-            if (deleteData.data.deleteProject.public){
+            if (deleteData.data.deleteProject.public) {
                 const deletePublicReq = `
                 mutation{
                     deletePublicProject(input: {
@@ -110,19 +110,19 @@ export default function Project() {
                 await API.graphql(graphqlOperation(deletePublicReq));
             }
             history.push("/projects", {projectDeleted: true});
-        } catch(e) {
+        } catch (e) {
             console.log(e);
         }
     }
 
     async function exportProject(e) {
-        let JSONobj={"projectid":id, "name":projName,"public":publicId,"events":events};
-        let JSONtext=JSON.stringify(JSONobj);
-        let blob=new Blob([JSONtext],{type: "text/plain;charset=utf-8"});
-        saveAs(blob,projName+".json");
+        let JSONobj = {"projectid": id, "name": projName, "public": publicId, "events": events};
+        let JSONtext = JSON.stringify(JSONobj);
+        let blob = new Blob([JSONtext], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, projName + ".json");
     }
 
-    async function editProjectInfo(){
+    async function editProjectInfo() {
         let editQuery = `
             mutation {
                 updateProject(input: {
@@ -151,7 +151,7 @@ export default function Project() {
         }).catch(e => console.log(e));
     }
 
-    function cancelEditProjectInfo(e){
+    function cancelEditProjectInfo(e) {
         e.preventDefault();
         if (newProjDescript === projDescript && newProjName === projName) {
             setIsEdit(false);
@@ -202,7 +202,7 @@ export default function Project() {
         }
 
         async function onLoad() {
-            if (auth.authState !== "signedIn"){
+            if (auth.authState !== "signedIn") {
                 history.push({pathname: "/login", state: {message: "You must be logged in to edit projects."}});
                 return;
             }
@@ -216,7 +216,7 @@ export default function Project() {
                 setProjDescript(decodedDescript);
                 setNewProjDescript(decodedDescript);
 
-                if (projectData.data.getProject.public){
+                if (projectData.data.getProject.public) {
                     setPublicId(projectData.data.getProject.publicProject.id)
                 } else setPublicId(false);
 
@@ -228,12 +228,11 @@ export default function Project() {
                 setEvents(sortedEvents);
                 // setIsLoading(false);
                 setIsInit(true);
-            }
-            catch (e) {
+            } catch (e) {
                 console.log(e);
             }
         }
-        
+
         onLoad();
     }, [id, history, auth.authState]);
 
@@ -249,12 +248,15 @@ export default function Project() {
             {/* {isLoading && (
                 <p className="aside ~info">Loading...</p>
             )} */}
+            <div className="text-center">
+                <p className="label mb-4"><Link to="/projects">&lt; Back to all projects</Link></p>
+            </div>
             {isInit && (
                 <>
                     <div className="text-center">
-                        <p className="label mb-4"><Link to="/projects">&lt; Back to all projects</Link></p>
                         {isEdit ? (
-                            <input type="text" className="field heading block max-w-2xl w-full mx-auto" value={newProjName} onChange={e => setNewProjName(e.target.value)}/>
+                            <input type="text" className="field heading block max-w-2xl w-full mx-auto"
+                                   value={newProjName} onChange={e => setNewProjName(e.target.value)}/>
                         ) : (
                             <h1 className="heading">{projName}</h1>
                         )}
@@ -290,17 +292,25 @@ export default function Project() {
                     ) : (
                         <div className="max-w-2xl my-4 mx-auto text-center">
                             {projDescript !== null ? Parser(markdownConverter.makeHtml(projDescript)) : (
-                                <p className="opacity-50">Set a project description or change the project name by clicking the three dots on the right and clicking "edit project info."</p>
+                                <p className="opacity-50">Set a project description or change the project name by
+                                    clicking the three dots on the right and clicking "edit project info."</p>
                             )}
                         </div>
                     )}
                     <MoreButton className="right-0 top-0">
                         {!isEdit && (
-                            <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={() => {setIsEdit(!isEdit)}}>Edit Project Info</button>
+                            <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={() => {
+                                setIsEdit(!isEdit)
+                            }}>Edit Project Info</button>
                         )}
-                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete Project</button>
-                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={exportProject}>Export Project</button>
-                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={publicId ? makePrivate : makePublic}>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete
+                            Project
+                        </button>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={exportProject}>Export
+                            Project
+                        </button>
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left"
+                                onClick={publicId ? makePrivate : makePublic}>
                             {publicId ? "Make private" : "Make public"}
                         </button>
                     </MoreButton>
@@ -330,21 +340,21 @@ export default function Project() {
                     </div>
 
                     <div className={showPrivate ? "" : "projectsHidePrivate"}>
-                    {(sortNew ? events : events.slice(0).reverse()).map((event, i, arr) =>
-                        (
+                        {(sortNew ? events : events.slice(0).reverse()).map((event, i, arr) =>
+                            (
                                 <div key={event.id}>
                                     {
-                                    (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
-                                        <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
-                                    )
-                                }
-                                <ProjectItem changeHiddenLocal={changeHiddenLocal}
-                                             removeLocal={removeLocal}
-                                             event={event}
-                                             publicId={publicId}
-                                />
-                            </div>
-                    ))}
+                                        (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
+                                            <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
+                                        )
+                                    }
+                                    <ProjectItem changeHiddenLocal={changeHiddenLocal}
+                                                 removeLocal={removeLocal}
+                                                 event={event}
+                                                 publicId={publicId}
+                                    />
+                                </div>
+                            ))}
                     </div>
                 </>
             )}

@@ -4,21 +4,24 @@ import SignOut from './SignOut';
 import {useAuth} from "../lib/authLib";
 import MoreButton from "./MoreButton";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faStream } from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPlus, faStream} from "@fortawesome/free-solid-svg-icons";
+import {noAuto} from "@fortawesome/fontawesome-svg-core";
 
-export default function Navbar(){
+export default function Navbar(props) {
     const auth = useAuth();
 
     return (
-        <div className="sz-navbar bg-gray-100 ">
-            <div className="max-w-6xl px-4 sz-navbar-inner sz-navbar-left">
-                <input type="checkbox" id="sz-navbar-check" />
+        <div className={"sz-navbar " + (props.context === "app" ? "" : "border-b")}>
+            <div className="max-w-6xl sz-navbar-inner sz-navbar-left">
+                <input type="checkbox" id="sz-navbar-check"/>
                 <label htmlFor="sz-navbar-check" className="sz-navbar-hamburger">☰</label>
-                <div className="mr-4 supra opacity-50"><span>SZ Project Tracker</span></div>
+                <div className="mr-4 supra opacity-50">
+                    <Link to="/"><span>SZ Project Tracker</span></Link>
+                </div>
                 <div className="sz-navbar-items flex-1">
                     {
-                        auth.authState === "signedIn" ? (
+                        props.context === "app" ? auth.authState === "signedIn" ? (
                             <>
                                 <div className="sz-navbar-item sm:px-2"><span><Link to="/projects">
                                     <FontAwesomeIcon icon={faStream} className="pr-1"/> All projects
@@ -38,6 +41,19 @@ export default function Navbar(){
                                     </MoreButton>
                                 </div>
                             </>
+                        ) : (
+                            <>
+                                <div className="sz-navbar-item sm:ml-auto">
+                                    <span><Link to="/login">Log in</Link></span>
+                                </div>
+                                <div className="sz-navbar-item">
+                                    <span><Link to="/signup">Sign up</Link></span>
+                                </div>
+                            </>
+                        ) : auth.authState === "signedIn" ? (
+                            <div className="sz-navbar-item">
+                                <span><Link to="/projects">&lt; Back to app</Link></span>
+                            </div>
                         ) : (
                             <>
                                 <div className="sz-navbar-item sm:ml-auto">
