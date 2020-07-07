@@ -129,7 +129,7 @@ export default function PublicProject() {
                             </p>
                         </>
                     ) : (
-                        <>
+                        <div className="max-w-4xl mx-auto">
                             <p className="label">
                                 <Link to={`/public/${id}`}>&lt; Back to project</Link>
                             </p>
@@ -143,7 +143,7 @@ export default function PublicProject() {
                             <p className="aside mb-12 ~neutral !normal content">This update is part of the project <b>{projName}</b>.
                                 The latest updates in this project are shown below. <Link to={`/public/${id}`}>Go to project page</Link>
                             </p>
-                        </>
+                        </div>
                     )) : (
                         <>
                             <div className="text-center">
