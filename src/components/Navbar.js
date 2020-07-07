@@ -6,7 +6,6 @@ import MoreButton from "./MoreButton";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlus, faStream} from "@fortawesome/free-solid-svg-icons";
-import {noAuto} from "@fortawesome/fontawesome-svg-core";
 
 export default function Navbar(props) {
     const auth = useAuth();

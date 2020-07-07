@@ -12,7 +12,6 @@ import GoogleRedirect from "./containers/GoogleRedirect";
 import Settings from "./containers/Settings";
 import ResetPassword from "./containers/ResetPassword";
 import Navbar from "./components/Navbar";
-import {ProvideAuth} from "./lib/authLib";
 
 export default function Routes() {
     return (
