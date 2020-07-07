@@ -51,7 +51,7 @@ export default function Project() {
             mutation {
                 createPublicProject(input: {
                     name: "${projName}",
-                    descript: "${utf8.encode(projDescript)}",
+                    description: "${utf8.encode(projDescript)}",
                     publicProjectProjectId: "${id}"
                 }){id name project{id}}
             }                    
@@ -60,11 +60,11 @@ export default function Project() {
             const publicProject = res.data.createPublicProject.id;
             const updateProject = `
                 mutation{
-                    updateProject(input: {id: "${id}", projectPublicProjectId: "${publicProject}", public: true}){
-                        public publicProject{
-                            id
-                        }
-                    }
+                    updateProject(input: {
+                        id: "${id}",
+                        projectPublicProjectId: "${publicProject}",
+                        public: true
+                    }){public publicProject{id}}
                 }
             `
             API.graphql(graphqlOperation(updateProject)).then(res => {

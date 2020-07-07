@@ -100,7 +100,7 @@ export default function ProjectItem(props) {
         */
 
         try {
-            if (event.project.publicProject === null) {
+            if (props.publicId === false) {
                 throw new Error("Project not public");
             }
             if (isPrivate) { // private -> public
@@ -203,11 +203,16 @@ export default function ProjectItem(props) {
         const newFileUUIDs = `[${allFileUUIDs.map(d => `"${d}"`)}]`;
         let query = `
         mutation{
-            updateEvent(input: {id: "${event.id}", note: """${utf8.encode(newNote)}""", filenames: ${newFileUUIDs}})
-            {id hidden filenames note time publicEvent { id } project { publicProject { id } }}`
-        query += publicId ? `updatePublicEvent(input:{id: "${publicId}",
-                    note: """${utf8.encode(newNote)}""",    
-                    filenames: ${newFileUUIDs}){ id }` : "";
+            updateEvent(input: {
+                id: "${event.id}",
+                note: """${utf8.encode(newNote)}""",
+                filenames: ${newFileUUIDs}
+            }){id hidden filenames note time publicEvent { id } project { publicProject { id } }}`
+        query += publicId ? `updatePublicEvent(input:{
+            id: "${publicId}",
+            note: """${utf8.encode(newNote)}""",    
+            filenames: ${newFileUUIDs}
+        }){ id }` : "";
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
             console.log(res);
@@ -247,7 +252,7 @@ export default function ProjectItem(props) {
     return (
         <div className={isPrivate ? "projectItemPrivate" : ""}>
             <hr></hr>
-            <div className={`md:flex py-8 ${isPrivate ? "hover:bg-gray-100" : "hover:bg-blue-100"} rounded relative`}>
+            <div className={`md:flex py-8 ${isPrivate ? "md:hover:bg-gray-100" : "md:hover:bg-blue-100"} rounded relative`}>
                 <div className="w-32 flex-none flex md:block mb-4 md:mb-0">
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
@@ -258,7 +263,7 @@ export default function ProjectItem(props) {
                         </Link>
                     )}
                 </div>
-                <div className="content pr-8 mr-6 md:mr-0 w-8" style={{flex: "1 0 0"}}>
+                <div className="content md:pr-8 mr-6 md:mr-0 md:w-8" style={{flex: "1 0 0"}}>
                     {/* w-8 is arbitrary here to get flex to work*/}
                     {isEdit ? (
                         <>
