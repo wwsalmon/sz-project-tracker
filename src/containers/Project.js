@@ -32,6 +32,7 @@ export default function Project() {
     // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
+    const [sortNew, setSortNew] = useState(true);
     const [showPrivate, setShowPrivate] = useState(true);
     const [numPrivate, setNumPrivate] = useState(0);
     const auth = useAuth();
@@ -320,8 +321,16 @@ export default function Project() {
                         </div>
                     )}
 
+                    <div className="flex justify-end items-center my-4">
+                        <p className="mr-4 opacity-50">{sortNew ? "Sorting by newest first" : "Sorting by oldest first"}</p>
+                        <button className="button block ~neutral"
+                                onClick={() => setSortNew(!sortNew)}>
+                            Toggle sorting
+                        </button>
+                    </div>
+
                     <div className={showPrivate ? "" : "projectsHidePrivate"}>
-                    {events.map((event, i, arr) => 
+                    {(sortNew ? events : events.slice(0).reverse()).map((event, i, arr) =>
                         (
                                 <div key={event.id}>
                                     {
@@ -334,7 +343,7 @@ export default function Project() {
                                              event={event}
                                              publicId={publicId}
                                 />
-                            </div>                     
+                            </div>
                     ))}
                     </div>
                 </>

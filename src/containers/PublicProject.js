@@ -17,6 +17,7 @@ export default function PublicProject() {
     const [events, setEvents] = useState([]);
     const [owner, setOwner] = useState("");
     const [featuredEvent, setFeaturedEvent] = useState(false);
+    const [sortNew, setSortNew] = useState(true);
     // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
 
@@ -158,18 +159,29 @@ export default function PublicProject() {
                             <hr className="sep"/>
                         </>
                     )}
-                    {projName !== "error" && events.map((event, i, arr) =>
-                        (
-                            <div key={event.id}>
-                                {
-                                    (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
-                                        <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
-                                    )
-                                }
-                                <hr/>
-                                <PublicItem event={event} publicProjectId={id}/>
+                    {projName !== "error" && (
+                        <>
+                            <div className="flex justify-end items-center my-4">
+                                <p className="mr-4 opacity-50">{sortNew ? "Sorting by newest first" : "Sorting by oldest first"}</p>
+                                <button className="button block ~neutral"
+                                        onClick={() => setSortNew(!sortNew)}>
+                                    Toggle sorting
+                                </button>
                             </div>
-                        ))}
+                            {(sortNew ? events : events.slice(0).reverse()).map((event, i, arr) =>
+                            (
+                                <div key={event.id}>
+                                    {
+                                        (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
+                                            <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
+                                        )
+                                    }
+                                    <hr/>
+                                    <PublicItem event={event} publicProjectId={id}/>
+                                </div>
+                            ))}
+                        </>
+                    )}
                 </>
             )}
         </div>
