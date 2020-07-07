@@ -33,13 +33,13 @@ export default function Routes() {
                 <Route exact path="/googleredirect">
                     <GoogleRedirect/>
                 </Route>
-                <Route exact path="/projects" render={(props) => <Projects {...props} />}/>
-                <Route exact path="/projects/new">
+                <Route exact path="/newproject">
                     <NewProject />
                 </Route>
                 <Route exact path="/projects/:id">
                     <Project />
                 </Route>
+                <Route exact path="/projects" render={(props) => <Projects {...props} />}/>
                 <Route exact path="/resetpassword">
                     <ResetPassword/>
                 </Route>

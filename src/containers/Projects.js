@@ -21,7 +21,7 @@ export default function Projects(props) {
     async function deleteProject(e, projectID) {
         e.preventDefault();
         // setIsLoading(true);
-        const deleteQuery = `
+        const deleteReq = `
             mutation {
                 deleteProject(input: {
                     id: "${projectID}"
@@ -29,15 +29,18 @@ export default function Projects(props) {
                     name id
                 }
             }
-        `
-        try {
-            await API.graphql(graphqlOperation(deleteQuery));
-            setProjects(projects.filter(p => p.id !== projectID));
-        } catch (error) {
-            // setIsLoading(false);
-            console.log(error);
+        `;
+        const deleteData = await API.graphql(graphqlOperation(deleteReq));
+        if (deleteData.data.deleteProject.public) {
+            const deletePublicReq = `
+                mutation{
+                    deletePublicProject(input: {
+                        id: "${deleteData.data.deleteProject.publicProject.id}"
+                    }){ id }
+                }`;
+            await API.graphql(graphqlOperation(deletePublicReq));
         }
-
+        setProjects(projects.filter(p => p.id !== projectID));
     }
 
 
@@ -105,7 +108,7 @@ export default function Projects(props) {
             )}
             <div className="flex my-8 justify-between items-center">
                 <h1 className="heading">Your projects</h1>
-                <Link to="/projects/new">
+                <Link to="/newproject">
                     <button className="button ~info !high">
                         <FontAwesomeIcon icon={faPlus} className="pr-1"/> New Project
                     </button>
@@ -142,7 +145,7 @@ export default function Projects(props) {
                                 </MoreButton>
                             </div>
                         )) : (
-                            <p className="content">You don't have any projects yet. <Link to="/projects/new">Create one now!</Link></p>
+                            <p className="content">You don't have any projects yet. <Link to="/newproject">Create one now!</Link></p>
                         )}
                     </div>
                 </>

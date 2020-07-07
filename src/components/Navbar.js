@@ -25,7 +25,7 @@ export default function Navbar(props) {
                                 <div className="sz-navbar-item sm:px-2"><span><Link to="/projects">
                                     <FontAwesomeIcon icon={faStream} className="pr-1"/> All projects
                                 </Link></span></div>
-                                <div className="sz-navbar-item sm:px-2"><span><Link to="/projects/new">
+                                <div className="sz-navbar-item sm:px-2"><span><Link to="/newproject">
                                     <FontAwesomeIcon icon={faPlus} className="pr-1"/> New project
                                 </Link></span></div>
                                 <div className="sm:ml-auto sz-navbar-item pr-6 relative">

@@ -106,7 +106,7 @@ export default function Project() {
                 const deletePublicReq = `
                 mutation{
                     deletePublicProject(input: {
-                        id: ${deleteData.data.deleteProject.publicProject.id}
+                        id: "${deleteData.data.deleteProject.publicProject.id}"
                     }){ id }
                 }`;
                 await API.graphql(graphqlOperation(deletePublicReq));
