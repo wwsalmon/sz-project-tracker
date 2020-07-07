@@ -11,6 +11,9 @@ import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
 
 import * as FilePond from 'react-filepond';
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginFileValidateSize from "filepond-plugin-file-validate-size";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
@@ -44,6 +47,10 @@ export default function ProjectItem(props) {
 
     const pond = useRef();
 
+    FilePond.registerPlugin(FilePondPluginImagePreview,
+        FilePondPluginFileValidateSize,
+        FilePondPluginFileValidateType);
+
     function handleFilePondInit() {
         console.log("filepond init", pond);
     }
@@ -51,7 +58,6 @@ export default function ProjectItem(props) {
     function handleFilePondUpdate(fileItems) {
         setNewFiles(fileItems.map(fileItem => fileItem.file));
     }
-
 
     async function handleDeleteEvent(e) {
         e.preventDefault();
@@ -316,6 +322,8 @@ export default function ProjectItem(props) {
                                                allowMultiple={true}
                                                oninit={handleFilePondInit}
                                                onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
+                                               maxFileSize="1MB"
+                                               acceptedFileTypes={["image/png", "image/jpeg", "image/jpg", "image/gif"]}
                             />
                             <div className="flex">
                                 <button onClick={handleEditEvent}

@@ -6,6 +6,8 @@ import "easymde/dist/easymde.min.css";
 
 import * as FilePond from "react-filepond";
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
+import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 import "filepond/dist/filepond.min.css";
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
@@ -30,7 +32,9 @@ export default function ProjectNewEvent(props) {
     const [canSubmit, setCanSubmit] = useState(true);
     const pond = useRef();
 
-    FilePond.registerPlugin(FilePondPluginImagePreview);
+    FilePond.registerPlugin(FilePondPluginImagePreview,
+        FilePondPluginFileValidateSize,
+        FilePondPluginFileValidateType);
 
     document.addEventListener("FilePond:addfile", () => {
         setCanSubmit(false);
@@ -237,6 +241,8 @@ export default function ProjectNewEvent(props) {
                                    allowMultiple={true}
                                    oninit={handleFilePondInit}
                                    onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
+                                   maxFileSize="1MB"
+                                   acceptedFileTypes={["image/png", "image/jpeg", "image/jpg", "image/gif"]}
                 />
                 <div className="overflow-auto">
                     <div className="flex">
