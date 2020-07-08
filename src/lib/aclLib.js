@@ -8,7 +8,6 @@ export async function changeAcl(key, auth, level){
     auth.getIdentityId().then(res => {
 
         if (!(credentials && res)){
-            console.log("something's wrong with auth.", credentials, res);
             return Promise.reject("autherror");
         }
 
@@ -23,22 +22,11 @@ export async function changeAcl(key, auth, level){
             Key: `private/${res}/${key}`,
         }
 
-        console.log("reading ACL with query", readParams);
-
         s3.getObjectAcl(readParams, (err, data) => {
             if (level === "public"){
-
-                console.log("Changing to public");
-
                 if (data["Grants"].length > 1) {
-
-                    console.log("Already public");
-
                     return Promise.resolve("nochange");
                 } else {
-
-                    console.log("Adding public access...");
-
                     data["Grants"].push({
                         Grantee: {
                             Type: "Group",
@@ -48,18 +36,9 @@ export async function changeAcl(key, auth, level){
                     });
                 }
             } else if (level === "private"){
-
-                console.log("Changing to private");
-
                 if (data["Grants"].length > 1) {
-
-                    console.log("Removing public access...");
-
                     data["Grants"] = data["Grants"].filter(d => d.Permission !== "READ");
                 } else {
-
-                    console.log("Already no public access");
-
                     return Promise.resolve("nochange");
                 }
             }
@@ -68,14 +47,8 @@ export async function changeAcl(key, auth, level){
                 ...readParams,
                 AccessControlPolicy: data
             }
-
-            console.log("changing ACL with query", setAclParams);
-
             s3.putObjectAcl(setAclParams, (err, data) => {
                 if (err) return Promise.reject("Error setting object ACL");
-
-                console.log("Success!");
-
                 return Promise.resolve("success")
             });
         });
