@@ -6,7 +6,7 @@ import {useAuth} from "../lib/authLib";
 
 export default function Test(){
     const bucketName = config.aws_user_files_s3_bucket;
-    const testFileKey = "private/us-east-1:55ce86cc-c1c5-473b-b59e-e1b49812fb82/023cc030-bc9b-11ea-9d2f-67318d3d3c11.png";
+    const testFileKey = "private/us-east-1:1c2649c1-df20-47f2-9435-ab5cf8fcb4fa/17a0f8b0-c119-11ea-b126-b59938402f0c.jpg";
     const auth = useAuth();
 
     useEffect(() => {
@@ -36,10 +36,10 @@ export default function Test(){
 
         s3.getObject(readParams, callback)
 
-        let setAclParams = readParams;
-        setAclParams["GrantRead"] = "uri=http://acs.amazonaws.com/groups/global/AllUsers";
+        // let setAclParams = readParams;
+        // setAclParams["GrantRead"] = "uri=http://acs.amazonaws.com/groups/global/AllUsers";
 
-        s3.putObjectAcl(setAclParams, callback);
+        s3.getObjectAcl(readParams, callback);
     }
 
     return (
