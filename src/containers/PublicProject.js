@@ -16,6 +16,7 @@ export default function PublicProject() {
     const history = useHistory();
     const [projName, setProjName] = useState("");
     const [projDescript, setProjDescript] = useState("");
+    const [identityId, setIdentityId] = useState("");
     const [events, setEvents] = useState([]);
     const [owner, setOwner] = useState("");
     const [featuredEvent, setFeaturedEvent] = useState(false);
@@ -35,6 +36,7 @@ export default function PublicProject() {
                         id
                         name
                         description
+                        ownerIdentityId
                         owner
                         publicEvents{
                             items{
@@ -79,6 +81,8 @@ export default function PublicProject() {
                     setProjName(projectData.data.getPublicProject.name);
                     setProjDescript(projectData.data.getPublicProject.description);
                     setOwner(projectData.data.getPublicProject.owner);
+                    setIdentityId(projectData.data.getPublicProject.ownerIdentityId);
+
                     const sortedEvents = projectData.data.getPublicProject.publicEvents.items.sort((a, b) => {
                         return new Date(b.time) - new Date(a.time);
                     });
@@ -182,7 +186,7 @@ export default function PublicProject() {
                                         )
                                     }
                                     <hr/>
-                                    <PublicItem event={event} publicProjectId={id}/>
+                                    <PublicItem event={event} publicProjectId={id} identityId={identityId}/>
                                 </div>
                             ))}
                         </>

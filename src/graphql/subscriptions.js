@@ -19,6 +19,7 @@ export const onCreateProject = /* GraphQL */ `
         }
         nextToken
       }
+      description
       public
       archived
       createdAt
@@ -27,9 +28,12 @@ export const onCreateProject = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -64,6 +68,7 @@ export const onUpdateProject = /* GraphQL */ `
         }
         nextToken
       }
+      description
       public
       archived
       createdAt
@@ -72,9 +77,12 @@ export const onUpdateProject = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -109,6 +117,7 @@ export const onDeleteProject = /* GraphQL */ `
         }
         nextToken
       }
+      description
       public
       archived
       createdAt
@@ -117,9 +126,12 @@ export const onDeleteProject = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -146,6 +158,7 @@ export const onCreateEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -154,6 +167,8 @@ export const onCreateEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -186,6 +201,8 @@ export const onCreateEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -205,6 +222,7 @@ export const onUpdateEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -213,6 +231,8 @@ export const onUpdateEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -245,6 +265,8 @@ export const onUpdateEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -264,6 +286,7 @@ export const onDeleteEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -272,6 +295,8 @@ export const onDeleteEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -304,6 +329,8 @@ export const onDeleteEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -318,12 +345,15 @@ export const onCreatePublicProject = /* GraphQL */ `
     onCreatePublicProject(owner: $owner) {
       id
       name
+      description
+      ownerIdentityId
       project {
         id
         name
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -332,6 +362,8 @@ export const onCreatePublicProject = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -360,12 +392,15 @@ export const onUpdatePublicProject = /* GraphQL */ `
     onUpdatePublicProject(owner: $owner) {
       id
       name
+      description
+      ownerIdentityId
       project {
         id
         name
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -374,6 +409,8 @@ export const onUpdatePublicProject = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -402,12 +439,15 @@ export const onDeletePublicProject = /* GraphQL */ `
     onDeletePublicProject(owner: $owner) {
       id
       name
+      description
+      ownerIdentityId
       project {
         id
         name
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -416,6 +456,8 @@ export const onDeletePublicProject = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -448,6 +490,7 @@ export const onCreatePublicEvent = /* GraphQL */ `
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -479,9 +522,12 @@ export const onCreatePublicEvent = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -508,6 +554,7 @@ export const onUpdatePublicEvent = /* GraphQL */ `
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -539,9 +586,12 @@ export const onUpdatePublicEvent = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -568,6 +618,7 @@ export const onDeletePublicEvent = /* GraphQL */ `
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -599,9 +650,12 @@ export const onDeletePublicEvent = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt

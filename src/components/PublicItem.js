@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import * as Showdown from "showdown";
 import Parser from 'html-react-parser';
 import utf8 from "utf8";
+import EventImage from "./EventImage";
 
 export default function PublicItem(props) {
     const event = props.event;
@@ -29,6 +30,13 @@ export default function PublicItem(props) {
                 </div>
                 <div className="content mr-6 md:mr-0 flex-1">
                     {Parser(markdownConverter.makeHtml(utf8.decode(event.note)))}
+                    <div className="overflow-x-auto">
+                        <div className="flex pb-4">
+                            {event.filenames.map(filename => (
+                                <EventImage s3key={filename} key={filename} public={true} identityId={props.identityId}/>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

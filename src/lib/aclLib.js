@@ -3,27 +3,12 @@ import * as AWS from "aws-sdk";
 
 export async function changeAcl(key, auth, level){
 
-    let params = {
-        IdentityPoolId: config.aws_cognito_identity_pool_id,
-        Logins: {}
-    }
-
-    params.Logins[`cognito-idp.us-east-1.amazonaws.com/${config.aws_user_pools_id}`] =
-        auth.user.signInUserSession.idToken.jwtToken;
-
-    const ci = new AWS.CognitoIdentity({
-        region: "us-east-1"
-    });
-
     const credentials = await auth.getCurrentCredentials();
 
-    ci.getId(params, (err, data) => {
-        if (err) return Promise.reject("autherror");
+    auth.getIdentityId().then(res => {
 
-        const userSub = data.IdentityId;
-
-        if (!(credentials && userSub)){
-            console.log("something's wrong with auth.", credentials, userSub);
+        if (!(credentials && res)){
+            console.log("something's wrong with auth.", credentials, res);
             return Promise.reject("autherror");
         }
 
@@ -35,7 +20,7 @@ export async function changeAcl(key, auth, level){
 
         const readParams = {
             Bucket: config.aws_user_files_s3_bucket,
-            Key: `private/${userSub}/${key}`,
+            Key: `private/${res}/${key}`,
         }
 
         console.log("reading ACL with query", readParams);

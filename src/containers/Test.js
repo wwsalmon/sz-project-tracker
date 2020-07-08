@@ -1,5 +1,4 @@
 import React from "react";
-import {Storage} from "aws-amplify";
 import {changeAcl} from "../lib/aclLib";
 import {useAuth} from "../lib/authLib";
 

@@ -49,12 +49,14 @@ export default function Project() {
 
     async function makePublic(e) {
         e.preventDefault();
+        const identityId = await auth.getIdentityId();
         const createQuery = `
             mutation {
                 createPublicProject(input: {
                     name: "${projName}",
                     description: "${utf8.encode(projDescript)}",
-                    publicProjectProjectId: "${id}"
+                    publicProjectProjectId: "${id}",
+                    ownerIdentityId: "${identityId}"
                 }){id name project{id}}
             }                    
         `

@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 
+import config from "../aws-exports";
+
 export default function EventImage(props){
     const [imgUrl, setImgUrl] = useState("");
     const [showLightbox, setShowLightbox] = useState(false);
@@ -11,19 +13,24 @@ export default function EventImage(props){
 
     useEffect(() => {
         async function onLoad() {
-            Storage.vault.get(props.s3key)
-                .then(res => {
-                    setImgUrl(res);
-                    setIsLoading(false);
-                })
-                .catch(e => {
-                    console.log(e);
-                    setIsLoading(false);
-                });
+            if (props.public){
+                setImgUrl("https://" + config.aws_user_files_s3_bucket + ".s3.amazonaws.com/private/"
+                + `${props.identityId}/${props.s3key}`);
+            } else {
+                Storage.vault.get(props.s3key)
+                    .then(res => {
+                        setImgUrl(res);
+                        setIsLoading(false);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                        setIsLoading(false);
+                    });
+            }
         }
 
         onLoad();
-    }, [props.s3key]);
+    }, [props.s3key, props.identityId, props.public]);
 
     return (
         <div className="p-2 bg-gray-200 mr-4" style={{width: 240, height: 120}}>
