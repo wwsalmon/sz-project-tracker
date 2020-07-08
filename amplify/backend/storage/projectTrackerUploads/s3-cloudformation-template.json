@@ -340,11 +340,13 @@
 					"Statement": [
 						{
 							"Effect": "Allow",
-							"Action": {
-								"Fn::Split" : [ "," , {
-									"Ref": "s3PermissionsAuthenticatedPrivate"
-								} ] 
-							},
+							"Action": [
+								"s3:GetObject",
+								"s3:GetObjectAcl",
+								"s3:PutObject",
+								"s3:PutObjectAcl",
+								"s3:DeleteObject"
+							],
 							"Resource": [
 								{
 									"Fn::Join": [
