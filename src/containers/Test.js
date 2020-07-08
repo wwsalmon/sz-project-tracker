@@ -6,7 +6,7 @@ import {useAuth} from "../lib/authLib";
 
 export default function Test(){
     const bucketName = config.aws_user_files_s3_bucket;
-    const testFileKey = "private/us-east-1:55ce86cc-c1c5-473b-b59e-e1b49812fb82/8ed8bee0-ba2f-11ea-82b0-896efb9c304d.jpg";
+    const testFileKey = "private/us-east-1:55ce86cc-c1c5-473b-b59e-e1b49812fb82/023cc030-bc9b-11ea-9d2f-67318d3d3c11.png";
     const auth = useAuth();
 
     useEffect(() => {
@@ -14,24 +14,32 @@ export default function Test(){
     }, [auth.authState]);
 
     async function runTest(){
+        console.log(await Storage.vault.get(testFileKey.split("/")[2]));
+
         const credentials = await auth.getCurrentCredentials();
 
         const s3 = new AWS.S3({
+            apiVersion: '2006-03-01',
             credentials: credentials,
             region: "us-east-1"
         })
 
-        const params = {
+        const readParams = {
             Bucket: bucketName,
             Key: testFileKey,
         }
 
-        s3.getObject(params, (err, data) => {
+        function callback(err, data){
             if (err) console.log(err);
             else console.log(data);
-        });
+        }
 
-        return true;
+        s3.getObject(readParams, callback)
+
+        let setAclParams = readParams;
+        setAclParams["GrantRead"] = "uri=http://acs.amazonaws.com/groups/global/AllUsers";
+
+        s3.putObjectAcl(setAclParams, callback);
     }
 
     return (
