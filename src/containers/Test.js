@@ -6,12 +6,8 @@ import {useAuth} from "../lib/authLib";
 
 export default function Test(){
     const bucketName = config.aws_user_files_s3_bucket;
-    const testFileKey = "private/us-east-1:1c2649c1-df20-47f2-9435-ab5cf8fcb4fa/17a0f8b0-c119-11ea-b126-b59938402f0c.jpg";
+    const testFileKey = "private/us-east-1:1c2649c1-df20-47f2-9435-ab5cf8fcb4fa/f0669e40-c121-11ea-a2bc-3d09ae941ac8.jpg";
     const auth = useAuth();
-
-    useEffect(() => {
-        if (auth.authState === "signedIn") runTest();
-    }, [auth.authState]);
 
     async function runTest(){
         console.log(await Storage.vault.get(testFileKey.split("/")[2]));
@@ -29,20 +25,52 @@ export default function Test(){
             Key: testFileKey,
         }
 
-        function callback(err, data){
-            if (err) console.log(err);
-            else console.log(data);
+        function readAcl(){
+            s3.getObjectAcl(readParams, (err, data) => {
+                if (err) console.log(err);
+                else console.log(data);
+            });
         }
 
-        s3.getObject(readParams, callback)
+        s3.getObjectAcl(readParams, (err, data) => {
+            if (err) {console.log(err); return;}
+            console.log(data);
+
+            if (data["Grants"].length > 1){
+                console.log("removing public access");
+                data["Grants"] = data["Grants"].filter(d => d.Permission !== "READ");
+            } else {
+                console.log("adding public access");
+                data["Grants"].push({
+                    Grantee: {
+                        Type: "Group",
+                        URI: "http://acs.amazonaws.com/groups/global/AllUsers"
+                    },
+                    Permission: "READ"
+                });
+            }
+
+            const setAclParams = {
+                Bucket: bucketName,
+                Key: testFileKey,
+                AccessControlPolicy: data
+            }
+
+            console.log(setAclParams);
+
+            s3.putObjectAcl(setAclParams, (err, data) => {
+                if (err) console.log(err);
+                else readAcl();
+            });
+        });
 
         // let setAclParams = readParams;
         // setAclParams["GrantRead"] = "uri=http://acs.amazonaws.com/groups/global/AllUsers";
-
-        s3.getObjectAcl(readParams, callback);
     }
 
-    return (
-        <p>Test</p>
+    return auth.authState === "signedIn" ? (
+        <button className="button" onClick={runTest}>Run test</button>
+    ) : (
+        <p>Loading...</p>
     )
 }
