@@ -271,7 +271,7 @@ export default function ProjectItem(props) {
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {event.publicEvent && (
+                    {!isPrivate && (
                         <Link to={`/public/${props.publicId}/${event.publicEvent.id}`} target="_blank">
                             <FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}/>
                         </Link>
