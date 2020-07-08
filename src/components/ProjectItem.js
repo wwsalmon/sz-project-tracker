@@ -26,6 +26,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faGlobe, faTimes} from "@fortawesome/free-solid-svg-icons";
 
 import MoreButton from "../components/MoreButton";
+import {changeAcl} from "../lib/aclLib";
+
+import {useAuth} from "../lib/authLib";
 
 export default function ProjectItem(props) {
     const [event, setEvent] = useState(props.event);
@@ -46,6 +49,7 @@ export default function ProjectItem(props) {
     const changeHiddenLocal = props.changeHiddenLocal; // for changing public status
 
     const pond = useRef();
+    const auth = useAuth();
 
     FilePond.registerPlugin(FilePondPluginImagePreview,
         FilePondPluginFileValidateSize,
@@ -133,6 +137,11 @@ export default function ProjectItem(props) {
                     }
                 `
                 const update2Data = await API.graphql(graphqlOperation(updateEventQ2));
+
+                for (const filename of event.filenames){
+                    changeAcl(filename, auth, "public");
+                }
+
                 setEvent(update2Data.data.updateEvent);
                 setPublicId(publicEventId);
             } else { // public -> private
@@ -157,6 +166,11 @@ export default function ProjectItem(props) {
                     await API.graphql(graphqlOperation(deletePublicEventQ));
                     setPublicId(false);
                 }
+
+                for (const filename of event.filenames){
+                    changeAcl(filename, auth, "private");
+                }
+
                 setEvent(updateData.data.updateEvent);
             }
             setIsPrivate(!isPrivate);
@@ -182,7 +196,7 @@ export default function ProjectItem(props) {
                     filenames : ${newFileUUIDs}  
                 }
                     )
-            { id filenames note hidden time }
+            { id filenames note hidden time publicEvent {id}}
         }`
         console.log(query);
 
@@ -257,7 +271,7 @@ export default function ProjectItem(props) {
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
                     }</p>
-                    {event.publicEvent && (
+                    {!isPrivate && (
                         <Link to={`/public/${props.publicId}/${event.publicEvent.id}`} target="_blank">
                             <FontAwesomeIcon className="text-blue-400 ml-2 md:ml-0 md:my-4" icon={faGlobe}/>
                         </Link>

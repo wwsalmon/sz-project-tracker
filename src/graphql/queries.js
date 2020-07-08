@@ -19,6 +19,7 @@ export const getProject = /* GraphQL */ `
         }
         nextToken
       }
+      description
       public
       archived
       createdAt
@@ -27,9 +28,12 @@ export const getProject = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -59,6 +63,7 @@ export const listProjects = /* GraphQL */ `
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -67,6 +72,8 @@ export const listProjects = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -86,6 +93,7 @@ export const getEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -94,6 +102,8 @@ export const getEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -126,6 +136,8 @@ export const getEvent = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -147,6 +159,7 @@ export const listEvents = /* GraphQL */ `
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -184,9 +197,12 @@ export const listPublicProjects = /* GraphQL */ `
       items {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -209,12 +225,15 @@ export const getPublicProject = /* GraphQL */ `
     getPublicProject(id: $id) {
       id
       name
+      description
+      ownerIdentityId
       project {
         id
         name
         events {
           nextToken
         }
+        description
         public
         archived
         createdAt
@@ -223,6 +242,8 @@ export const getPublicProject = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner
@@ -255,6 +276,7 @@ export const getPublicEvent = /* GraphQL */ `
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -286,9 +308,12 @@ export const getPublicEvent = /* GraphQL */ `
       publicProject {
         id
         name
+        description
+        ownerIdentityId
         project {
           id
           name
+          description
           public
           archived
           createdAt
@@ -333,6 +358,8 @@ export const listPublicEvents = /* GraphQL */ `
         publicProject {
           id
           name
+          description
+          ownerIdentityId
           createdAt
           updatedAt
           owner

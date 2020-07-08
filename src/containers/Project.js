@@ -49,12 +49,14 @@ export default function Project() {
 
     async function makePublic(e) {
         e.preventDefault();
+        const identityId = await auth.getIdentityId();
         const createQuery = `
             mutation {
                 createPublicProject(input: {
                     name: "${projName}",
                     description: "${utf8.encode(projDescript)}",
-                    publicProjectProjectId: "${id}"
+                    publicProjectProjectId: "${id}",
+                    ownerIdentityId: "${identityId}"
                 }){id name project{id}}
             }                    
         `
@@ -78,6 +80,13 @@ export default function Project() {
 
     async function makePrivate(e) {
         e.preventDefault();
+
+        if (numPrivate !== events.length){
+            alert("This project cannot be made private because it has updates that are public." +
+                "Make all updates private and try again.");
+            return;
+        }
+
         const deleteQuery = `
             mutation {
                 deletePublicProject(input: {id: "${publicId}"}){id name}

@@ -25,6 +25,7 @@ type PublicProject @model @auth(rules: [
   id: ID!
   name: String!
   description: String
+  ownerIdentityId: String
   publicEvents: [PublicEvent!] @connection(name: "PublicProjectPublicEvents")
   project: Project! @connection(name: "ProjectPublicProject")
 }

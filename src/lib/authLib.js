@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useContext, createContext } from "react";
 import { Auth, Hub } from 'aws-amplify';
+import * as AWS from "aws-sdk";
+import config from "../aws-exports";
 
 const authContext = createContext();
 
@@ -94,6 +96,33 @@ function useProvideAuth(){
         return Auth.forgotPasswordSubmit(username, code, password);
     }
 
+    const getCurrentCredentials = () => {
+        return Auth.currentCredentials();
+    }
+
+    const getIdentityId = () => {
+        let params = {
+            IdentityPoolId: config.aws_cognito_identity_pool_id,
+            Logins: {}
+        }
+
+        params.Logins[`cognito-idp.us-east-1.amazonaws.com/${config.aws_user_pools_id}`] =
+            user.signInUserSession.idToken.jwtToken;
+
+        const ci = new AWS.CognitoIdentity({
+            region: "us-east-1"
+        });
+
+        return new Promise((res, rej) => {
+            ci.getId(params, (err, data) => {
+                if (err) return rej("error");
+                console.log(data);
+                return res(data.IdentityId);
+            });
+        });
+
+    }
+
     useEffect(() => {
         checkCurrentAuth().then(res => {
             console.log(res);
@@ -104,5 +133,5 @@ function useProvideAuth(){
 
     return {user, username, setUsername, authState, signIn, signInWithGoogle, checkGoogle,
         signUp,confirmSignUp, signOut, forceState, resendConfirmation, startResetPassword,
-        confirmResetPassword};
+        confirmResetPassword, getCurrentCredentials, getIdentityId};
 }

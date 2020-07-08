@@ -11,6 +11,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "aws-amplify": "^3.0.13",
+    "aws-sdk": "^2.711.0",
     "date-fns": "^2.14.0",
     "file-saver": "^2.0.2",
     "filepond": "^4.18.0",
