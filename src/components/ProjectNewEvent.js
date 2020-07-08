@@ -181,6 +181,7 @@ export default function ProjectNewEvent(props) {
 
     return isEdit ? (
             <div>
+                <h1 className="heading my-8">New Update</h1>
                 <SimpleMDE
                     value={newNote}
                     onChange={setNewNote}
@@ -245,18 +246,25 @@ export default function ProjectNewEvent(props) {
                                    acceptedFileTypes={["image/png", "image/jpeg", "image/jpg", "image/gif"]}
                 />
                 <div className="overflow-auto">
-                    <div className="flex">
+                    <div className="flex items-center">
                         <button onClick={handleCreateEvent}
                                 disabled={!canSubmit}
-                                className="button ~info !high w-auto block my-4 mr-2">
+                                className="button ~info !high w-auto block mr-2">
                             Create Update
                         </button>
                         <button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">
                             Cancel
                         </button>
+                        <label className={`mx-2 ${(canSubmit && props.publicId) ? "cursor-pointer" : "opacity-50"}`}>
+                            <input type="checkbox" checked={isPublic}
+                                   onChange={e => setIsPublic(e.target.checked)}
+                                   disabled={(!canSubmit || !props.publicId)}
+                            />
+                            <span className="ml-2">Post publicly</span>
+                        </label>
                         <button onClick={handleCreateEventTwitter}
                                 disabled={!(canSubmit && isPublic && props.publicId)}
-                                className="mx-4 button ~info !low w-auto block my-2">
+                                className="mx-4 button ~info !low w-auto block">
                             Create Update & Post to Twitter
                         </button>
                     </div>
