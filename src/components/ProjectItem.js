@@ -133,6 +133,11 @@ export default function ProjectItem(props) {
                     }
                 `
                 const update2Data = await API.graphql(graphqlOperation(updateEventQ2));
+
+                for (const filename of event.filenames){
+
+                }
+
                 setEvent(update2Data.data.updateEvent);
                 setPublicId(publicEventId);
             } else { // public -> private
