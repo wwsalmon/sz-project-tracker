@@ -17,6 +17,8 @@ import utf8 from "utf8";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
+import ReactTooltip from "react-tooltip";
+
 export default function ProjectNewEvent(props) {
     const defaultNewNote = "Write a new update here...";
 
@@ -255,7 +257,8 @@ export default function ProjectNewEvent(props) {
                         <button onClick={handleCancelEvent} className="mx-4 button ~critical !low w-auto block my-2">
                             Cancel
                         </button>
-                        <label className={`mx-2 ${(canSubmit && props.publicId) ? "cursor-pointer" : "opacity-50"}`}>
+                        <label data-tip={props.publicId ? "" : "Make project public to post public updates"}
+                               className={`mx-2 ${(canSubmit && props.publicId) ? "cursor-pointer" : "opacity-50"}`}>
                             <input type="checkbox" checked={isPublic}
                                    onChange={e => setIsPublic(e.target.checked)}
                                    disabled={(!canSubmit || !props.publicId)}
@@ -269,6 +272,7 @@ export default function ProjectNewEvent(props) {
                         </button>
                     </div>
                 </div>
+                <ReactTooltip/>
             </div>
         ) : (
             <div className="flex justify-center">
