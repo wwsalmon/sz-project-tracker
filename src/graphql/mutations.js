@@ -22,6 +22,7 @@ export const createProject = /* GraphQL */ `
         }
         nextToken
       }
+      sortNew
       description
       public
       archived
@@ -36,6 +37,7 @@ export const createProject = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -74,6 +76,7 @@ export const updateProject = /* GraphQL */ `
         }
         nextToken
       }
+      sortNew
       description
       public
       archived
@@ -88,6 +91,7 @@ export const updateProject = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -126,6 +130,7 @@ export const deleteProject = /* GraphQL */ `
         }
         nextToken
       }
+      sortNew
       description
       public
       archived
@@ -140,6 +145,7 @@ export const deleteProject = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -170,6 +176,7 @@ export const createEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -237,6 +244,7 @@ export const updateEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -304,6 +312,7 @@ export const deleteEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -374,6 +383,7 @@ export const createPublicProject = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -424,6 +434,7 @@ export const updatePublicProject = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -474,6 +485,7 @@ export const deletePublicProject = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -520,6 +532,7 @@ export const createPublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -557,6 +570,7 @@ export const createPublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -587,6 +601,7 @@ export const updatePublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -624,6 +639,7 @@ export const updatePublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -654,6 +670,7 @@ export const deletePublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -691,6 +708,7 @@ export const deletePublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived

@@ -19,6 +19,7 @@ export const getProject = /* GraphQL */ `
         }
         nextToken
       }
+      sortNew
       description
       public
       archived
@@ -33,6 +34,7 @@ export const getProject = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -63,6 +65,7 @@ export const listProjects = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -93,6 +96,7 @@ export const getEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -159,6 +163,7 @@ export const listEvents = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -202,6 +207,7 @@ export const listPublicProjects = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -233,6 +239,7 @@ export const getPublicProject = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
         description
         public
         archived
@@ -276,6 +283,7 @@ export const getPublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived
@@ -313,6 +321,7 @@ export const getPublicEvent = /* GraphQL */ `
         project {
           id
           name
+          sortNew
           description
           public
           archived

@@ -183,6 +183,7 @@ export default function ProjectNewEvent(props) {
 
     return isEdit ? (
             <div>
+                <hr className="my-8 pt-8"/>
                 <h1 className="heading my-8">New Update</h1>
                 <SimpleMDE
                     value={newNote}

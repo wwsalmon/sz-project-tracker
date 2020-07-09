@@ -186,6 +186,7 @@ export default function Project() {
                 name
                 description
                 public
+                sortNew
                 events{
                     items{
                         id
@@ -222,10 +223,12 @@ export default function Project() {
                 projectData = await loadProject();
                 const decodedDescript = projectData.data.getProject.description;
                 const dataProjName = projectData.data.getProject.name;
+                const defaultSortNew = projectData.data.getProject.sortNew;
                 setProjName(dataProjName);
                 setNewProjName(dataProjName);
                 setProjDescript(decodedDescript);
                 setNewProjDescript(decodedDescript);
+                setSortNew(defaultSortNew);
 
                 if (projectData.data.getProject.public) {
                     setPublicId(projectData.data.getProject.publicProject.id)
@@ -346,15 +349,15 @@ export default function Project() {
                     )}
 
                     <div className="flex justify-end items-center my-4">
-                        <p className="mr-4 opacity-50">{sortNew ? "Sorting by newest first" : "Sorting by oldest first"}</p>
+                        <p className="mr-4 opacity-50">{(sortNew || sortNew === null) ? "Sorting by newest first" : "Sorting by oldest first"}</p>
                         <button className="button block ~neutral"
-                                onClick={() => setSortNew(!sortNew)}>
+                                onClick={() => setSortNew(!(sortNew || sortNew === null))}>
                             Toggle sorting
                         </button>
                     </div>
 
                     <div className={showPrivate ? "" : "projectsHidePrivate"}>
-                        {(sortNew ? events : events.slice(0).reverse()).map((event, i, arr) =>
+                        {((sortNew || sortNew === null) ? events : events.slice(0).reverse()).map((event, i, arr) =>
                             (
                                 <div key={event.id}>
                                     {

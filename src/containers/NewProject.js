@@ -24,7 +24,8 @@ export default function NewProject() {
                 createProject(input: {
                     name: "${projName}",
                     description: "${utf8.encode(projDescript)}",
-                    archived: false
+                    archived: false,
+                    sortNew: true
                 }){
                     id
                 }

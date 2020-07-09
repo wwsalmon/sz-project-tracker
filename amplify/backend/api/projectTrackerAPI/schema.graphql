@@ -3,6 +3,7 @@ type Project @model @auth(rules: [{allow: owner}]) {
   name: String!
   events: [Event!]! @connection(name: "ProjectEvents")
   publicProject: PublicProject @connection(name: "ProjectPublicProject")
+  sortNew: Boolean
   description: String
   public: Boolean
   archived: Boolean!
