@@ -33,6 +33,9 @@ import Modal from "./Modal";
 
 import MoveEvent from "./MoveEvent";
 
+
+import {deleteEvent} from "../lib/reqLib";
+
 export default function ProjectItem(props) {
     const [event, setEvent] = useState(props.event);
     const [decodedNote, setDecodedNote] = useState(utf8.decode(props.event.note));
@@ -61,30 +64,6 @@ export default function ProjectItem(props) {
 
     function handleFilePondUpdate(fileItems) {
         setNewFiles(fileItems.map(fileItem => fileItem.file));
-    }
-
-    async function handleDeleteEvent(e) {
-        e.preventDefault();
-        const query = `
-        mutation{
-            deleteEvent(input: {id: "${event.id}"}){ id }`
-            + (publicId ? `deletePublicEvent(input: {id: "${publicId}"}){ id }` : "") + "}";
-        API.graphql(graphqlOperation(query)).then(() => {
-            for (const filename of event.filenames) {
-                Storage.vault.remove(filename);
-            }
-            removeLocal(event.id);
-        }).catch(e => {
-            console.log(e);
-        });
-
-        for (const filename of event.filenames) {
-            try {
-                await Storage.vault.remove(filename);
-            } catch (e) {
-                console.log(e);
-            }
-        }
     }
 
     async function handleToggleHidden(e) {
@@ -382,7 +361,9 @@ export default function ProjectItem(props) {
                 )} */}
 
                 <MoreButton className="right-0 top-8" uid={event.id}>
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleDeleteEvent}>Delete
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left"
+                            onClick={() => {deleteEvent(event, () => {removeLocal(event.id)});}}>
+                        Delete
                     </button>
                     {!isEdit &&
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}

@@ -21,6 +21,7 @@ import {faEye} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Helmet} from "react-helmet";
 import getTitle from "../lib/getTitle";
+import {deleteProject} from "../lib/reqLib";
 
 export default function Project() {
     const {id} = useParams();
@@ -78,10 +79,9 @@ export default function Project() {
         }).catch(e => console.log(e));
     }
 
-    async function makePrivate(e) {
-        e.preventDefault();
+    async function makePrivate() {
 
-        if (numPrivate !== events.length){
+        if (numPrivate !== events.length) {
             alert("This project cannot be made private because it has updates that are public." +
                 "Make all updates private and try again.");
             return;
@@ -99,34 +99,7 @@ export default function Project() {
             .catch(e => console.log(e))
     }
 
-    async function deleteProject(e) {
-        e.preventDefault();
-        try {
-            const deleteReq = `
-            mutation {
-                deleteProject(input: {
-                    id: "${id}"
-                }){
-                    public publicProject{ id }
-                }
-            }`;
-            const deleteData = await API.graphql(graphqlOperation(deleteReq));
-            if (deleteData.data.deleteProject.public) {
-                const deletePublicReq = `
-                mutation{
-                    deletePublicProject(input: {
-                        id: "${deleteData.data.deleteProject.publicProject.id}"
-                    }){ id }
-                }`;
-                await API.graphql(graphqlOperation(deletePublicReq));
-            }
-            history.push("/projects", {projectDeleted: true});
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    async function exportProject(e) {
+    async function exportProject() {
         let JSONobj = {"projectid": id, "name": projName, "public": publicId, "events": events};
         let JSONtext = JSON.stringify(JSONobj);
         let blob = new Blob([JSONtext], {type: "text/plain;charset=utf-8"});
@@ -321,8 +294,13 @@ export default function Project() {
                                 setIsEdit(!isEdit)
                             }}>Edit Project Info</button>
                         )}
-                        <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={deleteProject}>Delete
-                            Project
+                        <button className="hover:bg-gray-100 py-2 px-4 text-left"
+                                onClick={() => {
+                                    deleteProject(id, publicId, events, () => {
+                                        history.push("/projects", {projectDeleted: true})
+                                    });
+                                }}>
+                            Delete Project
                         </button>
                         <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={exportProject}>Export
                             Project

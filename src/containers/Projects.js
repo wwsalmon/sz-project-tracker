@@ -9,6 +9,7 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Helmet} from "react-helmet";
 import getTitle from "../lib/getTitle";
+import {deleteProject} from "../lib/reqLib";
 
 export default function Projects(props) {
     const history = useHistory();
@@ -18,29 +19,35 @@ export default function Projects(props) {
     const [isInit, setIsInit] = useState(false);
     const [projects, setProjects] = useState([]);
 
-    async function deleteProject(e, projectID) {
-        e.preventDefault();
-        // setIsLoading(true);
-        const deleteReq = `
-            mutation {
-                deleteProject(input: {
-                    id: "${projectID}"
-                }){
-                    name id
+    async function deleteProjectHelper(projectID) {
+        const query = `
+        query {
+            getProject(id: "${projectID}") {
+                id
+                public
+                events{
+                    items{
+                        id
+                        hidden
+                        filenames
+                        publicEvent{
+                            id
+                        }
+                    }
+                }
+                publicProject{
+                    id        
                 }
             }
-        `;
-        const deleteData = await API.graphql(graphqlOperation(deleteReq));
-        if (deleteData.data.deleteProject.public) {
-            const deletePublicReq = `
-                mutation{
-                    deletePublicProject(input: {
-                        id: "${deleteData.data.deleteProject.publicProject.id}"
-                    }){ id }
-                }`;
-            await API.graphql(graphqlOperation(deletePublicReq));
-        }
-        setProjects(projects.filter(p => p.id !== projectID));
+        }`;
+        const projectData = await API.graphql(graphqlOperation(query));
+        const publicProject = projectData.data.getProject.publicProject;
+        const publicId = publicProject ? publicProject.id : false;
+        const projectEvents = projectData.data.getProject.events.items;
+
+        deleteProject(projectID, publicId, projectEvents, () => {
+            setProjects(projects.filter(p => p.id !== projectID));
+        })
     }
 
 
@@ -139,7 +146,7 @@ export default function Projects(props) {
                                         </p>
                                         <button
                                             className="button ~critical !high"
-                                            onClick={(e) => deleteProject(e, project.id)}>Delete
+                                            onClick={() => deleteProjectHelper(project.id)}>Delete
                                         </button>
                                     </Modal>
                                 </MoreButton>
