@@ -352,7 +352,7 @@ export default function ProjectItem(props) {
                             </div>
                         </>
                     ) : Parser(markdownConverter.makeHtml(decodedNote))}
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto mt-8 pt-8">
                         <div className="flex pb-4">
                             {event.filenames.map(filename => (
                                 <div key={filename}>
