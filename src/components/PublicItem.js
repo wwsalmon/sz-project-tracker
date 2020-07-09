@@ -28,7 +28,7 @@ export default function PublicItem(props) {
                         }</p>
                     </Link>
                 </div>
-                <div className="content mr-6 md:mr-0 flex-1">
+                <div className="content mr-6 md:mr-0 md:w-8" style={{flex: "1 0 0"}}>
                     {Parser(markdownConverter.makeHtml(utf8.decode(event.note)))}
                     <div className="overflow-x-auto">
                         <div className="flex pb-4">

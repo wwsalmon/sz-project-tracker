@@ -19,7 +19,6 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css';
 
 import {v1 as uuidv1} from 'uuid';
 
-
 import EventImage from "../components/EventImage";
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -29,6 +28,10 @@ import MoreButton from "../components/MoreButton";
 import {changeAcl} from "../lib/aclLib";
 
 import {useAuth} from "../lib/authLib";
+
+import Modal from "./Modal";
+
+import MoveEvent from "./MoveEvent";
 
 export default function ProjectItem(props) {
     const [event, setEvent] = useState(props.event);
@@ -49,15 +52,12 @@ export default function ProjectItem(props) {
     const changeHiddenLocal = props.changeHiddenLocal; // for changing public status
 
     const pond = useRef();
+    const modal = useRef();
     const auth = useAuth();
 
     FilePond.registerPlugin(FilePondPluginImagePreview,
         FilePondPluginFileValidateSize,
         FilePondPluginFileValidateType);
-
-    function handleFilePondInit() {
-        console.log("filepond init", pond);
-    }
 
     function handleFilePondUpdate(fileItems) {
         setNewFiles(fileItems.map(fileItem => fileItem.file));
@@ -70,12 +70,12 @@ export default function ProjectItem(props) {
             deleteEvent(input: {id: "${event.id}"}){ id }`
             + (publicId ? `deletePublicEvent(input: {id: "${publicId}"}){ id }` : "") + "}";
         API.graphql(graphqlOperation(query)).then(() => {
-            for (const filename of event.filenames){
+            for (const filename of event.filenames) {
                 Storage.vault.remove(filename);
             }
             removeLocal(event.id);
         }).catch(e => {
-           console.log(e);
+            console.log(e);
         });
 
         for (const filename of event.filenames) {
@@ -132,13 +132,13 @@ export default function ProjectItem(props) {
                 const updateEventQ2 = `
                     mutation{
                         updateEvent(input: {id: "${event.id}", eventPublicEventId: "${publicEventId}"}){
-                            id hidden filenames note time publicEvent { id } project { publicProject { id } }
+                            id hidden filenames note time publicEvent { id } project { id publicProject { id } }
                         }
                     }
                 `
                 const update2Data = await API.graphql(graphqlOperation(updateEventQ2));
 
-                for (const filename of event.filenames){
+                for (const filename of event.filenames) {
                     changeAcl(filename, auth, "public");
                 }
 
@@ -148,7 +148,7 @@ export default function ProjectItem(props) {
                 const updateEventQ = `
                     mutation{
                         updateEvent(input: {id: "${event.id}", hidden: true}){
-                            id hidden filenames note time publicEvent { id } project { publicProject { id } }
+                            id hidden filenames note time publicEvent { id } project { id publicProject { id } }
                         }
                     }                    
                 `
@@ -167,7 +167,7 @@ export default function ProjectItem(props) {
                     setPublicId(false);
                 }
 
-                for (const filename of event.filenames){
+                for (const filename of event.filenames) {
                     changeAcl(filename, auth, "private");
                 }
 
@@ -198,7 +198,6 @@ export default function ProjectItem(props) {
                     )
             { id filenames note hidden time publicEvent {id}}
         }`
-        console.log(query);
 
         API.graphql(graphqlOperation(query)).then(res => {
             setEvent(res.data.updateEvent);
@@ -221,7 +220,7 @@ export default function ProjectItem(props) {
                 id: "${event.id}",
                 note: """${utf8.encode(newNote)}""",
                 filenames: ${newFileUUIDs}
-            }){id hidden filenames note time publicEvent { id } project { publicProject { id } }}`
+            }){id hidden filenames note time publicEvent { id } project { id publicProject { id } }}`
         query += publicId ? `updatePublicEvent(input:{
             id: "${publicId}",
             note: """${utf8.encode(newNote)}""",    
@@ -229,7 +228,6 @@ export default function ProjectItem(props) {
         }){ id }` : "";
         query += "}";
         API.graphql(graphqlOperation(query)).then(res => {
-            console.log(res);
             setEvent(res.data.updateEvent);
             setDecodedNote(newNote);
             setNewFiles([]);
@@ -266,7 +264,8 @@ export default function ProjectItem(props) {
     return (
         <div className={isPrivate ? "projectItemPrivate" : ""}>
             <hr></hr>
-            <div className={`md:flex py-8 ${isPrivate ? "md:hover:bg-gray-100" : "md:hover:bg-blue-100"} rounded relative`}>
+            <div
+                className={`md:flex py-8 ${isPrivate ? "md:hover:bg-gray-100" : "md:hover:bg-blue-100"} rounded relative`}>
                 <div className="w-32 flex-none flex md:block mb-4 md:mb-0">
                     <p className="supra">{
                         format(new Date(event.time), "h:mm a")
@@ -321,7 +320,6 @@ export default function ProjectItem(props) {
                                         }
                                     },
                                     revert: (uniqueFileId, load, error) => {
-                                        console.log(uniqueFileId);
                                         try {
                                             Storage.vault.remove(uniqueFileId)
                                                 .then(() => {
@@ -339,7 +337,6 @@ export default function ProjectItem(props) {
                                                ref={pond}
                                                files={newFiles}
                                                allowMultiple={true}
-                                               oninit={handleFilePondInit}
                                                onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
                                                maxFileSize="1MB"
                                                acceptedFileTypes={["image/png", "image/jpeg", "image/jpg", "image/gif"]}
@@ -361,7 +358,8 @@ export default function ProjectItem(props) {
                                 <div key={filename}>
                                     {isEdit && (
                                         <button className="button ~critical !low"
-                                                onClick={() => deleteAttachment(filename)}><FontAwesomeIcon icon={faTimes}/>
+                                                onClick={() => deleteAttachment(filename)}><FontAwesomeIcon
+                                            icon={faTimes}/>
                                         </button>
                                     )}
                                     <EventImage s3key={filename} key={filename}/>
@@ -388,6 +386,12 @@ export default function ProjectItem(props) {
                     </button>
                     {!isEdit &&
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
+                    <Modal buttonClassName="button hover:bg-gray-100 py-2 px-4 text-left"
+                           buttonDisabled={!event.hidden}
+                            buttonText="Move to another project"
+                            ref={modal}>
+                        <MoveEvent event={event} modal={modal} removeLocal={removeLocal}/>
+                    </Modal>
                     <button disabled={!props.publicId}
                             className="button hover:bg-gray-100 py-2 px-4 text-left"
                             onClick={handleToggleHidden}

@@ -195,6 +195,7 @@ export default function Project() {
                         time
                         hidden
                         project{
+                            id
                             publicProject{
                                 id
                             }

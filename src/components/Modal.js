@@ -11,6 +11,7 @@ const Modal = forwardRef((props, ref) => {
         <>
         <button
             className={props.buttonClassName}
+            disabled={props.buttonDisabled}
             onClick={() => {
                 setShowModal(true);
             }}
