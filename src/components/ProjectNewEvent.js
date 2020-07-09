@@ -173,10 +173,6 @@ export default function ProjectNewEvent(props) {
         }
     }
 
-    function handleFilePondInit() {
-        console.log("filepond init", pond);
-    }
-
     function handleFilePondUpdate(fileItems) {
         setNewFiles(fileItems.map(fileItem => fileItem.file));
     }
@@ -243,7 +239,6 @@ export default function ProjectNewEvent(props) {
                                    ref={pond}
                                    files={newFiles}
                                    allowMultiple={true}
-                                   oninit={handleFilePondInit}
                                    onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}
                                    maxFileSize="1MB"
                                    acceptedFileTypes={["image/png", "image/jpeg", "image/jpg", "image/gif"]}

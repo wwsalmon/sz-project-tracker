@@ -28,12 +28,14 @@ export default function PublicItem(props) {
                         }</p>
                     </Link>
                 </div>
-                <div className="content mr-6 md:mr-0 flex-1">
+                <div className="content mr-6 md:mr-0 md:w-8" style={{flex: "1 0 0"}}>
                     {Parser(markdownConverter.makeHtml(utf8.decode(event.note)))}
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto mt-8 pt-8">
                         <div className="flex pb-4">
                             {event.filenames.map(filename => (
-                                <EventImage s3key={filename} key={filename} public={true} identityId={props.identityId}/>
+                                <div key={filename}>
+                                    <EventImage s3key={filename} public={true} identityId={props.identityId}/>
+                                </div>
                             ))}
                         </div>
                     </div>

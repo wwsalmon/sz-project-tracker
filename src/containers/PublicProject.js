@@ -9,6 +9,7 @@ import * as Showdown from "showdown";
 import utf8 from "utf8";
 import {Helmet} from "react-helmet";
 import getTitle from "../lib/getTitle";
+import EventImage from "../components/EventImage";
 
 export default function PublicProject() {
     let { id, postid } = useParams();
@@ -146,6 +147,15 @@ export default function PublicProject() {
                             <p className="my-4">by <b>{owner}</b></p>
                             <div className="content mr-6 pt-4 md:mr-0 flex-1">
                                 {Parser(markdownConverter.makeHtml(utf8.decode(featuredEvent.note)))}
+                                <div className="overflow-x-auto mt-8 pt-8">
+                                    <div className="flex pb-4">
+                                        {featuredEvent.filenames.map(filename => (
+                                            <div key={filename}>
+                                                <EventImage s3key={filename} key={filename} public={true} identityId={identityId}/>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                             <hr className="sep"/>
                             <hr className="my-4"/>
