@@ -33,7 +33,9 @@ export default function PublicItem(props) {
                     <div className="overflow-x-auto">
                         <div className="flex pb-4">
                             {event.filenames.map(filename => (
-                                <EventImage s3key={filename} key={filename} public={true} identityId={props.identityId}/>
+                                <div>
+                                    <EventImage s3key={filename} key={filename} public={true} identityId={props.identityId}/>
+                                </div>
                             ))}
                         </div>
                     </div>
