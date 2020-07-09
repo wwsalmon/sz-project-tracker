@@ -118,7 +118,7 @@ export default function ProjectItem(props) {
                 const update2Data = await API.graphql(graphqlOperation(updateEventQ2));
 
                 for (const filename of event.filenames) {
-                    changeAcl(filename, auth, "public");
+                    await changeAcl(filename, auth, "public");
                 }
 
                 setEvent(update2Data.data.updateEvent);
@@ -361,23 +361,23 @@ export default function ProjectItem(props) {
                 )} */}
 
                 <MoreButton className="right-0 top-8" uid={event.id}>
-                    <button className="hover:bg-gray-100 py-2 px-4 text-left"
-                            onClick={() => {deleteEvent(event, () => {removeLocal(event.id)});}}>
-                        Delete
-                    </button>
                     {!isEdit &&
                     <button className="hover:bg-gray-100 py-2 px-4 text-left" onClick={handleToggleEdit}>Edit</button>}
+                    <button disabled={!props.publicId}
+                            className="button hover:bg-gray-100 py-2 px-4 text-left"
+                            onClick={handleToggleHidden}
+                    >
+                        {isPrivate ? "Make public" : "Make private"}
+                    </button>
                     <Modal buttonClassName="button hover:bg-gray-100 py-2 px-4 text-left"
                            buttonDisabled={!event.hidden}
                             buttonText="Move to another project"
                             ref={modal}>
                         <MoveEvent event={event} modal={modal} removeLocal={removeLocal}/>
                     </Modal>
-                    <button disabled={!props.publicId}
-                            className="button hover:bg-gray-100 py-2 px-4 text-left"
-                            onClick={handleToggleHidden}
-                    >
-                        {isPrivate ? "Make public" : "Make private"}
+                    <button className="hover:bg-gray-100 py-2 px-4 text-left"
+                            onClick={() => {deleteEvent(event, () => {removeLocal(event.id)});}}>
+                        Delete
                     </button>
                 </MoreButton>
             </div>

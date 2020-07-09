@@ -48,8 +48,7 @@ export default function Project() {
         setNumPrivate(hide ? numPrivate + 1 : numPrivate - 1);
     }
 
-    async function makePublic(e) {
-        e.preventDefault();
+    async function makePublic() {
         const identityId = await auth.getIdentityId();
         const createQuery = `
             mutation {

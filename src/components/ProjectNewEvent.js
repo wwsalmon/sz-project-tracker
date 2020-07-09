@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Storage, API, graphqlOperation } from "aws-amplify";
 
 import SimpleMDE from "react-simplemde-editor";
@@ -18,6 +18,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 import ReactTooltip from "react-tooltip";
+import {changeAcl} from "../lib/aclLib";
+
+import {useAuth} from "../lib/authLib";
 
 export default function ProjectNewEvent(props) {
     const defaultNewNote = "Write a new update here...";
@@ -32,7 +35,7 @@ export default function ProjectNewEvent(props) {
     const [isPublic, setIsPublic] = useState(false);
 
     const [canSubmit, setCanSubmit] = useState(true);
-    const pond = useRef();
+    const auth = useAuth();
 
     FilePond.registerPlugin(FilePondPluginImagePreview,
         FilePondPluginFileValidateSize,
@@ -118,6 +121,11 @@ export default function ProjectNewEvent(props) {
                         }
                     }
                 }`;
+
+                for (const filename of fileUUIDs) {
+                    await changeAcl(filename, auth, "public");
+                }
+
                 return new Promise(resolve => {
                     API.graphql(graphqlOperation(updatePrivateQuery)).then(res => {
                         afterCreateEvent(res.data.updateEvent);
@@ -236,7 +244,6 @@ export default function ProjectNewEvent(props) {
                         }
                     }
                 }
-                                   ref={pond}
                                    files={newFiles}
                                    allowMultiple={true}
                                    onupdatefiles={(fileItems) => handleFilePondUpdate(fileItems)}

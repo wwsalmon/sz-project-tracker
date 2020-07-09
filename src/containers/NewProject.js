@@ -8,6 +8,8 @@ import "easymde/dist/easymde.min.css";
 import {Helmet} from "react-helmet";
 import getTitle from "../lib/getTitle";
 
+import {useAuth} from "../lib/authLib";
+
 export default function NewProject() {
     const defaultName = "Enter a project name...";
     const [projName, setProjName] = useState(defaultName);
@@ -15,9 +17,9 @@ export default function NewProject() {
     const [isPublic, setIsPublic] = useState(false);
 
     const history = useHistory();
+    const auth = useAuth();
 
-    async function handleCreate(e) {
-        e.preventDefault();
+    async function handleCreate() {
         try {
             const createReq = `
             mutation{
@@ -34,12 +36,14 @@ export default function NewProject() {
             const createData = await API.graphql(graphqlOperation(createReq));
             const createId = createData.data.createProject.id;
             if (isPublic) {
+                const identityId = await auth.getIdentityId();
                 const publicReq = `
                 mutation{
                     createPublicProject(input: {
                         name: "${projName}",
                         description: "${utf8.encode(projDescript)}",
-                        publicProjectProjectId: "${createId}"
+                        publicProjectProjectId: "${createId}",
+                        ownerIdentityId: "${identityId}"
                     }){
                         id
                     }
