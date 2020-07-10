@@ -281,7 +281,7 @@ export default function Project() {
                         </>
                     ) : (
                         <div className="max-w-2xl my-4 mx-auto text-center content">
-                            {projDescript !== null ? Parser(markdownConverter.makeHtml(projDescript)) : (
+                            {!(projDescript === null || projDescript.length === 0) ? Parser(markdownConverter.makeHtml(projDescript)) : (
                                 <p className="opacity-50">Set a project description or change the project name by
                                     clicking the three dots on the right and clicking "edit project info."</p>
                             )}
@@ -313,46 +313,53 @@ export default function Project() {
                     <ProjectNewEvent setEvents={setEvents} publicId={publicId} events={events} projectId={id}/>
                     <hr className="sep"/>
 
-                    {showPrivate ? (
-                        <button className="button ml-auto block ~neutral my-4" disabled={numPrivate === 0}
-                                onClick={() => setShowPrivate(false)}>
-                            <FontAwesomeIcon icon={faEye} className="pr-1"/> Show only public updates
-                        </button>
-                    ) : (
-                        <div className="aside align-center ~info md:flex">
-                            <span className="leading-8">Showing only public updates</span>
-                            <button className="button ml-auto bg-transparent pl-0 underline"
-                                    onClick={() => setShowPrivate(true)}>Show {numPrivate} private {numPrivate === 1 ? "update" : "updates"}</button>
-                        </div>
-                    )}
-
-                    <div className="flex justify-end items-center my-4">
-                        <p className="mr-4 opacity-50">{(sortNew || sortNew === null) ? "Sorting by newest first" : "Sorting by oldest first"}</p>
-                        <button className="button block ~neutral"
-                                onClick={() => setSortNew(!(sortNew || sortNew === null))}>
-                            Toggle sorting
-                        </button>
-                    </div>
 
                     <div className={showPrivate ? "" : "projectsHidePrivate"}>
-                        {!(events.length > 0) && (
-                            <p></p>
-                        )}
-                        {((sortNew || sortNew === null) ? events : events.slice(0).reverse()).map((event, i, arr) =>
-                            (
-                                <div key={event.id}>
-                                    {
-                                        (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
-                                            <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
-                                        )
-                                    }
-                                    <ProjectItem changeHiddenLocal={changeHiddenLocal}
-                                                 removeLocal={removeLocal}
-                                                 event={event}
-                                                 publicId={publicId}
-                                    />
+                        {events.length > 0 ? (
+                            <>
+                                {showPrivate ? (
+                                    <button className="button ml-auto block ~neutral my-4" disabled={numPrivate === 0}
+                                            onClick={() => setShowPrivate(false)}>
+                                        <FontAwesomeIcon icon={faEye} className="pr-1"/> Show only public updates
+                                    </button>
+                                ) : (
+                                    <div className="aside align-center ~info md:flex">
+                                        <span className="leading-8">Showing only public updates</span>
+                                        <button className="button ml-auto bg-transparent pl-0 underline"
+                                                onClick={() => setShowPrivate(true)}>Show {numPrivate} private {numPrivate === 1 ? "update" : "updates"}</button>
+                                    </div>
+                                )}
+                                <div className="flex justify-end items-center my-4">
+                                    <p className="mr-4 opacity-50">{(sortNew || sortNew === null) ? "Sorting by newest first" : "Sorting by oldest first"}</p>
+                                    <button className="button block ~neutral"
+                                            onClick={() => setSortNew(!(sortNew || sortNew === null))}>
+                                        Toggle sorting
+                                    </button>
                                 </div>
-                            ))}
+                                {((sortNew || sortNew === null) ? events : events.slice(0).reverse()).map((event, i, arr) =>
+                                    (
+                                        <div key={event.id}>
+                                            {
+                                                (i === 0 || format(new Date(arr[i - 1].time), "yyyy-MM-dd") !== format(new Date(event.time), "yyyy-MM-dd")) && (
+                                                    <p className="label my-4">{format(new Date(event.time), "EEEE, MMMM d")}</p>
+                                                )
+                                            }
+                                            <ProjectItem changeHiddenLocal={changeHiddenLocal}
+                                                         removeLocal={removeLocal}
+                                                         event={event}
+                                                         publicId={publicId}
+                                            />
+                                        </div>
+                                    ))}
+                            </>
+                        ) : (
+                            <>
+                                <hr className="my-8"/>
+                                <p className="content text-center opacity-50">You don't have any updates in this project
+                                    yet. Press the big blue button above to create one!</p>
+                            </>
+                        )}
+
                     </div>
                 </>
             )}
