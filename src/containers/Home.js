@@ -16,6 +16,10 @@ export default function Home() {
         <>
             <Helmet>
                 <title>{getTitle("Home")}</title>
+                <meta
+                    name="description"
+                    content="SZ Project Tracker: create effortless project, learning, or anything logs"
+                />
             </Helmet>
             <div className="text-center">
                 <h1 className="heading text-4xl mt-8">

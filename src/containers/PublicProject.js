@@ -123,6 +123,10 @@ export default function PublicProject() {
         <div className="relative">
             <Helmet>
                 <title>{getTitle(projName + " by " + owner)}</title>
+                <meta
+                    name="description"
+                    content={`Project log for "${projName}" by ${owner}. ${projDescript ? `"${projDescript.substr(0,100)}..."` : ""} Created in SZ Project Tracker`}
+                />
             </Helmet>
             {/* {isLoading && (
                 <p className="aside ~info">Loading...</p>
