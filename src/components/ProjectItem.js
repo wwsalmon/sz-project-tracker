@@ -193,20 +193,21 @@ export default function ProjectItem(props) {
         e.preventDefault();
         const allFileUUIDs = [...event.filenames, ...fileUUIDs];
         const newFileUUIDs = `[${allFileUUIDs.map(d => `"${d}"`)}]`;
+        const newNoteEncoded = utf8.encode(newNote);
         let query = `
-        mutation{
+        mutation update($newNote: String){
             updateEvent(input: {
                 id: "${event.id}",
-                note: """${utf8.encode(newNote)}""",
+                note: $newNote,
                 filenames: ${newFileUUIDs}
             }){id hidden filenames note time publicEvent { id } project { id publicProject { id } }}`
         query += publicId ? `updatePublicEvent(input:{
             id: "${publicId}",
-            note: """${utf8.encode(newNote)}""",    
+            note: $newNote,    
             filenames: ${newFileUUIDs}
         }){ id }` : "";
         query += "}";
-        API.graphql(graphqlOperation(query)).then(res => {
+        API.graphql(graphqlOperation(query, {newNote: newNoteEncoded})).then(res => {
             setEvent(res.data.updateEvent);
             setDecodedNote(newNote);
             setNewFiles([]);

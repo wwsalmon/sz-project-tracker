@@ -55,17 +55,20 @@ export default function ProjectNewEvent(props) {
     get the public id
     update the private event
     */
-    async function handleCreateEvent(e) {
-        e.preventDefault();
-        const currentDate = new Date();
-        const newFileUUIDs = `[${fileUUIDs.map(d => `"${d}"`)}]`;
-        const newNoteQuery = `
-        mutation {
+    async function handleCreateEvent() {
+        try{
+            if (isPublic && !props.publicId) throw new Error("Can't create public update, project is private");
+
+            const currentDate = new Date();
+            const newFileUUIDs = `[${fileUUIDs.map(d => `"${d}"`)}]`;
+            const newNoteEncoded = utf8.encode(newNote);
+            const newNoteQuery = `
+        mutation create($newNote: String){
           createEvent(input: {
               eventProjectId: "${props.projectId}",
               time: "${currentDate.toISOString()}",
               filenames: ${newFileUUIDs},
-              note: """${utf8.encode(newNote)}""",
+              note: $newNote,
               hidden: ${!isPublic}}) {
                 id
                 note
@@ -83,9 +86,7 @@ export default function ProjectNewEvent(props) {
           }
         }`;
 
-        try{
-            if (isPublic && !props.publicId) throw new Error("Can't create public update, project is private");
-            const createPrivateData = await API.graphql(graphqlOperation(newNoteQuery));
+            const createPrivateData = await API.graphql(graphqlOperation(newNoteQuery, {newNote: newNoteEncoded}));
             if (isPublic){
                 const privateEventId = createPrivateData.data.createEvent.id;
                 const publicProjectId = props.publicId;
