@@ -164,7 +164,6 @@ export default function ProjectNewEvent(props) {
             const noteUrl = "szpt.netlify.app/public/"
                 + props.publicId + "/" + createEventStatus.publicEventId;
             const openUrl = twitterUrl + noteText + noteUrl;
-            console.log(openUrl);
             window.open(openUrl);
         }
     }
