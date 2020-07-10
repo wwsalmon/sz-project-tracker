@@ -32,7 +32,7 @@ export default function ProjectNewEvent(props) {
     let fasterFileUUIDs = [];
 
     const [isEdit, setIsEdit] = useState(false);
-    const [isPublic, setIsPublic] = useState(false);
+    const [isPublic, setIsPublic] = useState(!!props.publicId);
 
     const [canSubmit, setCanSubmit] = useState(true);
     const auth = useAuth();
