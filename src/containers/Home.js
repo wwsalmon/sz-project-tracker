@@ -41,7 +41,7 @@ export default function Home() {
                 )}
             </div>
             <div className="text-center">
-                <img src={maincapture} className="my-8 max-w-xl inline shadow-2xl" alt=""/>
+                <img src={maincapture} className="my-8 max-w-xl w-full inline shadow-2xl" alt=""/>
 
                 <hr className="sep"/>
                 <hr/>
@@ -49,7 +49,7 @@ export default function Home() {
 
                 <h3 className="heading">Build in public</h3>
                 <p className="subheading my-4">Make your project viewable by public link</p>
-                <img src={publicproject} className="my-8 max-w-xl inline shadow-xl" alt=""/>
+                <img src={publicproject} className="my-8 max-w-xl w-full inline shadow-xl" alt=""/>
 
                 <hr className="sep"/>
                 <hr/>
@@ -57,7 +57,7 @@ export default function Home() {
 
                 <h3 className="heading">Effortless logging experience</h3>
                 <p className="subheading my-4">Notes in markdown + drag & drop image uploads</p>
-                <img src={editing} className="my-8 max-w-xl inline shadow-xl" alt=""/>
+                <img src={editing} className="my-8 max-w-xl w-full inline shadow-xl" alt=""/>
 
                 <hr className="sep"/>
                 <hr/>
@@ -66,13 +66,22 @@ export default function Home() {
                 <h3 className="heading">Get started today</h3>
                 <p className="subheading my-4">It's free, it's useful, it's beautiful. What more reason do you need?</p>
                 <div>
-                    <img src={projects} className="my-8 max-w-xl inline shadow-xl" alt=""/>
+                    <img src={projects} className="my-8 max-w-xl w-full inline shadow-xl" alt=""/>
                 </div>
-                <div>
-                    <Link to="/signup">
-                        <button className="button !high ~info my-4 text-2xl p-4">Sign up for free</button>
-                    </Link>
-                </div>
+                {auth.authState === "signedIn" ? (
+                    <div>
+                        <p>You're already logged in.</p>
+                        <Link to="/projects">
+                            <button className="button !high ~info my-4">Go to app</button>
+                        </Link>
+                    </div>
+                ) : (
+                    <div>
+                        <Link to="/signup">
+                            <button className="button !high ~info my-4 text-2xl p-4">Sign up for free</button>
+                        </Link>
+                    </div>
+                )}
 
             </div>
         </>
