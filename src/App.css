@@ -1,0 +1,21 @@
+button.button:focus{
+    outline: 0;
+}
+
+.editor-toolbar .heading{
+    font-size: inherit;
+    color: inherit;
+}
+
+.CodeMirror, .CodeMirror-scroll{
+    max-height: 80vh;
+}
+
+.CodeMirror-fullscreen.CodeMirror, .CodeMirror-fullscreen .CodeMirror-scroll {
+    max-height: none;
+}
+
+.content{
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}

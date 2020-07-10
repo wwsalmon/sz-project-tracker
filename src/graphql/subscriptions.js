@@ -13,18 +13,42 @@ export const onCreateProject = /* GraphQL */ `
           note
           hidden
           filenames
-          audio
-          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      sortNew
+      description
+      public
       archived
       createdAt
       updatedAt
       owner
+      publicProject {
+        id
+        name
+        description
+        ownerIdentityId
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
     }
   }
 `;
@@ -40,18 +64,42 @@ export const onUpdateProject = /* GraphQL */ `
           note
           hidden
           filenames
-          audio
-          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      sortNew
+      description
+      public
       archived
       createdAt
       updatedAt
       owner
+      publicProject {
+        id
+        name
+        description
+        ownerIdentityId
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
     }
   }
 `;
@@ -67,18 +115,42 @@ export const onDeleteProject = /* GraphQL */ `
           note
           hidden
           filenames
-          audio
-          video
           createdAt
           updatedAt
           owner
         }
         nextToken
       }
+      sortNew
+      description
+      public
       archived
       createdAt
       updatedAt
       owner
+      publicProject {
+        id
+        name
+        description
+        ownerIdentityId
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
     }
   }
 `;
@@ -92,20 +164,58 @@ export const onCreateEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
+        description
+        public
         archived
         createdAt
         updatedAt
         owner
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
       }
       time
       note
       hidden
       filenames
-      audio
-      video
       createdAt
       updatedAt
       owner
+      publicEvent {
+        id
+        event {
+          id
+          time
+          note
+          hidden
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        filenames
+        createdAt
+        updatedAt
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
+        owner
+      }
     }
   }
 `;
@@ -119,20 +229,58 @@ export const onUpdateEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
+        description
+        public
         archived
         createdAt
         updatedAt
         owner
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
       }
       time
       note
       hidden
       filenames
-      audio
-      video
       createdAt
       updatedAt
       owner
+      publicEvent {
+        id
+        event {
+          id
+          time
+          note
+          hidden
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        filenames
+        createdAt
+        updatedAt
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
+        owner
+      }
     }
   }
 `;
@@ -146,17 +294,439 @@ export const onDeleteEvent = /* GraphQL */ `
         events {
           nextToken
         }
+        sortNew
+        description
+        public
         archived
         createdAt
         updatedAt
         owner
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
       }
       time
       note
       hidden
       filenames
-      audio
-      video
+      createdAt
+      updatedAt
+      owner
+      publicEvent {
+        id
+        event {
+          id
+          time
+          note
+          hidden
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        filenames
+        createdAt
+        updatedAt
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
+        owner
+      }
+    }
+  }
+`;
+export const onCreatePublicProject = /* GraphQL */ `
+  subscription OnCreatePublicProject($owner: String!) {
+    onCreatePublicProject(owner: $owner) {
+      id
+      name
+      description
+      ownerIdentityId
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        sortNew
+        description
+        public
+        archived
+        createdAt
+        updatedAt
+        owner
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      createdAt
+      updatedAt
+      owner
+      publicEvents {
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onUpdatePublicProject = /* GraphQL */ `
+  subscription OnUpdatePublicProject($owner: String!) {
+    onUpdatePublicProject(owner: $owner) {
+      id
+      name
+      description
+      ownerIdentityId
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        sortNew
+        description
+        public
+        archived
+        createdAt
+        updatedAt
+        owner
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      createdAt
+      updatedAt
+      owner
+      publicEvents {
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onDeletePublicProject = /* GraphQL */ `
+  subscription OnDeletePublicProject($owner: String!) {
+    onDeletePublicProject(owner: $owner) {
+      id
+      name
+      description
+      ownerIdentityId
+      project {
+        id
+        name
+        events {
+          nextToken
+        }
+        sortNew
+        description
+        public
+        archived
+        createdAt
+        updatedAt
+        owner
+        publicProject {
+          id
+          name
+          description
+          ownerIdentityId
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      createdAt
+      updatedAt
+      owner
+      publicEvents {
+        items {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+        nextToken
+      }
+    }
+  }
+`;
+export const onCreatePublicEvent = /* GraphQL */ `
+  subscription OnCreatePublicEvent($owner: String!) {
+    onCreatePublicEvent(owner: $owner) {
+      id
+      event {
+        id
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        hidden
+        filenames
+        createdAt
+        updatedAt
+        owner
+        publicEvent {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      time
+      note
+      filenames
+      createdAt
+      updatedAt
+      publicProject {
+        id
+        name
+        description
+        ownerIdentityId
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const onUpdatePublicEvent = /* GraphQL */ `
+  subscription OnUpdatePublicEvent($owner: String!) {
+    onUpdatePublicEvent(owner: $owner) {
+      id
+      event {
+        id
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        hidden
+        filenames
+        createdAt
+        updatedAt
+        owner
+        publicEvent {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      time
+      note
+      filenames
+      createdAt
+      updatedAt
+      publicProject {
+        id
+        name
+        description
+        ownerIdentityId
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const onDeletePublicEvent = /* GraphQL */ `
+  subscription OnDeletePublicEvent($owner: String!) {
+    onDeletePublicEvent(owner: $owner) {
+      id
+      event {
+        id
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        time
+        note
+        hidden
+        filenames
+        createdAt
+        updatedAt
+        owner
+        publicEvent {
+          id
+          time
+          note
+          filenames
+          createdAt
+          updatedAt
+          owner
+        }
+      }
+      time
+      note
+      filenames
+      createdAt
+      updatedAt
+      publicProject {
+        id
+        name
+        description
+        ownerIdentityId
+        project {
+          id
+          name
+          sortNew
+          description
+          public
+          archived
+          createdAt
+          updatedAt
+          owner
+        }
+        createdAt
+        updatedAt
+        owner
+        publicEvents {
+          nextToken
+        }
+      }
+      owner
+    }
+  }
+`;
+export const onCreateUser = /* GraphQL */ `
+  subscription OnCreateUser($owner: String!) {
+    onCreateUser(owner: $owner) {
+      username
+      email
+      profilePic
+      realname
+      twitter
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onUpdateUser = /* GraphQL */ `
+  subscription OnUpdateUser($owner: String!) {
+    onUpdateUser(owner: $owner) {
+      username
+      email
+      profilePic
+      realname
+      twitter
+      createdAt
+      updatedAt
+      owner
+    }
+  }
+`;
+export const onDeleteUser = /* GraphQL */ `
+  subscription OnDeleteUser($owner: String!) {
+    onDeleteUser(owner: $owner) {
+      username
+      email
+      profilePic
+      realname
+      twitter
       createdAt
       updatedAt
       owner

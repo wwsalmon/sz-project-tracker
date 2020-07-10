@@ -2,16 +2,53 @@ type Project @model @auth(rules: [{allow: owner}]) {
   id: ID!
   name: String!
   events: [Event!]! @connection(name: "ProjectEvents")
+  publicProject: PublicProject @connection(name: "ProjectPublicProject")
+  sortNew: Boolean
+  description: String
+  public: Boolean
   archived: Boolean!
 }
 
 type Event @model @auth(rules: [{allow: owner}]) {
   id: ID!
   project: Project! @connection(name: "ProjectEvents")
+  publicEvent: PublicEvent @connection(name: "EventPublicEvent")
   time: AWSDateTime!
   note: String
   hidden: Boolean!
   filenames: [String!]
-  audio: String
-  video: String
+}
+
+type PublicProject @model @auth(rules: [
+  {allow:owner},
+  {allow: public, operations: [read]}
+  ]) {
+  id: ID!
+  name: String!
+  description: String
+  ownerIdentityId: String
+  publicEvents: [PublicEvent!] @connection(name: "PublicProjectPublicEvents")
+  project: Project! @connection(name: "ProjectPublicProject")
+}
+
+type PublicEvent @model @auth(rules: [
+  {allow:owner},
+  {allow: public, operations: [read]}
+  ]){
+  id: ID!
+  publicProject: PublicProject! @connection(name: "PublicProjectPublicEvents")
+  event: Event @connection(name: "EventPublicEvent")
+  time: AWSDateTime!
+  note: String
+  filenames: [String!]
+}
+
+type User @model @key(fields: ["username"]) @auth(rules: [
+  {allow:owner},
+  {allow:public, operations:[read]}]){
+  username: String!,
+  email: String!,
+  profilePic: String,
+  realname: String,
+  twitter: String
 }
