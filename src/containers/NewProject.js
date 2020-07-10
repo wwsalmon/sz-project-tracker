@@ -21,11 +21,12 @@ export default function NewProject() {
 
     async function handleCreate() {
         try {
+            const encodedDescript = utf8.encode(projDescript);
             const createReq = `
-            mutation{
+            mutation create($name: String!, $descript: String){
                 createProject(input: {
-                    name: "${projName}",
-                    description: "${utf8.encode(projDescript)}",
+                    name: $name,
+                    description: $descript,
                     archived: false,
                     sortNew: true
                 }){
@@ -33,15 +34,18 @@ export default function NewProject() {
                 }
             }
             `;
-            const createData = await API.graphql(graphqlOperation(createReq));
+            const createData = await API.graphql(graphqlOperation(createReq, {
+                descript: encodedDescript,
+                name: projName
+            }));
             const createId = createData.data.createProject.id;
             if (isPublic) {
                 const identityId = await auth.getIdentityId();
                 const publicReq = `
-                mutation{
+                mutation create($name: String!, $descript: String){
                     createPublicProject(input: {
-                        name: "${projName}",
-                        description: "${utf8.encode(projDescript)}",
+                        name: $name,
+                        description: $descript,
                         publicProjectProjectId: "${createId}",
                         ownerIdentityId: "${identityId}"
                     }){
@@ -49,7 +53,10 @@ export default function NewProject() {
                     }
                 }                
                 `
-                const publicData = await API.graphql(graphqlOperation(publicReq));
+                const publicData = await API.graphql(graphqlOperation(publicReq, {
+                    descript: encodedDescript,
+                    name: projName
+                }));
                 const publicId = publicData.data.createPublicProject.id;
 
                 const updateReq = `
