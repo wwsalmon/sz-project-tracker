@@ -280,7 +280,7 @@ export default function Project() {
                             </div>
                         </>
                     ) : (
-                        <div className="max-w-2xl my-4 mx-auto text-center">
+                        <div className="max-w-2xl my-4 mx-auto text-center content">
                             {projDescript !== null ? Parser(markdownConverter.makeHtml(projDescript)) : (
                                 <p className="opacity-50">Set a project description or change the project name by
                                     clicking the three dots on the right and clicking "edit project info."</p>

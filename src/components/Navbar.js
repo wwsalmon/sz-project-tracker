@@ -11,7 +11,7 @@ export default function Navbar(props) {
     const auth = useAuth();
 
     return (
-        <div className={"sz-navbar " + (props.context === "app" ? "" : "border-b")}>
+        <div className={"sz-navbar px-4 " + (props.context === "app" ? "" : "border-b")}>
             <div className="max-w-6xl sz-navbar-inner sz-navbar-left">
                 <input type="checkbox" id="sz-navbar-check"/>
                 <label htmlFor="sz-navbar-check" className="sz-navbar-hamburger">☰</label>
@@ -46,7 +46,7 @@ export default function Navbar(props) {
                                     <span><Link to="/login">Log in</Link></span>
                                 </div>
                                 <div className="sz-navbar-item">
-                                    <span><Link to="/signup">Sign up</Link></span>
+                                    <span><Link to="/signup" className="button ~info !high">Sign up</Link></span>
                                 </div>
                             </>
                         ) : auth.authState === "signedIn" ? (
@@ -59,7 +59,7 @@ export default function Navbar(props) {
                                     <span><Link to="/login">Log in</Link></span>
                                 </div>
                                 <div className="sz-navbar-item">
-                                    <span><Link to="/signup">Sign up</Link></span>
+                                    <span><Link to="/signup" className="button ~info !high">Sign up</Link></span>
                                 </div>
                             </>
                         )

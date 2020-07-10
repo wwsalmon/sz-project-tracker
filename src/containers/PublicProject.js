@@ -21,7 +21,7 @@ export default function PublicProject() {
     const [events, setEvents] = useState([]);
     const [owner, setOwner] = useState("");
     const [featuredEvent, setFeaturedEvent] = useState(false);
-    const [sortNew, setSortNew] = useState(true);
+    const [sortNew, setSortNew] = useState(false);
     // const [isLoading, setIsLoading] = useState(true);
     const [isInit, setIsInit] = useState(false);
 
@@ -172,7 +172,7 @@ export default function PublicProject() {
                                 </h1>
                                 { projName !== "error" && <p className="my-4 text-center">by <b>{owner}</b></p>}
                                 {projDescript !== null && (
-                                <div className="max-w-2xl my-4 mx-auto">{Parser(markdownConverter.makeHtml(projDescript))}</div>
+                                <div className="max-w-2xl my-4 mx-auto content">{Parser(markdownConverter.makeHtml(projDescript))}</div>
                                 )}
                             </div>
                             <hr className="sep"/>
