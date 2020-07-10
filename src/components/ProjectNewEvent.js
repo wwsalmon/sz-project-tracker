@@ -157,7 +157,7 @@ export default function ProjectNewEvent(props) {
     async function handleCreateEventTwitter(e) {
         const createEventStatus = await handleCreateEvent(e);
         if (createEventStatus.status === "success"){
-            const twitterUrl = 'https:/twitter.com/intent/tweet?text=';
+            const twitterUrl = 'https://twitter.com/intent/tweet?text=';
             const maxTweetLength = 280 - 23 - 5;
             const noteText = newNote.length < maxTweetLength ? encodeURIComponent(newNote + " ") :
                 encodeURIComponent(newNote.substring(0,280 - 23 - 5) + "... ");
