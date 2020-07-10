@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {useHistory} from "react-router-dom";
+import {useHistory, Redirect} from "react-router-dom";
 import {API, graphqlOperation} from 'aws-amplify';
 import utf8 from "utf8";
 
@@ -92,6 +92,9 @@ export default function NewProject() {
 
     return (
         <>
+            {auth.authState !== "signedIn" && (
+                <Redirect to={{pathname: "/login", state: {message: "You must be logged in to make a new project."}}}/>
+            )}
             <Helmet>
                 <title>{getTitle("New project")}</title>
             </Helmet>
