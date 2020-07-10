@@ -335,6 +335,9 @@ export default function Project() {
                     </div>
 
                     <div className={showPrivate ? "" : "projectsHidePrivate"}>
+                        {!(events.length > 0) && (
+                            <p></p>
+                        )}
                         {((sortNew || sortNew === null) ? events : events.slice(0).reverse()).map((event, i, arr) =>
                             (
                                 <div key={event.id}>

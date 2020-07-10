@@ -8,7 +8,6 @@ import maincapture from "../assets/sc/maincapture.jpg";
 import editing from "../assets/sc/editing.jpg";
 import projects from "../assets/sc/projects.jpg";
 import publicproject from "../assets/sc/publicproject.jpg";
-import publicupdate from "../assets/sc/publicupdate.jpg";
 
 export default function Home() {
     const auth = useAuth();
