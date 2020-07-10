@@ -161,9 +161,10 @@ export default function ProjectNewEvent(props) {
             const maxTweetLength = 280 - 23 - 5;
             const noteText = newNote.length < maxTweetLength ? encodeURIComponent(newNote + " ") :
                 encodeURIComponent(newNote.substring(0,280 - 23 - 5) + "... ");
-            const noteUrl = "https://sz-project-tracker-v0.netlify.app/public/"
+            const noteUrl = "szpt.netlify.app/public/"
                 + props.publicId + "/" + createEventStatus.publicEventId;
-            window.open(twitterUrl + noteText + noteUrl);
+            const openUrl = twitterUrl + noteText + noteUrl;
+            window.open(openUrl);
         }
     }
 
