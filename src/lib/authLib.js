@@ -4,6 +4,7 @@ import React, { useState, useEffect, useContext, createContext } from "react";
 import { Auth, Hub } from 'aws-amplify';
 import * as AWS from "aws-sdk";
 import config from "../aws-exports";
+import "dotenv";
 
 const authContext = createContext();
 
@@ -120,18 +121,43 @@ function useProvideAuth(){
                 return res(data.IdentityId);
             });
         });
+    }
 
+    // help from https://stackoverflow.com/questions/41000259/why-isnt-mailchimp-api-working-with-fetch
+
+    async function addToMailchimp(email){
+        const url = "https://bel7t7wvbj.execute-api.us-east-1.amazonaws.com/live/";
+        const body = JSON.stringify({
+            "email": email
+        });
+        const params = {
+            mode: "cors",
+            method: "POST",
+            body: body,
+            headers: {
+                "Content-Type": "application/json",
+                "X-API-KEY": process.env.REACT_APP_MC_API_KEY
+            }
+        };
+        try{
+            await fetch(url, params);
+        } catch(e){
+            // do nothing
+        }
+        return Promise.resolve("done");
     }
 
     useEffect(() => {
+        window.mcfunc = addToMailchimp;
         checkCurrentAuth().then(res => {
             console.log(res);
         }).catch(e => {
             console.log(e);
         });
+        // eslint-disable-next-line
     }, []);
 
     return {user, username, setUsername, authState, signIn, signInWithGoogle, checkGoogle,
         signUp,confirmSignUp, signOut, forceState, resendConfirmation, startResetPassword,
-        confirmResetPassword, getCurrentCredentials, getIdentityId};
+        confirmResetPassword, getCurrentCredentials, getIdentityId, addToMailchimp};
 }

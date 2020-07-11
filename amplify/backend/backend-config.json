@@ -1,40 +1,41 @@
 {
-    "auth": {
-        "projecttracker46100bbc": {
-            "service": "Cognito",
-            "providerPlugin": "awscloudformation",
-            "dependsOn": []
-        }
-    },
-    "api": {
-        "projectTrackerAPI": {
-            "service": "AppSync",
-            "providerPlugin": "awscloudformation",
-            "output": {
-                "authConfig": {
-                    "additionalAuthenticationProviders": [
-                        {
-                            "authenticationType": "API_KEY",
-                            "apiKeyConfig": {
-                                "description": "project tracker public access api key",
-                                "apiKeyExpirationDays": "365"
-                            }
-                        }
-                    ],
-                    "defaultAuthentication": {
-                        "authenticationType": "AMAZON_COGNITO_USER_POOLS",
-                        "userPoolConfig": {
-                            "userPoolId": "authprojecttracker46100bbc"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "storage": {
-        "projectTrackerUploads": {
-            "service": "S3",
-            "providerPlugin": "awscloudformation"
-        }
-    }
+	"auth": {
+		"projecttracker46100bbc": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	},
+	"api": {
+		"projectTrackerAPI": {
+			"service": "AppSync",
+			"providerPlugin": "awscloudformation",
+			"output": {
+				"authConfig": {
+					"additionalAuthenticationProviders": [
+						{
+							"authenticationType": "API_KEY",
+							"apiKeyConfig": {
+								"description": "project tracker public access api key",
+								"apiKeyExpirationDays": "365"
+							}
+						}
+					],
+					"defaultAuthentication": {
+						"authenticationType": "AMAZON_COGNITO_USER_POOLS",
+						"userPoolConfig": {
+							"userPoolId": "authprojecttracker46100bbc"
+						}
+					}
+				}
+			}
+		}
+	},
+	"storage": {
+		"projectTrackerUploads": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
+		}
+	},
+	"function": {}
 }

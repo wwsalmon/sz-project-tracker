@@ -13,6 +13,7 @@
     "aws-amplify": "^3.0.13",
     "aws-sdk": "^2.711.0",
     "date-fns": "^2.14.0",
+    "dotenv": "^8.2.0",
     "file-saver": "^2.0.2",
     "filepond": "^4.18.0",
     "filepond-plugin-file-validate-size": "^2.2.1",
