@@ -50,7 +50,7 @@
     "hostedUIDomainName": "projecttracker46100bbc-46100bbc",
     "authProvidersUserPool": [],
     "hostedUIProviderMeta": "[]",
-    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://sz-project-tracker-v0.netlify.app/googleredirect\"],\"LogoutURLs\":[\"https://sz-project-tracker-v0.netlify.app/\"]}",
+    "oAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"https://szpt.netlify.app/googleredirect\"],\"LogoutURLs\":[\"https://szpt.netlify.app/\"]}",
     "userPoolGroupList": [],
     "dependsOn": []
 }

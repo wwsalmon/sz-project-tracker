@@ -16,8 +16,8 @@ const awsmobile = {
             "profile",
             "aws.cognito.signin.user.admin"
         ],
-        "redirectSignIn": "https://sz-project-tracker-v0.netlify.app/googleredirect",
-        "redirectSignOut": "https://sz-project-tracker-v0.netlify.app/",
+        "redirectSignIn": "https://szpt.netlify.app/googleredirect",
+        "redirectSignOut": "https://szpt.netlify.app/",
         "responseType": "code"
     },
     "federationTarget": "COGNITO_USER_POOLS",
