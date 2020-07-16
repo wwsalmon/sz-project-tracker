@@ -107,11 +107,11 @@ export default function Project() {
 
     async function editProjectInfo() {
         let editQuery = `
-            mutation {
+            mutation edit($name: String, $descript: String) {
                 updateProject(input: {
                     id: "${id}",
-                    name: "${newProjName}",
-                    description: "${newProjDescript}"
+                    name: $name,
+                    description: $descript
                 }){
                     id name
                 }           
@@ -119,14 +119,14 @@ export default function Project() {
         editQuery += publicId ? `
                 updatePublicProject(input: {
                     id: "${publicId}",
-                    name: "${newProjName}",
-                    description: "${newProjDescript}"
+                    name: $name,
+                    description: $descript
                 }){
                     id
                 }
         ` : "";
         editQuery += "}";
-        API.graphql(graphqlOperation(editQuery)).then(res => {
+        API.graphql(graphqlOperation(editQuery, {name: newProjName, descript: newProjDescript})).then(res => {
             setProjName(newProjName);
             setProjDescript(newProjDescript);
             setIsEdit(false);
