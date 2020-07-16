@@ -56,6 +56,7 @@ export default function SignUp(){
                                     <input type="submit" className="button ~info !high w-auto block my-4"/>
                                 </div>
                             </form>
+                            <p className="mt-4 opacity-50">By signing up, you agree to receive occasional emails about SZPT. You may unsubscribe at any time.</p>
                             <hr className="my-8"/>
                             <div className="flex justify-between items-center">
                                 <p className="label">Already have an account?</p>
