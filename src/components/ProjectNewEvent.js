@@ -69,7 +69,7 @@ export default function ProjectNewEvent(props) {
               time: "${currentDate.toISOString()}",
               filenames: ${newFileUUIDs},
               note: $newNote,
-              hidden: ${!isPublic}}) {
+              hidden: true}) {
                 id
                 note
                 time
@@ -91,21 +91,22 @@ export default function ProjectNewEvent(props) {
                 const privateEventId = createPrivateData.data.createEvent.id;
                 const publicProjectId = props.publicId;
                 const createPublicQuery = `
-                mutation{
+                mutation create($newNote: String){
                    createPublicEvent(input: {
                         publicEventEventId: "${privateEventId}",
                         publicEventPublicProjectId: "${publicProjectId}",
                         time: "${currentDate.toISOString()}",
                         filenames: ${newFileUUIDs},
-                        note: """${utf8.encode(newNote)}"""}){ id }                         
+                        note: $newNote}){ id }                         
                 }`;
-                const publicEventData = await API.graphql(graphqlOperation(createPublicQuery));
+                const publicEventData = await API.graphql(graphqlOperation(createPublicQuery, {newNote: newNoteEncoded}));
                 const publicEventId = publicEventData.data.createPublicEvent.id;
                 const updatePrivateQuery = `
                 mutation{
                     updateEvent(input: {
                         id: "${privateEventId}",
-                        eventPublicEventId: "${publicEventId}"
+                        eventPublicEventId: "${publicEventId}",
+                        hidden: ${!isPublic}
                     }){
                         id
                         note

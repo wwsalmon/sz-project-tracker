@@ -90,7 +90,7 @@ export default function ProjectItem(props) {
                 const newFileUUIDs = `[${event.filenames.map(d => `"${d}"`)}]`;
                 const updateEventQ1 = `
                     mutation{
-                        updateEvent(input: {id: "${event.id}", hidden: false}){
+                        updateEvent(input: {id: "${event.id}", hidden: true}){
                             hidden project { publicProject{ id } }
                         }
                     }
@@ -99,18 +99,18 @@ export default function ProjectItem(props) {
                 const publicProjectId = update1Data.data.updateEvent.project.publicProject.id;
                 // if (publicProjectId === undefined) throw "Project is not public, failed to make update public";
                 const createPublicEventQ = `
-                    mutation{
+                    mutation create($newNote: String){
                         createPublicEvent(input: {filenames: ${newFileUUIDs},
-                        note: """${utf8.encode(newNote)}""",
+                        note: $newNote,
                         time: "${event.time}",
                         publicEventPublicProjectId: "${publicProjectId}"}){ id filenames note time publicProject { id }}
                     }    
                 `
-                const createPublicData = await API.graphql(graphqlOperation(createPublicEventQ));
+                const createPublicData = await API.graphql(graphqlOperation(createPublicEventQ, {newNote: utf8.encode(newNote)}));
                 const publicEventId = createPublicData.data.createPublicEvent.id;
                 const updateEventQ2 = `
                     mutation{
-                        updateEvent(input: {id: "${event.id}", eventPublicEventId: "${publicEventId}"}){
+                        updateEvent(input: {id: "${event.id}", eventPublicEventId: "${publicEventId}", hidden: false}){
                             id hidden filenames note time publicEvent { id } project { id publicProject { id } }
                         }
                     }
