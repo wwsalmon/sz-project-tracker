@@ -23,7 +23,8 @@ export default function Home() {
             </Helmet>
             <div className="text-center">
                 <h1 className="heading text-4xl mt-8">
-                    SZ Project Tracker <span data-tip="Expect it to be functional but possibly buggy" className="chip ~info !normal my-4">
+                    SZ Project Tracker <span data-tip="Expect it to be functional but possibly buggy"
+                                             className="chip ~info !normal my-4">
                         v0
                     </span>
                 </h1>
@@ -43,6 +44,13 @@ export default function Home() {
                         </Link>
                     </>
                 )}
+            </div>
+            <div className="my-8">
+                <a href="https://www.producthunt.com/posts/sz-project-tracker?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-sz-project-tracker"
+                   target="_blank" rel="noopener noreferrer"><img
+                    src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=214727&theme=light"
+                    alt="SZ Project Tracker - Make dev/learning/anything logging as effortless as Twitter | Product Hunt Embed"
+                    className="mx-auto" style={{width: 250, height: 54}}/></a>
             </div>
             <div className="text-center">
                 <img src={maincapture} className="my-8 max-w-xl w-full inline shadow-2xl" alt=""/>
