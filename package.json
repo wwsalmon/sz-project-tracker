@@ -19,7 +19,7 @@
     "filepond-plugin-file-validate-type": "^1.2.5",
     "filepond-plugin-image-preview": "^4.6.4",
     "html-react-parser": "^0.10.5",
-    "postcss": "^7.0.32",
+    "postcss": "^8.2.10",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-filepond": "^7.0.1",
